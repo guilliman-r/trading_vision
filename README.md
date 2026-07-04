@@ -3,7 +3,8 @@
 Trading Vision is a local-first Python application for interactive financial charts and
 explainable chart-pattern alerts. The current milestone provides a working chart, BIST-aware
 symbol search, generic Yahoo Finance symbols, local candle caching, visible data freshness, and
-closed-candle horizontal breakout, reversal, and triangle detection.
+closed-candle horizontal breakout, reversal, and triangle detection, plus a separate scanner
+process for continuous BIST monitoring.
 
 See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 
@@ -28,6 +29,34 @@ See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 
 Open <http://127.0.0.1:8050>. The first symbol load may take a few seconds; subsequent loads
 use the local SQLite cache when fresh enough.
+
+## Run the scanner
+
+Keep the UI running and start the worker in a second terminal:
+
+```bash
+.venv/bin/python -m trading_vision.worker
+```
+
+It scans only jobs due after completed BIST candles, catches up stale symbols after a restart,
+sleeps until the next relevant boundary, and stops cleanly with `Ctrl-C`. Start with a small,
+non-persisting smoke run before requesting a large Yahoo universe:
+
+```bash
+.venv/bin/python -m trading_vision.worker \
+  --once --force --dry-run --max-symbols 5 --intervals 1d
+```
+
+To scan known symbols once and persist pattern transitions:
+
+```bash
+.venv/bin/python -m trading_vision.worker \
+  --once --force --symbols THYAO GARAN --intervals 1d
+```
+
+The left panel shows the last persisted scanner heartbeat when the page loads. Run counts and
+concise per-symbol failures are stored in SQLite. See the [scanner operator guide](docs/SCANNER.md)
+for scheduling rules, commands, configuration, and diagnostics.
 
 ## Pattern engine
 
@@ -79,6 +108,15 @@ Provider validation and an equity-only review are tracked in the implementation 
 .venv/bin/ruff check .
 .venv/bin/pytest
 ```
+
+## Troubleshooting
+
+- `Another scanner owns .../scanner.lock`: another worker is active. Stop that process cleanly;
+  do not delete the lock file while it is running.
+- Yahoo errors or empty symbols: retry a small `--once --dry-run` selection. The worker records a
+  partial run and continues past bad tickers.
+- Stale heartbeat in the UI: reload the page. Live scanner dashboards are tracked in Phase 15.
+- No job fetched: due-job mode intentionally skips current candles; add `--force` for a manual run.
 
 ## Data limitations
 

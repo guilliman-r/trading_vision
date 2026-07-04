@@ -12,7 +12,7 @@ from trading_vision.ui.chart_builder import CHART_CONFIG, empty_chart
 QUICK_SYMBOLS = ("THYAO", "GARAN", "ASELS", "TUPRS", "BIMAS", "EREGL")
 
 
-def build_layout(settings: Settings) -> html.Div:
+def build_layout(settings: Settings, scanner_status: str = "Scanner not started") -> html.Div:
     return html.Div(
         id=ids.APP_ROOT,
         className="app-shell theme-dark",
@@ -21,7 +21,7 @@ def build_layout(settings: Settings) -> html.Div:
             html.Main(
                 className="workspace",
                 children=[
-                    _watchlist(),
+                    _watchlist(scanner_status),
                     _chart_panel(),
                     _details_panel(),
                 ],
@@ -69,7 +69,7 @@ def _top_bar(settings: Settings) -> html.Header:
     )
 
 
-def _watchlist() -> html.Aside:
+def _watchlist(scanner_status: str) -> html.Aside:
     buttons = [
         html.Button(
             [html.Strong(symbol), html.Span("BIST")],
@@ -85,6 +85,11 @@ def _watchlist() -> html.Aside:
             html.Div(buttons, className="watchlist"),
             html.Div(
                 [html.Span(className="pulse-dot"), html.Span("Yahoo Finance data")],
+                className="source-note",
+            ),
+            html.Div(
+                [html.Span(className="pulse-dot"), html.Span(scanner_status)],
+                id=ids.SCANNER_STATUS,
                 className="source-note",
             ),
         ],

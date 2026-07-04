@@ -38,3 +38,15 @@ development machine. Readability remains the priority until full-universe scanni
 The triangle detector fits only consecutive four-pivot candidates. Its runtime is comparable to
 the other pivot-based detectors; candidate overlap and visual density, rather than CPU time, are
 the next validation concern.
+
+## 2026-07-04 — Scanner milestone
+
+- Universe: 713 committed BIST catalog entries
+- Input per symbol: 36 deterministic daily candles from an in-memory fake provider
+- Mode: forced one-shot dry run through fetch, validation contract, SQLite cache, bounded read,
+  every detector, scan-run persistence, and heartbeat
+- Complete pass: 12.033 seconds; 16.88 ms per symbol
+
+This deliberately excludes network time and Yahoo throttling. It measures our sequential Python
+and SQLite pipeline only. A provider-backed full-universe daily/hourly measurement remains open;
+do not tune concurrency or enable the hourly universe until that evidence exists.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0 — 2026-07-04
+
+- Add a standalone scanner with continuous, one-shot, forced, limited-universe, and dry-run modes.
+- Add a one-process file lock, graceful `SIGINT`/`SIGTERM` shutdown, and boundary-aware sleeping.
+- Add data-driven BIST normal-day, weekend, holiday, and half-day scheduling for 2026.
+- Catch up missing history, bound detector input, and isolate every provider/symbol failure.
+- Persist scan-run counts, concise errors, and a scanner heartbeat visible in the UI on page load.
+- Mark BIST daily candles complete after the verified exchange session close.
+- Add fake-provider end-to-end worker, calendar, lock, partial-failure, dry-run, and UI tests.
+- Record a 713-symbol local dry-pipeline baseline without making Yahoo part of automated tests.
+
 ## 0.5.0 — 2026-07-04
 
 - Add ascending, descending, and symmetrical triangle detection from confirmed four-pivot shapes.

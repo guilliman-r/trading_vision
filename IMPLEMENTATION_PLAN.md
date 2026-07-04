@@ -752,7 +752,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0105 — P0 / XS:** Add install commands using standard `python -m venv` and `python -m pip`.
 - [x] **TV-0106 — P0 / XS:** Configure Ruff with a small, documented rule set; avoid dozens of stylistic exceptions.
 - [x] **TV-0107 — P0 / XS:** Configure pytest and a temporary database fixture.
-- [ ] **TV-0108 — P0 / XS:** Add `README.md` sections: purpose, limitations, install, run UI, run scanner, test, and troubleshoot.
+- [x] **TV-0108 — P0 / XS:** Add `README.md` sections: purpose, limitations, install, run UI, run scanner, test, and troubleshoot.
 - [x] **TV-0109 — P0 / XS:** Add `config.example.toml` with every setting commented in plain language.
 - [x] **TV-0110 — P0 / XS:** Add `.env.example` only for secrets such as notification tokens.
 - [x] **TV-0111 — P1 / S:** Add a CI workflow that installs, runs Ruff, and executes tests on one supported Python version.
@@ -843,16 +843,16 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 ### Phase 6 — Market calendar and data quality
 
 - [x] **TV-0601 — P0 / S:** Represent interval lengths and expected candle boundaries in one module.
-- [ ] **TV-0602 — P0 / M:** Implement BIST session awareness using official trading hours and holiday data that can be updated without code changes.
-- [ ] **TV-0603 — P0 / S:** Handle half days and exceptional closures through a small override data file.
-- [ ] **TV-0604 — P0 / S:** Define when daily candles become eligible for scanning.
+- [x] **TV-0602 — P0 / M:** Implement BIST session awareness using official trading hours and holiday data that can be updated without code changes.
+- [x] **TV-0603 — P0 / S:** Handle half days and exceptional closures through a small override data file.
+- [x] **TV-0604 — P0 / S:** Define when daily candles become eligible for scanning.
 - [x] **TV-0605 — P0 / M:** Validate OHLC relationships, positive prices, non-negative volume, duplicates, ordering, and timezone awareness.
 - [ ] **TV-0606 — P0 / S:** Detect gaps relative to expected session candles without inventing missing prices.
 - [ ] **TV-0607 — P0 / S:** Define stale thresholds per interval.
 - [ ] **TV-0608 — P0 / S:** Distinguish “market closed” from “feed stale.”
 - [ ] **TV-0609 — P0 / S:** Quarantine invalid rows and preserve an error summary instead of silently dropping them.
 - [ ] **TV-0610 — P1 / M:** Detect suspicious split-like jumps and compare them with corporate-action information.
-- [ ] **TV-0611 — P0 / M:** Create fixture tests for DST boundaries, weekends, holidays, half days, duplicates, and malformed OHLC.
+- [x] **TV-0611 — P0 / M:** Create fixture tests for DST boundaries, weekends, holidays, half days, duplicates, and malformed OHLC.
 - [ ] **TV-0612 — P1 / S:** Build `scripts/check_data.py` to print coverage and quality by symbol/interval.
 
 **Exit criterion:** scanners cannot unknowingly run on partial, malformed, or obviously stale data.
@@ -962,21 +962,21 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 13 — Scanner process
 
-- [ ] **TV-1301 — P0 / S:** Implement `python -m trading_vision.worker` with graceful Ctrl-C shutdown.
-- [ ] **TV-1302 — P0 / S:** Acquire a simple process lock so two local scanners do not run accidentally.
-- [ ] **TV-1303 — P0 / M:** Calculate which symbol/interval jobs are due from the last completed candle.
-- [ ] **TV-1304 — P0 / M:** Batch due symbols by interval and provider.
-- [ ] **TV-1305 — P0 / M:** Fetch, quality-check, store, detect, and persist in explicit sequential steps.
-- [ ] **TV-1306 — P0 / S:** Isolate per-batch/per-symbol failures so one bad ticker does not abort the full run.
-- [ ] **TV-1307 — P0 / S:** Persist scan-run counts and concise errors.
-- [ ] **TV-1308 — P0 / S:** Sleep only until the next relevant boundary, with a configurable provider delay.
-- [ ] **TV-1309 — P0 / S:** Avoid polling closed markets except for daily/catch-up jobs.
-- [ ] **TV-1310 — P0 / S:** Catch up missing candles after restart before scanning.
-- [ ] **TV-1311 — P0 / S:** Scan only a bounded lookback window required by the enabled detectors.
-- [ ] **TV-1312 — P0 / S:** Emit a heartbeat row or timestamp visible to the UI.
-- [ ] **TV-1313 — P0 / M:** Add an end-to-end worker test using a fake provider and temporary database.
-- [ ] **TV-1314 — P1 / M:** Add a one-shot mode for manual runs and scheduled environments.
-- [ ] **TV-1315 — P1 / S:** Add a dry-run mode that downloads/detects but does not create alerts.
+- [x] **TV-1301 — P0 / S:** Implement `python -m trading_vision.worker` with graceful Ctrl-C shutdown.
+- [x] **TV-1302 — P0 / S:** Acquire a simple process lock so two local scanners do not run accidentally.
+- [x] **TV-1303 — P0 / M:** Calculate which symbol/interval jobs are due from the last completed candle.
+- [x] **TV-1304 — P0 / M:** Batch due symbols by interval and provider.
+- [x] **TV-1305 — P0 / M:** Fetch, quality-check, store, detect, and persist in explicit sequential steps.
+- [x] **TV-1306 — P0 / S:** Isolate per-batch/per-symbol failures so one bad ticker does not abort the full run.
+- [x] **TV-1307 — P0 / S:** Persist scan-run counts and concise errors.
+- [x] **TV-1308 — P0 / S:** Sleep only until the next relevant boundary, with a configurable provider delay.
+- [x] **TV-1309 — P0 / S:** Avoid polling closed markets except for daily/catch-up jobs.
+- [x] **TV-1310 — P0 / S:** Catch up missing candles after restart before scanning.
+- [x] **TV-1311 — P0 / S:** Scan only a bounded lookback window required by the enabled detectors.
+- [x] **TV-1312 — P0 / S:** Emit a heartbeat row or timestamp visible to the UI.
+- [x] **TV-1313 — P0 / M:** Add an end-to-end worker test using a fake provider and temporary database.
+- [x] **TV-1314 — P1 / M:** Add a one-shot mode for manual runs and scheduled environments.
+- [x] **TV-1315 — P1 / S:** Add a dry-run mode that downloads/detects but does not create alerts.
 - [ ] **TV-1316 — P1 / M:** Measure full-universe duration by interval and tune only after collecting numbers.
 
 **Exit criterion:** the scanner can run unattended, recover after restart, and clearly report partial failure.

@@ -11,3 +11,10 @@ chart_candle_limit = 500
 [storage]
 database_path = "var/trading_vision.sqlite3"
 
+[scanner]
+# Start conservatively. Add "1h" after measuring provider throughput for your universe.
+intervals = ["1d"]
+batch_size = 25
+lookback_bars = 500
+provider_delay_seconds = 60
+lock_path = "var/scanner.lock"

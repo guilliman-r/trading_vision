@@ -9,10 +9,12 @@ from trading_vision.database import connection_scope, initialize_database
 from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.repositories import import_symbol_catalog, seed_symbols
+from trading_vision.scanner_repository import get_heartbeat
 from trading_vision.services.market_data import MarketDataService
 from trading_vision.services.pattern_scan import PatternScanService
 from trading_vision.ui.callbacks import register_callbacks
 from trading_vision.ui.layout import build_layout
+from trading_vision.ui.scanner_status import scanner_status_text
 
 CATALOG_PATH = PROJECT_ROOT / "data" / "catalogs" / "bist_symbols.csv"
 FALLBACK_SYMBOLS = (
@@ -31,6 +33,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
     with connection_scope(settings.database_path) as connection:
         import_symbol_catalog(connection, CATALOG_PATH)
         seed_symbols(connection, FALLBACK_SYMBOLS)
+        scanner_status = scanner_status_text(get_heartbeat(connection))
 
     data_provider = provider or YahooFinanceProvider()
 
@@ -54,7 +57,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         update_title="Loading market data…",
         suppress_callback_exceptions=False,
     )
-    app.layout = build_layout(settings)
+    app.layout = build_layout(settings, scanner_status)
     register_callbacks(app, load_chart)
     return app
 

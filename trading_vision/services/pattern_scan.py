@@ -50,12 +50,7 @@ class PatternScanService:
     ) -> PatternScanResult:
         if symbol.id is None:
             raise ValueError("A stored symbol is required for pattern persistence")
-        matches = [
-            *detect_horizontal_breakouts(candles, self.breakout_settings),
-            *detect_double_patterns(candles, self.double_pattern_settings),
-            *detect_head_shoulders_patterns(candles, self.head_shoulders_settings),
-            *detect_triangles(candles, self.triangle_settings),
-        ]
+        matches = self.detect(candles)
         transitions = 0
         for match in matches:
             pattern_id = stable_pattern_id(symbol.provider_symbol, interval, match)
@@ -63,4 +58,15 @@ class PatternScanService:
                 upsert_pattern(self.connection, pattern_id, symbol.id, interval, match)
             )
         self.connection.commit()
-        return PatternScanResult(tuple(matches), transitions)
+        return PatternScanResult(matches, transitions)
+
+    def detect(self, candles: pd.DataFrame) -> tuple[PatternMatch, ...]:
+        """Run enabled detectors without writing results."""
+
+        matches = [
+            *detect_horizontal_breakouts(candles, self.breakout_settings),
+            *detect_double_patterns(candles, self.double_pattern_settings),
+            *detect_head_shoulders_patterns(candles, self.head_shoulders_settings),
+            *detect_triangles(candles, self.triangle_settings),
+        ]
+        return tuple(matches)
