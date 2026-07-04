@@ -18,3 +18,8 @@ batch_size = 25
 lookback_bars = 500
 provider_delay_seconds = 60
 lock_path = "var/scanner.lock"
+
+[alerts]
+minimum_score = 70
+# The more ambiguous detectors stay excluded until frozen real examples are reviewed.
+enabled_pattern_types = ["resistance_breakout", "support_breakdown"]

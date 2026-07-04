@@ -92,6 +92,9 @@ transition, status, and concise error counts. Status is:
 - `failed`: every requested symbol failed;
 - `running`: the row was created but has not reached a terminal update.
 
+New confirmed transitions can create in-app alerts according to `config.toml`. `--dry-run` executes
+detectors but persists neither pattern transitions nor alerts.
+
 `scanner_heartbeat` is a one-row current status record containing process ID, start/update time,
 next wake time, last run, and a short message. The UI reads it when the page loads.
 

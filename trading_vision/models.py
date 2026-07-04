@@ -72,3 +72,42 @@ class PatternMatch:
     reasons: tuple[str, ...]
     parameters: dict[str, Any]
     detector_version: str
+
+
+@dataclass(frozen=True, slots=True)
+class PatternTransition:
+    id: int
+    pattern_id: str
+    old_state: str | None
+    new_state: str
+    changed_at: datetime
+    reason: str
+
+
+@dataclass(frozen=True, slots=True)
+class AlertRule:
+    id: int
+    name: str
+    minimum_score: float
+    required_state: str
+    pattern_types: tuple[str, ...]
+    is_active: bool
+
+
+@dataclass(frozen=True, slots=True)
+class AlertEvent:
+    id: int
+    fingerprint: str
+    pattern_id: str
+    provider_symbol: str
+    interval: str
+    pattern_type: str
+    direction: str
+    state: str
+    score: float
+    event_at: datetime
+    boundary_price: float
+    target_price: float | None
+    app_link: str
+    created_at: datetime
+    acknowledged_at: datetime | None

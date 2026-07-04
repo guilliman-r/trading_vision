@@ -34,3 +34,13 @@ def test_loads_scanner_settings_and_resolves_lock_path(tmp_path: Path) -> None:
     assert settings.scanner_lookback_bars == 400
     assert settings.provider_delay_seconds == 90
     assert settings.scanner_lock_path.is_absolute()
+
+
+def test_loads_and_validates_alert_settings(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text('[alerts]\nminimum_score = 80\nenabled_pattern_types = ["double_top"]\n')
+    settings = load_settings(config_path)
+    assert settings.minimum_alert_score == 80
+    assert settings.alert_pattern_types == ("double_top",)
+    with pytest.raises(ValueError, match="minimum_alert_score"):
+        Settings(minimum_alert_score=101).validate()

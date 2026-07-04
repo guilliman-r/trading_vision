@@ -3,16 +3,22 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from urllib.parse import parse_qs
 
 from dash import ALL, Input, Output, State, ctx, html
 
 from trading_vision.services.market_data import ChartLoadResult
 from trading_vision.ui import ids
+from trading_vision.ui.alert_views import render_alerts
 from trading_vision.ui.chart_builder import build_chart, empty_chart
 from trading_vision.ui.layout import detail_rows
 
 
-def register_callbacks(app, load_chart: Callable[[str, str], ChartLoadResult]) -> None:
+def register_callbacks(
+    app,
+    load_chart: Callable[[str, str], ChartLoadResult],
+    update_alerts: Callable[[str | None, int | None], tuple[int, tuple]],
+) -> None:
     @app.callback(
         Output(ids.CHART, "figure"),
         Output(ids.CHART_TITLE, "children"),
@@ -25,13 +31,28 @@ def register_callbacks(app, load_chart: Callable[[str, str], ChartLoadResult]) -
         Input(ids.REFRESH_BUTTON, "n_clicks"),
         Input(ids.INTERVAL_SELECT, "value"),
         Input({"type": ids.QUICK_SYMBOL_TYPE, "symbol": ALL}, "n_clicks"),
+        Input(ids.URL, "search"),
         State(ids.SYMBOL_INPUT, "value"),
     )
-    def update_chart(_load, _submit, _refresh, interval, _quick_clicks, typed_symbol):
+    def update_chart(
+        _load,
+        _submit,
+        _refresh,
+        interval,
+        _quick_clicks,
+        url_search,
+        typed_symbol,
+    ):
         requested = typed_symbol or ""
         triggered = ctx.triggered_id
         if isinstance(triggered, dict) and triggered.get("type") == ids.QUICK_SYMBOL_TYPE:
             requested = triggered["symbol"]
+        elif triggered == ids.URL or (triggered is None and url_search):
+            query = parse_qs((url_search or "").lstrip("?"))
+            requested = query.get("symbol", [requested])[0]
+            requested_interval = query.get("interval", [interval])[0]
+            if requested_interval in {"1d", "1h", "15m", "5m"}:
+                interval = requested_interval
         try:
             result = load_chart(requested, interval)
             if result.candles.empty:
@@ -65,6 +86,29 @@ def register_callbacks(app, load_chart: Callable[[str, str], ChartLoadResult]) -
         if clicks and clicks % 2:
             return "app-shell theme-light", "Dark mode"
         return "app-shell theme-dark", "Light mode"
+
+    @app.callback(
+        Output(ids.ALERT_COUNT, "children"),
+        Output(ids.ALERT_LIST, "children"),
+        Input(ids.ALERT_POLL, "n_intervals"),
+        Input(ids.ALERT_ACK_ALL, "n_clicks"),
+        Input({"type": ids.ALERT_ACK_TYPE, "alert_id": ALL}, "n_clicks"),
+        Input({"type": ids.ALERT_MUTE_TYPE, "alert_id": ALL}, "n_clicks"),
+    )
+    def refresh_alerts(_poll, _ack_all, _ack_clicks, _mute_clicks):
+        action = None
+        alert_id = None
+        triggered = ctx.triggered_id
+        if triggered == ids.ALERT_ACK_ALL:
+            action = "acknowledge_all"
+        elif isinstance(triggered, dict):
+            alert_id = int(triggered["alert_id"])
+            if triggered.get("type") == ids.ALERT_ACK_TYPE:
+                action = "acknowledge"
+            elif triggered.get("type") == ids.ALERT_MUTE_TYPE:
+                action = "mute"
+        unread, events = update_alerts(action, alert_id)
+        return str(unread), render_alerts(events)
 
 
 def _successful_chart_result(result: ChartLoadResult, interval: str):

@@ -17,6 +17,8 @@ def build_layout(settings: Settings, scanner_status: str = "Scanner not started"
         id=ids.APP_ROOT,
         className="app-shell theme-dark",
         children=[
+            dcc.Location(id=ids.URL, refresh=False),
+            dcc.Interval(id=ids.ALERT_POLL, interval=15_000, n_intervals=0),
             _top_bar(settings),
             html.Main(
                 className="workspace",
@@ -64,6 +66,10 @@ def _top_bar(settings: Settings) -> html.Header:
                 className="interval-select",
             ),
             html.Button("Refresh", id=ids.REFRESH_BUTTON, className="button secondary"),
+            html.Div(
+                [html.Span("Alerts"), html.Strong("0", id=ids.ALERT_COUNT)],
+                className="alert-indicator",
+            ),
             html.Button("Light mode", id=ids.THEME_BUTTON, className="button ghost"),
         ],
     )
@@ -129,6 +135,26 @@ def _details_panel() -> html.Aside:
         children=[
             html.Div([html.H2("Instrument"), html.Span("Snapshot")], className="panel-heading"),
             html.Div(id=ids.DETAILS, className="details", children=_empty_details()),
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            html.H2("Alerts"),
+                            html.Button(
+                                "Acknowledge all",
+                                id=ids.ALERT_ACK_ALL,
+                                className="alert-ack-all",
+                            ),
+                        ],
+                        className="alert-center-heading",
+                    ),
+                    html.Div(
+                        id=ids.ALERT_LIST,
+                        children=[html.P("No pattern alerts yet.", className="alert-empty")],
+                    ),
+                ],
+                className="alert-center",
+            ),
         ],
     )
 

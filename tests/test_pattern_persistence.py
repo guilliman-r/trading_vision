@@ -6,12 +6,12 @@ from tests.test_head_shoulders import head_shoulders_fixture, head_shoulders_set
 from tests.test_triangles import ascending_triangle_fixture, triangle_settings
 from trading_vision.database import connect
 from trading_vision.models import Symbol
-from trading_vision.patterns.scoring import stable_pattern_id
-from trading_vision.repositories import (
+from trading_vision.pattern_repository import (
     count_pattern_transitions,
     get_pattern,
-    upsert_symbol,
 )
+from trading_vision.patterns.scoring import stable_pattern_id
+from trading_vision.repositories import upsert_symbol
 from trading_vision.services.pattern_scan import PatternScanService
 
 

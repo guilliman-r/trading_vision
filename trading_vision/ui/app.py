@@ -4,6 +4,13 @@ from __future__ import annotations
 
 from dash import Dash
 
+from trading_vision.alert_repository import (
+    acknowledge_alert,
+    acknowledge_all_alerts,
+    list_recent_alerts,
+    mute_alert_pattern,
+    unread_alert_count,
+)
 from trading_vision.config import PROJECT_ROOT, Settings, load_settings
 from trading_vision.database import connection_scope, initialize_database
 from trading_vision.models import Symbol
@@ -46,10 +53,24 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
             )
             result = market_data.load(symbol_query, interval)
             if not result.candles.empty:
-                pattern_scan = PatternScanService(connection)
+                pattern_scan = PatternScanService(
+                    connection,
+                    minimum_alert_score=settings.minimum_alert_score,
+                    alert_pattern_types=settings.alert_pattern_types,
+                )
                 scan_result = pattern_scan.scan(result.symbol, interval, result.candles)
                 result.patterns = scan_result.matches
             return result
+
+    def update_alerts(action: str | None, alert_id: int | None):
+        with connection_scope(settings.database_path) as connection:
+            if action == "acknowledge" and alert_id is not None:
+                acknowledge_alert(connection, alert_id)
+            elif action == "acknowledge_all":
+                acknowledge_all_alerts(connection)
+            elif action == "mute" and alert_id is not None:
+                mute_alert_pattern(connection, alert_id)
+            return unread_alert_count(connection), tuple(list_recent_alerts(connection))
 
     app = Dash(
         __name__,
@@ -58,7 +79,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         suppress_callback_exceptions=False,
     )
     app.layout = build_layout(settings, scanner_status)
-    register_callbacks(app, load_chart)
+    register_callbacks(app, load_chart, update_alerts)
     return app
 
 

@@ -9,6 +9,17 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SUPPORTED_INTERVALS = ("1d", "1h", "15m", "5m")
+SUPPORTED_PATTERN_TYPES = (
+    "resistance_breakout",
+    "support_breakdown",
+    "double_top",
+    "double_bottom",
+    "head_shoulders",
+    "inverse_head_shoulders",
+    "ascending_triangle",
+    "descending_triangle",
+    "symmetrical_triangle",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,6 +38,11 @@ class Settings:
     scanner_lookback_bars: int = 500
     provider_delay_seconds: int = 60
     scanner_lock_path: Path = PROJECT_ROOT / "var" / "scanner.lock"
+    minimum_alert_score: float = 70.0
+    alert_pattern_types: tuple[str, ...] = (
+        "resistance_breakout",
+        "support_breakdown",
+    )
 
     def validate(self) -> Settings:
         if self.default_interval not in SUPPORTED_INTERVALS:
@@ -48,6 +64,12 @@ class Settings:
             raise ValueError("scanner_lookback_bars must be between 350 and 5000")
         if not 0 <= self.provider_delay_seconds <= 3_600:
             raise ValueError("provider_delay_seconds must be between 0 and 3600")
+        if not 0 <= self.minimum_alert_score <= 100:
+            raise ValueError("minimum_alert_score must be between 0 and 100")
+        invalid_pattern_types = set(self.alert_pattern_types).difference(SUPPORTED_PATTERN_TYPES)
+        if invalid_pattern_types:
+            invalid = ", ".join(sorted(invalid_pattern_types))
+            raise ValueError(f"Unsupported alert pattern types: {invalid}")
         return self
 
 
@@ -62,6 +84,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
         app = document.get("app", {})
         storage = document.get("storage", {})
         scanner = document.get("scanner", {})
+        alerts = document.get("alerts", {})
         raw_database_path = storage.get("database_path", str(settings.database_path))
         database_path = Path(raw_database_path)
         if not database_path.is_absolute():
@@ -86,6 +109,10 @@ def load_settings(config_path: Path | None = None) -> Settings:
                 scanner.get("provider_delay_seconds", settings.provider_delay_seconds)
             ),
             scanner_lock_path=scanner_lock_path,
+            minimum_alert_score=float(alerts.get("minimum_score", settings.minimum_alert_score)),
+            alert_pattern_types=tuple(
+                alerts.get("enabled_pattern_types", settings.alert_pattern_types)
+            ),
         )
 
     environment_values: dict[str, object] = {}

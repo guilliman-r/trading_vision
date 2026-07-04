@@ -785,10 +785,10 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0304 — P0 / S:** Implement symbol upsert, get, search, list-active, and mark-inactive functions.
 - [x] **TV-0305 — P0 / M:** Implement bulk candle upsert in a transaction.
 - [ ] **TV-0306 — P0 / S:** Implement candle range and latest-candle queries.
-- [ ] **TV-0307 — P0 / M:** Implement pattern upsert and immutable transition append in one transaction.
-- [ ] **TV-0308 — P0 / S:** Implement scan-run start/finish/fail operations.
+- [x] **TV-0307 — P0 / M:** Implement pattern upsert and immutable transition append in one transaction.
+- [x] **TV-0308 — P0 / S:** Implement scan-run start/finish/fail operations.
 - [ ] **TV-0309 — P0 / S:** Implement watchlist create, reorder, add, and remove operations.
-- [ ] **TV-0310 — P0 / M:** Implement alert rule/event queries and unique deduplication fingerprints.
+- [x] **TV-0310 — P0 / M:** Implement alert rule/event queries and unique deduplication fingerprints.
 - [ ] **TV-0311 — P1 / S:** Implement drawings save/load/delete operations.
 - [ ] **TV-0312 — P0 / M:** Test every repository against a fresh temporary database.
 - [ ] **TV-0313 — P0 / S:** Test migration idempotency and upgrade from each committed schema fixture.
@@ -983,16 +983,16 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 14 — Alert rules and notification center
 
-- [ ] **TV-1401 — P0 / S:** Create one default rule: newly confirmed enabled patterns above a configurable score.
-- [ ] **TV-1402 — P0 / M:** Evaluate rules only against newly appended pattern transitions.
-- [ ] **TV-1403 — P0 / S:** Generate a unique alert fingerprint.
-- [ ] **TV-1404 — P0 / S:** Create in-app alert events transactionally with pattern transitions.
-- [ ] **TV-1405 — P0 / S:** Display unread count and newest alerts in the UI.
-- [ ] **TV-1406 — P0 / S:** Implement acknowledge, acknowledge-all, and mute-pattern actions.
-- [ ] **TV-1407 — P0 / S:** Include symbol, interval, type, state, score, time, boundary, target, and app link.
-- [ ] **TV-1408 — P0 / S:** Never send a second alert for score-only changes.
-- [ ] **TV-1409 — P0 / M:** Add tests for duplicate scans, restarts, state changes, and muted rules.
-- [ ] **TV-1410 — P1 / M:** Add a notification adapter interface.
+- [x] **TV-1401 — P0 / S:** Create one default rule: newly confirmed enabled patterns above a configurable score.
+- [x] **TV-1402 — P0 / M:** Evaluate rules only against newly appended pattern transitions.
+- [x] **TV-1403 — P0 / S:** Generate a unique alert fingerprint.
+- [x] **TV-1404 — P0 / S:** Create in-app alert events transactionally with pattern transitions.
+- [x] **TV-1405 — P0 / S:** Display unread count and newest alerts in the UI.
+- [x] **TV-1406 — P0 / S:** Implement acknowledge, acknowledge-all, and mute-pattern actions.
+- [x] **TV-1407 — P0 / S:** Include symbol, interval, type, state, score, time, boundary, target, and app link.
+- [x] **TV-1408 — P0 / S:** Never send a second alert for score-only changes.
+- [x] **TV-1409 — P0 / M:** Add tests for duplicate scans, restarts, state changes, and muted rules.
+- [x] **TV-1410 — P1 / M:** Add a notification adapter interface.
 - [ ] **TV-1411 — P1 / M:** Implement one external channel chosen by the user, preferably Telegram for a personal deployment.
 - [ ] **TV-1412 — P1 / S:** Store channel secrets only in environment variables.
 - [ ] **TV-1413 — P1 / S:** Add a visible “send test notification” action.

@@ -128,6 +128,7 @@ def _load_callback_request(app) -> dict:
                 "property": "n_clicks",
                 "value": [None, None, None, None, None, None],
             },
+            {"id": "app-url", "property": "search", "value": ""},
         ],
         "state": [{"id": "symbol-input", "property": "value", "value": "THYAO"}],
         "changedPropIds": ["load-button.n_clicks"],

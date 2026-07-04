@@ -58,6 +58,17 @@ The left panel shows the last persisted scanner heartbeat when the page loads. R
 concise per-symbol failures are stored in SQLite. See the [scanner operator guide](docs/SCANNER.md)
 for scheduling rules, commands, configuration, and diagnostics.
 
+## Alerts
+
+Newly confirmed enabled patterns above the configured score create one deduplicated in-app alert.
+The top bar shows the unread count; the right panel lists recent alerts with chart context,
+acknowledge, acknowledge-all, and mute-pattern actions. By default only horizontal resistance and
+support confirmations are enabled. Head-and-shoulders and triangles remain excluded until their
+real-world validation backlog is complete.
+
+See the [alert guide](docs/ALERTS.md) for freshness, deduplication, configuration, and safety rules.
+No external Telegram or email delivery is enabled yet.
+
 ## Pattern engine
 
 The first detector finds repeated horizontal resistance and support levels. It:

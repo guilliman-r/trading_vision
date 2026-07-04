@@ -198,7 +198,11 @@ class ScannerService:
                 job.interval,
                 self.settings.scanner_lookback_bars,
             )
-            pattern_scan = PatternScanService(connection)
+            pattern_scan = PatternScanService(
+                connection,
+                minimum_alert_score=self.settings.minimum_alert_score,
+                alert_pattern_types=self.settings.alert_pattern_types,
+            )
             if dry_run:
                 pattern_scan.detect(candles)
                 transitions = 0

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0 — 2026-07-04
+
+- Add configurable in-app alert rules evaluated only for newly persisted pattern transitions.
+- Enable recent confirmed horizontal breakouts by default while keeping ambiguous detectors off.
+- Add stable alert fingerprints and database uniqueness so rescans and restarts cannot duplicate.
+- Create pattern transitions and matching alert events in the same SQLite transaction.
+- Suppress stale historical confirmations while preserving forming-pattern catch-up alerts.
+- Add an unread counter, recent alert cards, chart context links, acknowledge-all, and mute actions.
+- Include symbol, interval, type, direction, state, score, event time, boundary, target, and app link.
+- Add a replaceable notification adapter contract without enabling an external delivery channel.
+- Add lifecycle, threshold, mute, inactive-rule, rollback, restart, fingerprint, and Dash tests.
+
 ## 0.6.0 — 2026-07-04
 
 - Add a standalone scanner with continuous, one-shot, forced, limited-universe, and dry-run modes.
