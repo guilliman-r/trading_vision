@@ -19,6 +19,7 @@ from trading_vision.repositories import import_symbol_catalog, seed_symbols
 from trading_vision.scanner_repository import get_heartbeat
 from trading_vision.services.market_data import MarketDataService
 from trading_vision.services.pattern_scan import PatternScanService
+from trading_vision.services.scanner_results import ScannerResultsService
 from trading_vision.ui.callbacks import register_callbacks
 from trading_vision.ui.layout import build_layout
 from trading_vision.ui.scanner_status import scanner_status_text
@@ -72,6 +73,14 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
                 mute_alert_pattern(connection, alert_id)
             return unread_alert_count(connection), tuple(list_recent_alerts(connection))
 
+    def load_scanner(filters):
+        with connection_scope(settings.database_path) as connection:
+            return ScannerResultsService(connection, settings).load(filters)
+
+    def export_scanner(filters):
+        with connection_scope(settings.database_path) as connection:
+            return ScannerResultsService(connection, settings).export_csv(filters)
+
     app = Dash(
         __name__,
         title="Trading Vision",
@@ -79,7 +88,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         suppress_callback_exceptions=False,
     )
     app.layout = build_layout(settings, scanner_status)
-    register_callbacks(app, load_chart, update_alerts)
+    register_callbacks(app, load_chart, update_alerts, load_scanner, export_scanner)
     return app
 
 

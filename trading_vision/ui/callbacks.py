@@ -5,19 +5,23 @@ from __future__ import annotations
 from collections.abc import Callable
 from urllib.parse import parse_qs
 
-from dash import ALL, Input, Output, State, ctx, html
+from dash import ALL, Input, Output, State, ctx, dcc, html
 
+from trading_vision.scanner_results import PatternResultFilters, ScannerResultsSnapshot
 from trading_vision.services.market_data import ChartLoadResult
 from trading_vision.ui import ids
 from trading_vision.ui.alert_views import render_alerts
 from trading_vision.ui.chart_builder import build_chart, empty_chart
 from trading_vision.ui.layout import detail_rows
+from trading_vision.ui.scanner_views import diagnostic_cards, render_result_table
 
 
 def register_callbacks(
     app,
     load_chart: Callable[[str, str], ChartLoadResult],
     update_alerts: Callable[[str | None, int | None], tuple[int, tuple]],
+    load_scanner: Callable[[PatternResultFilters], ScannerResultsSnapshot],
+    export_scanner: Callable[[PatternResultFilters], str],
 ) -> None:
     @app.callback(
         Output(ids.CHART, "figure"),
@@ -110,6 +114,80 @@ def register_callbacks(
         unread, events = update_alerts(action, alert_id)
         return str(unread), render_alerts(events)
 
+    @app.callback(
+        Output(ids.SCANNER_TABLE, "children"),
+        Output(ids.SCANNER_DIAGNOSTICS, "children"),
+        Output(ids.SCANNER_RESULT_COUNT, "children"),
+        Input(ids.SCANNER_POLL, "n_intervals"),
+        Input(ids.SCANNER_REFRESH, "n_clicks"),
+        Input(ids.FILTER_SYMBOL, "value"),
+        Input(ids.FILTER_INTERVAL, "value"),
+        Input(ids.FILTER_PATTERN, "value"),
+        Input(ids.FILTER_DIRECTION, "value"),
+        Input(ids.FILTER_STATE, "value"),
+        Input(ids.FILTER_SCORE, "value"),
+        Input(ids.FILTER_AGE, "value"),
+    )
+    def refresh_scanner(
+        _poll,
+        _refresh,
+        symbol,
+        interval,
+        pattern_type,
+        direction,
+        state,
+        minimum_score,
+        lookback_days,
+    ):
+        filters = _result_filters(
+            symbol,
+            interval,
+            pattern_type,
+            direction,
+            state,
+            minimum_score,
+            lookback_days,
+        )
+        snapshot = load_scanner(filters)
+        return (
+            render_result_table(snapshot.rows),
+            diagnostic_cards(snapshot.diagnostics),
+            f"{len(snapshot.rows):,} results",
+        )
+
+    @app.callback(
+        Output(ids.SCANNER_DOWNLOAD, "data"),
+        Input(ids.SCANNER_EXPORT, "n_clicks"),
+        State(ids.FILTER_SYMBOL, "value"),
+        State(ids.FILTER_INTERVAL, "value"),
+        State(ids.FILTER_PATTERN, "value"),
+        State(ids.FILTER_DIRECTION, "value"),
+        State(ids.FILTER_STATE, "value"),
+        State(ids.FILTER_SCORE, "value"),
+        State(ids.FILTER_AGE, "value"),
+        prevent_initial_call=True,
+    )
+    def export_scanner_csv(
+        _clicks,
+        symbol,
+        interval,
+        pattern_type,
+        direction,
+        state,
+        minimum_score,
+        lookback_days,
+    ):
+        filters = _result_filters(
+            symbol,
+            interval,
+            pattern_type,
+            direction,
+            state,
+            minimum_score,
+            lookback_days,
+        )
+        return dcc.send_string(export_scanner(filters), "trading-vision-patterns.csv")
+
 
 def _successful_chart_result(result: ChartLoadResult, interval: str):
     candles = result.candles
@@ -141,4 +219,24 @@ def _successful_chart_result(result: ChartLoadResult, interval: str):
         status_class,
         details,
         result.symbol.provider_symbol,
+    )
+
+
+def _result_filters(
+    symbol,
+    interval,
+    pattern_type,
+    direction,
+    state,
+    minimum_score,
+    lookback_days,
+) -> PatternResultFilters:
+    return PatternResultFilters(
+        symbol=(symbol or "").strip(),
+        interval=interval or "",
+        pattern_type=pattern_type or "",
+        direction=direction or "",
+        state=state or "",
+        minimum_score=float(minimum_score or 0),
+        lookback_days=int(lookback_days or 0),
     )

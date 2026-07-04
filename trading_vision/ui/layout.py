@@ -8,6 +8,7 @@ from trading_vision.config import SUPPORTED_INTERVALS, Settings
 from trading_vision.models import PatternMatch
 from trading_vision.ui import ids
 from trading_vision.ui.chart_builder import CHART_CONFIG, empty_chart
+from trading_vision.ui.scanner_views import build_scanner_workspace
 
 QUICK_SYMBOLS = ("THYAO", "GARAN", "ASELS", "TUPRS", "BIMAS", "EREGL")
 
@@ -28,6 +29,7 @@ def build_layout(settings: Settings, scanner_status: str = "Scanner not started"
                     _details_panel(),
                 ],
             ),
+            build_scanner_workspace(),
         ],
     )
 

@@ -69,7 +69,7 @@ delete history.
 
 ## External delivery
 
-`NotificationAdapter` is the replaceable contract for a future Telegram, email, or desktop sender.
-No external channel is enabled, no delivery credentials are requested, and no network message is
-sent in v0.7. Delivery persistence, retries, test-message controls, and visible permanent failures
-remain open roadmap items.
+`NotificationAdapter` is the replaceable contract for a future external sender only if one is later
+chosen. Telegram is explicitly excluded by product decision. No external channel is enabled, no
+delivery credentials are requested, and no network message is sent in v0.8. Delivery persistence,
+retries, test-message controls, and visible permanent failures remain open roadmap items.

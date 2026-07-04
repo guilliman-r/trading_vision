@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.8.0 — 2026-07-05
+
+- Add a full-width scanner operations workspace below the interactive chart.
+- Add server-side symbol, interval, pattern, direction, state, score, and age filters.
+- Link every persisted result back to its symbol and interval chart context.
+- Show score-reason previews with native expandable full explanations in each result row.
+- Add CSV export that uses the exact active server-side filters.
+- Display heartbeat, next wake, last run duration/counts, database path/size, package versions,
+  provider run state, and recent scanner errors.
+- Use a plain HTML table rather than adopting Dash's deprecated built-in DataTable.
+- Add repository, SQL-binding, CSV, diagnostics, rendering, and callback tests.
+- Record Telegram as explicitly excluded from the external notification roadmap.
+
 ## 0.7.0 — 2026-07-04
 
 - Add configurable in-app alert rules evaluated only for newly persisted pattern transitions.

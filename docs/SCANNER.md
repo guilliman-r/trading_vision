@@ -111,3 +111,6 @@ sqlite3 var/trading_vision.sqlite3 \
 Yahoo Finance is an unofficial personal-research source and can throttle a large universe. Test a
 small dry run first. Partial failures are expected diagnostic outcomes, not reasons to discard the
 successful symbols.
+
+The dashboard's [scanner results workspace](SCANNER_RESULTS.md) exposes these runs, persisted
+patterns, filters, CSV export, and diagnostics without requiring SQLite commands.

@@ -42,6 +42,7 @@ def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None
     assert b"Trading Vision" in page.data
     assert layout.status_code == 200
     assert b'"app-root"' in layout.data
+    assert b'"scanner-results-table"' in layout.data
     assert dependencies.status_code == 200
     assert b"price-chart.figure" in dependencies.data
     assert stylesheet.status_code == 200

@@ -67,7 +67,17 @@ support confirmations are enabled. Head-and-shoulders and triangles remain exclu
 real-world validation backlog is complete.
 
 See the [alert guide](docs/ALERTS.md) for freshness, deduplication, configuration, and safety rules.
-No external Telegram or email delivery is enabled yet.
+Telegram is intentionally excluded. No external delivery channel is currently enabled.
+
+## Scanner results and diagnostics
+
+Scroll below the chart to inspect persisted detections across the scanned universe. The operations
+workspace filters by symbol, interval, pattern, direction, state, score, and age. Every row links
+back to its chart and expands to show all score reasons. CSV export uses the active filters.
+
+The same workspace shows scanner heartbeat, next wake time, latest run duration and success/failure
+counts, database path and size, package versions, provider run state, and recent errors. See the
+[scanner results guide](docs/SCANNER_RESULTS.md).
 
 ## Pattern engine
 

@@ -320,7 +320,7 @@ Do not overload states with alert delivery status.
 
 ### 5.6 Alert event
 
-An immutable record that a pattern changed state or crossed a user rule. A separate delivery record tracks whether each UI, desktop, email, or Telegram notification succeeded.
+An immutable record that a pattern changed state or crossed a user rule. A separate delivery record tracks whether each in-app or explicitly selected external notification succeeded.
 
 ---
 
@@ -993,7 +993,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-1408 — P0 / S:** Never send a second alert for score-only changes.
 - [x] **TV-1409 — P0 / M:** Add tests for duplicate scans, restarts, state changes, and muted rules.
 - [x] **TV-1410 — P1 / M:** Add a notification adapter interface.
-- [ ] **TV-1411 — P1 / M:** Implement one external channel chosen by the user, preferably Telegram for a personal deployment.
+- [ ] **TV-1411 — P1 / M:** Implement one external channel only if the user later chooses one; Telegram is explicitly excluded.
 - [ ] **TV-1412 — P1 / S:** Store channel secrets only in environment variables.
 - [ ] **TV-1413 — P1 / S:** Add a visible “send test notification” action.
 - [ ] **TV-1414 — P1 / M:** Retry transient delivery failures with a strict attempt limit.
@@ -1003,19 +1003,19 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 15 — Scanner and settings UI
 
-- [ ] **TV-1501 — P0 / M:** Build the scanner results table with server-side repository filtering.
-- [ ] **TV-1502 — P0 / S:** Add pattern, direction, state, interval, score, symbol, and time filters.
+- [x] **TV-1501 — P0 / M:** Build the scanner results table with server-side repository filtering.
+- [x] **TV-1502 — P0 / S:** Add pattern, direction, state, interval, score, symbol, and time filters.
 - [ ] **TV-1503 — P0 / S:** Link table rows to the relevant chart and visible date range.
-- [ ] **TV-1504 — P0 / S:** Add score-reason preview and full detail panel.
-- [ ] **TV-1505 — P0 / S:** Display last scanner heartbeat, last run, duration, successes, and failures.
-- [ ] **TV-1506 — P0 / S:** Add CSV export for the currently filtered table.
+- [x] **TV-1504 — P0 / S:** Add score-reason preview and full detail panel.
+- [x] **TV-1505 — P0 / S:** Display last scanner heartbeat, last run, duration, successes, and failures.
+- [x] **TV-1506 — P0 / S:** Add CSV export for the currently filtered table.
 - [ ] **TV-1507 — P0 / M:** Build detector settings forms from explicit UI code, not dynamic reflection magic.
 - [ ] **TV-1508 — P0 / S:** Validate settings before saving and show field-specific errors.
 - [ ] **TV-1509 — P0 / S:** Add reset-to-default per detector.
 - [ ] **TV-1510 — P0 / S:** Add watchlist management and scan-interval controls.
 - [ ] **TV-1511 — P1 / S:** Add data-retention controls with a preview of what will be deleted.
-- [ ] **TV-1512 — P1 / M:** Add a diagnostics page for package versions, paths, database size, provider health, and recent errors.
-- [ ] **TV-1513 — P0 / M:** Test callback service boundaries and key page smoke paths.
+- [x] **TV-1512 — P1 / M:** Add a diagnostics page for package versions, paths, database size, provider health, and recent errors.
+- [x] **TV-1513 — P0 / M:** Test callback service boundaries and key page smoke paths.
 
 **Exit criterion:** normal operation and tuning require no database or code edits.
 

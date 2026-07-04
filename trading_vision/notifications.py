@@ -14,7 +14,7 @@ class DeliveryResult:
 
 
 class NotificationAdapter:
-    """Base class implemented by future Telegram, email, or desktop channels."""
+    """Base class implemented only if a future external channel is selected."""
 
     name = "unknown"
 
