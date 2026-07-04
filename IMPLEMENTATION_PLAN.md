@@ -883,34 +883,34 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 8 — Shared pivot and scoring foundation
 
-- [ ] **TV-0801 — P0 / S:** Implement true range and ATR with formula comments and tests.
-- [ ] **TV-0802 — P0 / M:** Implement confirmed local-high/local-low pivot extraction.
-- [ ] **TV-0803 — P0 / S:** Record both pivot time and knowledge/confirmation time.
-- [ ] **TV-0804 — P0 / S:** Remove adjacent same-kind pivots by retaining the more extreme one.
-- [ ] **TV-0805 — P0 / S:** Calculate percent and ATR prominence.
-- [ ] **TV-0806 — P0 / S:** Implement line fitting/value helpers and explain input units.
-- [ ] **TV-0807 — P0 / S:** Implement breakout/breakdown tests on completed closes.
-- [ ] **TV-0808 — P0 / S:** Implement rolling median volume ratio with null/zero handling.
-- [ ] **TV-0809 — P0 / M:** Implement score components and human-readable reasons.
-- [ ] **TV-0810 — P0 / S:** Implement stable fingerprints.
-- [ ] **TV-0811 — P0 / M:** Generate synthetic trend, range, and noise fixtures.
-- [ ] **TV-0812 — P0 / M:** Prove in tests that truncating future candles does not alter already knowable pivots.
-- [ ] **TV-0813 — P0 / S:** Benchmark pivot extraction over the maximum planned candle window.
+- [x] **TV-0801 — P0 / S:** Implement true range and ATR with formula comments and tests.
+- [x] **TV-0802 — P0 / M:** Implement confirmed local-high/local-low pivot extraction.
+- [x] **TV-0803 — P0 / S:** Record both pivot time and knowledge/confirmation time.
+- [x] **TV-0804 — P0 / S:** Remove adjacent same-kind pivots by retaining the more extreme one.
+- [x] **TV-0805 — P0 / S:** Calculate percent and ATR prominence.
+- [x] **TV-0806 — P0 / S:** Implement line fitting/value helpers and explain input units.
+- [x] **TV-0807 — P0 / S:** Implement breakout/breakdown tests on completed closes.
+- [x] **TV-0808 — P0 / S:** Implement rolling median volume ratio with null/zero handling.
+- [x] **TV-0809 — P0 / M:** Implement score components and human-readable reasons.
+- [x] **TV-0810 — P0 / S:** Implement stable fingerprints.
+- [x] **TV-0811 — P0 / M:** Generate synthetic trend, range, and noise fixtures.
+- [x] **TV-0812 — P0 / M:** Prove in tests that truncating future candles does not alter already knowable pivots.
+- [x] **TV-0813 — P0 / S:** Benchmark pivot extraction over the maximum planned candle window.
 
 **Exit criterion:** every later detector can reuse a leak-free, documented pivot representation.
 
 ### Phase 9 — Breakout detector vertical slice
 
-- [ ] **TV-0901 — P0 / S:** Define breakout settings with names, units, defaults, and allowed ranges.
-- [ ] **TV-0902 — P0 / M:** Detect repeated horizontal resistance and support levels.
-- [ ] **TV-0903 — P0 / S:** Require minimum touch count and spacing.
-- [ ] **TV-0904 — P0 / S:** Implement forming, confirmed, invalidated, and expired transitions.
-- [ ] **TV-0905 — P0 / S:** Score geometry, touches, breakout strength, and volume.
-- [ ] **TV-0906 — P0 / S:** Persist matches and transitions with stable IDs.
-- [ ] **TV-0907 — P0 / S:** Render level, touch pivots, confirmation marker, target, and invalidation.
-- [ ] **TV-0908 — P0 / S:** Show score reasons in the detail panel.
-- [ ] **TV-0909 — P0 / M:** Add positive, negative, edge, and no-future-leakage tests.
-- [ ] **TV-0910 — P0 / M:** Run a manual scan on a small fixed BIST watchlist and review every match.
+- [x] **TV-0901 — P0 / S:** Define breakout settings with names, units, defaults, and allowed ranges.
+- [x] **TV-0902 — P0 / M:** Detect repeated horizontal resistance and support levels.
+- [x] **TV-0903 — P0 / S:** Require minimum touch count and spacing.
+- [x] **TV-0904 — P0 / S:** Implement forming, confirmed, invalidated, and expired transitions.
+- [x] **TV-0905 — P0 / S:** Score geometry, touches, breakout strength, and volume.
+- [x] **TV-0906 — P0 / S:** Persist matches and transitions with stable IDs.
+- [x] **TV-0907 — P0 / S:** Render level, touch pivots, confirmation marker, target, and invalidation.
+- [x] **TV-0908 — P0 / S:** Show score reasons in the detail panel.
+- [x] **TV-0909 — P0 / M:** Add positive, negative, edge, and no-future-leakage tests.
+- [x] **TV-0910 — P0 / M:** Run a manual scan on a small fixed BIST watchlist and review every match.
 
 **Exit criterion:** one complete signal travels from downloaded candle to UI explanation without manual database edits.
 

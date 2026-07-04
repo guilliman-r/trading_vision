@@ -6,8 +6,15 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from trading_vision.models import PatternMatch
 
-def build_chart(candles: pd.DataFrame, symbol: str, interval: str) -> go.Figure:
+
+def build_chart(
+    candles: pd.DataFrame,
+    symbol: str,
+    interval: str,
+    patterns: tuple[PatternMatch, ...] = (),
+) -> go.Figure:
     if candles.empty:
         return empty_chart("No chart data is available")
 
@@ -33,6 +40,7 @@ def build_chart(candles: pd.DataFrame, symbol: str, interval: str) -> go.Figure:
         row=1,
         col=1,
     )
+    _add_pattern_overlays(figure, candles, patterns)
     figure.add_trace(
         go.Bar(
             x=candles["opened_at_utc"],
@@ -75,6 +83,123 @@ def build_chart(candles: pd.DataFrame, symbol: str, interval: str) -> go.Figure:
         fixedrange=False,
     )
     return figure
+
+
+def _add_pattern_overlays(
+    figure: go.Figure,
+    candles: pd.DataFrame,
+    patterns: tuple[PatternMatch, ...],
+) -> None:
+    last_time = candles.iloc[-1]["opened_at_utc"]
+    for pattern in patterns:
+        if pattern.state == "expired":
+            continue
+        color = _pattern_color(pattern)
+        opacity = 0.45 if pattern.state == "invalidated" else 0.9
+        end_time = pattern.ended_at or last_time
+        figure.add_trace(
+            go.Scatter(
+                x=[pattern.started_at, end_time],
+                y=[pattern.boundary_price, pattern.boundary_price],
+                mode="lines",
+                line={"color": color, "width": 2},
+                opacity=opacity,
+                name=f"{pattern.pattern_type} · {pattern.state}",
+                hovertemplate=(
+                    f"{pattern.pattern_type.replace('_', ' ').title()}<br>"
+                    f"State: {pattern.state}<br>Level: {pattern.boundary_price:,.2f}"
+                    "<extra></extra>"
+                ),
+            ),
+            row=1,
+            col=1,
+        )
+        touches = [point for point in pattern.points if point.label.startswith("touch_")]
+        figure.add_trace(
+            go.Scatter(
+                x=[point.occurred_at for point in touches],
+                y=[point.price for point in touches],
+                mode="markers",
+                marker={"color": color, "size": 9, "symbol": "circle-open", "line_width": 2},
+                opacity=opacity,
+                name="Confirmed touches",
+                hovertemplate="Confirmed level touch<br>%{x}<br>%{y:,.2f}<extra></extra>",
+            ),
+            row=1,
+            col=1,
+        )
+        _add_confirmation_marker(figure, pattern, color)
+        _add_reference_line(figure, pattern, "target_price", "Target", color, "dot", last_time)
+        _add_reference_line(
+            figure,
+            pattern,
+            "invalidation_price",
+            "Invalidation",
+            "#8b96a8",
+            "dash",
+            last_time,
+        )
+
+
+def _add_confirmation_marker(
+    figure: go.Figure,
+    pattern: PatternMatch,
+    color: str,
+) -> None:
+    confirmation = next(
+        (point for point in pattern.points if point.label == "confirmation"),
+        None,
+    )
+    if confirmation is None:
+        return
+    symbol = "triangle-up" if pattern.direction == "bullish" else "triangle-down"
+    figure.add_trace(
+        go.Scatter(
+            x=[confirmation.occurred_at],
+            y=[confirmation.price],
+            mode="markers",
+            marker={"color": color, "size": 13, "symbol": symbol},
+            name="Confirmation",
+            hovertemplate="Confirmation<br>%{x}<br>%{y:,.2f}<extra></extra>",
+        ),
+        row=1,
+        col=1,
+    )
+
+
+def _add_reference_line(
+    figure: go.Figure,
+    pattern: PatternMatch,
+    field: str,
+    label: str,
+    color: str,
+    dash: str,
+    last_time,
+) -> None:
+    price = getattr(pattern, field)
+    if price is None:
+        return
+    figure.add_trace(
+        go.Scatter(
+            x=[pattern.started_at, last_time],
+            y=[price, price],
+            mode="lines",
+            line={"color": color, "width": 1, "dash": dash},
+            opacity=0.65,
+            name=label,
+            hovertemplate=f"{label}: %{{y:,.2f}}<extra></extra>",
+        ),
+        row=1,
+        col=1,
+    )
+
+
+def _pattern_color(pattern: PatternMatch) -> str:
+    if pattern.state == "invalidated":
+        return "#8b96a8"
+    if pattern.state == "forming":
+        return "#4da3ff"
+    return "#19c37d" if pattern.direction == "bullish" else "#f05a67"
 
 
 def empty_chart(message: str) -> go.Figure:

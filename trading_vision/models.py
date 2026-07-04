@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,3 +29,46 @@ class ChartSnapshot:
     latest_candle_at: datetime | None
     fetched_at: datetime | None
     provider_message: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Pivot:
+    """A local high or low that became knowable after its confirmation window."""
+
+    index: int
+    confirmation_index: int
+    kind: str
+    occurred_at: datetime
+    confirmed_at: datetime
+    price: float
+    atr: float
+    prominence_percent: float
+    prominence_atr: float
+
+
+@dataclass(frozen=True, slots=True)
+class PatternPoint:
+    label: str
+    index: int
+    occurred_at: datetime
+    price: float
+
+
+@dataclass(frozen=True, slots=True)
+class PatternMatch:
+    """Detector output independent of storage and user-interface concerns."""
+
+    pattern_type: str
+    direction: str
+    state: str
+    started_at: datetime
+    ended_at: datetime | None
+    confirmed_at: datetime | None
+    score: float
+    boundary_price: float
+    target_price: float | None
+    invalidation_price: float | None
+    points: tuple[PatternPoint, ...]
+    reasons: tuple[str, ...]
+    parameters: dict[str, Any]
+    detector_version: str

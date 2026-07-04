@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from trading_vision.models import Symbol
+from trading_vision.models import PatternMatch, Symbol
 from trading_vision.providers.base import MarketDataProvider
 from trading_vision.repositories import find_symbol, get_candles, upsert_candles, upsert_symbol
 
@@ -17,6 +17,7 @@ class ChartLoadResult:
     symbol: Symbol
     candles: pd.DataFrame
     provider_message: str | None = None
+    patterns: tuple[PatternMatch, ...] = ()
 
 
 class MarketDataService:

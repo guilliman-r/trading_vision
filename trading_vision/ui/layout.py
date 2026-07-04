@@ -5,6 +5,7 @@ from __future__ import annotations
 from dash import dcc, html
 
 from trading_vision.config import SUPPORTED_INTERVALS, Settings
+from trading_vision.models import PatternMatch
 from trading_vision.ui import ids
 from trading_vision.ui.chart_builder import CHART_CONFIG, empty_chart
 
@@ -123,24 +124,17 @@ def _details_panel() -> html.Aside:
         children=[
             html.Div([html.H2("Instrument"), html.Span("Snapshot")], className="panel-heading"),
             html.Div(id=ids.DETAILS, className="details", children=_empty_details()),
-            html.Div(
-                [
-                    html.H3("Pattern engine"),
-                    html.Div("NEXT", className="coming-soon-pill"),
-                    html.P(
-                        "Closed-candle pattern detection will plug into this panel "
-                        "without changing "
-                        "the chart or provider layers."
-                    ),
-                ],
-                className="pattern-placeholder",
-            ),
         ],
     )
 
 
 def _empty_details() -> list[html.Div]:
-    return [_detail_row("Symbol", "—"), _detail_row("Candles", "—"), _detail_row("Latest", "—")]
+    return [
+        _detail_row("Symbol", "—"),
+        _detail_row("Candles", "—"),
+        _detail_row("Latest", "—"),
+        _pattern_empty("Load a symbol to scan completed candles."),
+    ]
 
 
 def detail_rows(
@@ -151,6 +145,7 @@ def detail_rows(
     latest: str,
     close: str,
     change: str,
+    patterns: tuple[PatternMatch, ...] = (),
 ) -> list[html.Div]:
     rows = [
         _detail_row("Symbol", symbol),
@@ -160,9 +155,65 @@ def detail_rows(
         _detail_row("Latest", latest),
         _detail_row("Close", close),
         _detail_row("Bar change", change),
+        _pattern_summary(patterns),
     ]
     return rows
 
 
 def _detail_row(label: str, value: str) -> html.Div:
     return html.Div([html.Span(label), html.Strong(value)], className="detail-row")
+
+
+def _pattern_summary(patterns: tuple[PatternMatch, ...]) -> html.Div:
+    active = [pattern for pattern in patterns if pattern.state != "expired"]
+    if not active:
+        return _pattern_empty("No active horizontal breakouts in this window.")
+    priority = {"confirmed": 0, "forming": 1, "invalidated": 2}
+    active.sort(key=lambda pattern: (priority.get(pattern.state, 9), -pattern.score))
+    cards = [_pattern_card(pattern) for pattern in active[:3]]
+    return html.Div(
+        [
+            html.Div(
+                [html.H3("Pattern engine"), html.Div(str(len(active)), className="pattern-count")],
+                className="pattern-section-heading",
+            ),
+            *cards,
+        ],
+        className="pattern-summary",
+    )
+
+
+def _pattern_card(pattern: PatternMatch) -> html.Div:
+    title = pattern.pattern_type.replace("_", " ").title()
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Strong(title),
+                    html.Span(pattern.state, className=f"pattern-state {pattern.state}"),
+                ],
+                className="pattern-card-heading",
+            ),
+            html.Div(
+                [
+                    html.Span(f"Score {pattern.score:.0f}"),
+                    html.Span(f"Level {pattern.boundary_price:,.2f}"),
+                    html.Span(
+                        f"Target {pattern.target_price:,.2f}"
+                        if pattern.target_price is not None
+                        else "No target"
+                    ),
+                ],
+                className="pattern-metrics",
+            ),
+            html.Ul([html.Li(reason) for reason in pattern.reasons], className="pattern-reasons"),
+        ],
+        className="pattern-card",
+    )
+
+
+def _pattern_empty(message: str) -> html.Div:
+    return html.Div(
+        [html.H3("Pattern engine"), html.P(message)],
+        className="pattern-placeholder",
+    )

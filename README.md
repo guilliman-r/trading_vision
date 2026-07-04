@@ -2,9 +2,10 @@
 
 Trading Vision is a local-first Python application for interactive financial charts and
 explainable chart-pattern alerts. The current milestone provides a working chart, BIST-aware
-symbol search, generic Yahoo Finance symbols, local candle caching, and visible data freshness.
+symbol search, generic Yahoo Finance symbols, local candle caching, visible data freshness, and
+closed-candle horizontal breakout detection.
 
-Pattern detection is the next milestone. See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
+See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 
 ## Requirements
 
@@ -27,6 +28,20 @@ Pattern detection is the next milestone. See the complete [implementation plan](
 
 Open <http://127.0.0.1:8050>. The first symbol load may take a few seconds; subsequent loads
 use the local SQLite cache when fresh enough.
+
+## Pattern engine
+
+The first detector finds repeated horizontal resistance and support levels. It:
+
+- uses locally confirmed pivots and records when each pivot became knowable;
+- analyzes completed candles only;
+- labels patterns as forming, confirmed, invalidated, or expired;
+- scores geometry, prominence, duration, touches, breakout strength, and volume;
+- draws the level, touch points, confirmation, target, and invalidation on the chart;
+- stores stable pattern IDs and immutable state transitions in SQLite.
+
+Scores describe how closely a chart matches the configured geometric rules. They are not a
+probability of profit.
 
 Configuration is optional. Copy `config.example.toml` to `config.toml`, then edit its plain
 TOML values. Environment variables `TV_DATABASE_PATH`, `TV_HOST`, and `TV_PORT` override the
@@ -57,4 +72,3 @@ Provider validation and an equity-only review are tracked in the implementation 
 `yfinance` is an unofficial source intended for personal research. It can be delayed, incomplete,
 or temporarily unavailable, and Yahoo limits intraday history. This project does not place trades
 and is not financial advice.
-

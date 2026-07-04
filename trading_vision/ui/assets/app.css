@@ -121,6 +121,19 @@ button, input { font: inherit; }
 .pattern-placeholder h3 { margin: 0 0 10px; font-size: 13px; display: inline-block; }
 .pattern-placeholder p { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .coming-soon-pill { float: right; color: var(--blue); font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.pattern-summary { margin-top: 24px; }
+.pattern-section-heading, .pattern-card-heading { display: flex; justify-content: space-between; align-items: center; }
+.pattern-section-heading h3 { margin: 0; font-size: 13px; }
+.pattern-count { min-width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: rgba(77,163,255,.14); color: var(--blue); font-size: 10px; font-weight: 800; }
+.pattern-card { margin-top: 10px; padding: 13px; border: 1px solid var(--border); border-radius: 11px; background: var(--panel-raised); }
+.pattern-card-heading strong { font-size: 12px; }
+.pattern-state { padding: 4px 7px; border-radius: 99px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.pattern-state.forming { color: var(--blue); background: rgba(77,163,255,.12); }
+.pattern-state.confirmed { color: var(--green); background: rgba(25,195,125,.12); }
+.pattern-state.invalidated { color: var(--muted); background: rgba(126,137,153,.12); }
+.pattern-metrics { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.pattern-metrics span { padding: 4px 6px; border-radius: 5px; background: var(--panel); color: var(--muted); font-size: 9px; }
+.pattern-reasons { margin: 10px 0 0; padding-left: 16px; color: var(--muted); font-size: 10px; line-height: 1.55; }
 .inline-error, .inline-warning { margin: 14px 0 0; padding: 10px; border-radius: 8px; font-size: 11px; line-height: 1.45; }
 .inline-error { color: var(--red); background: rgba(240,90,103,.1); }
 .inline-warning { color: #eab65f; background: rgba(234,182,95,.1); }
@@ -141,4 +154,3 @@ button, input { font: inherit; }
     .left-panel { display: none; }
     .chart { min-height: 520px; }
 }
-

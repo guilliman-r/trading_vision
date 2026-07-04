@@ -75,7 +75,8 @@ def _successful_chart_result(result: ChartLoadResult, interval: str):
     latest_time = latest["opened_at_utc"].tz_convert("Europe/Istanbul")
     latest_label = latest_time.strftime("%d %b %Y · %H:%M")
     provider_message = result.provider_message
-    status_text = "Cached" if provider_message else "Live data loaded"
+    active_patterns = [pattern for pattern in result.patterns if pattern.state != "expired"]
+    status_text = "Cached" if provider_message else f"Live · {len(active_patterns)} patterns"
     status_class = "status-badge warning" if provider_message else "status-badge success"
     details = detail_rows(
         symbol=result.symbol.provider_symbol,
@@ -85,11 +86,12 @@ def _successful_chart_result(result: ChartLoadResult, interval: str):
         latest=latest_label,
         close=f"{latest['close']:,.2f} {result.symbol.currency or ''}".strip(),
         change=f"{change_percent:+.2f}%",
+        patterns=result.patterns,
     )
     if provider_message:
         details.append(html.P(provider_message, className="inline-warning"))
     return (
-        build_chart(candles, result.symbol.provider_symbol, interval),
+        build_chart(candles, result.symbol.provider_symbol, interval, result.patterns),
         result.symbol.provider_symbol,
         status_text,
         status_class,
