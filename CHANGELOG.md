@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 — 2026-07-04
+
+- Add standard and inverse head-and-shoulders detection from confirmed five-pivot structures.
+- Fit and enforce a sloped neckline with a percentage-per-candle slope limit.
+- Add shoulder price/time symmetry, head prominence, duration, breakout, and volume scoring.
+- Add forming, confirmed, invalidated, and expired states with measured targets.
+- Extend fitted necklines correctly on the chart and stop invalidated lines at invalidation time.
+- Add standard, inverse, timing, prominence, slope, invalidation, persistence, and leakage tests.
+- Review default detector behavior across six cached BIST daily histories.
+
 ## 0.3.0 — 2026-07-04
 
 - Add double-top and double-bottom detection from confirmed pivot triples.

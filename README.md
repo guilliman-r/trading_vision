@@ -44,6 +44,10 @@ The pattern engine also detects double tops and double bottoms from confirmed th
 structures. It requires explicit endpoint similarity, formation depth, leg spacing, and buffered
 neckline confirmation. See [pattern definitions](docs/PATTERNS.md) for diagrams and formulas.
 
+Standard and inverse head-and-shoulders patterns use five confirmed pivots, shoulder and timing
+symmetry, explicit head prominence, and a fitted sloped neckline. The chart extends that neckline
+to the pattern's current state boundary instead of flattening it.
+
 Scores describe how closely a chart matches the configured geometric rules. They are not a
 probability of profit.
 

@@ -932,15 +932,15 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 11 — Head-and-shoulders family
 
-- [ ] **TV-1101 — P0 / S:** Document shoulder equality, head prominence, timing symmetry, and neckline-slope limits.
-- [ ] **TV-1102 — P0 / L:** Implement head-and-shoulders candidate generation from alternating pivots.
-- [ ] **TV-1103 — P0 / M:** Fit and evaluate a sloped neckline.
-- [ ] **TV-1104 — P0 / S:** Confirm, invalidate, expire, and calculate target.
-- [ ] **TV-1105 — P0 / S:** Add component score and reasons.
-- [ ] **TV-1106 — P0 / L:** Implement inverse head-and-shoulders separately.
-- [ ] **TV-1107 — P0 / M:** Render shoulders, head, neckline, confirmation, target, and invalidation.
+- [x] **TV-1101 — P0 / S:** Document shoulder equality, head prominence, timing symmetry, and neckline-slope limits.
+- [x] **TV-1102 — P0 / L:** Implement head-and-shoulders candidate generation from alternating pivots.
+- [x] **TV-1103 — P0 / M:** Fit and evaluate a sloped neckline.
+- [x] **TV-1104 — P0 / S:** Confirm, invalidate, expire, and calculate target.
+- [x] **TV-1105 — P0 / S:** Add component score and reasons.
+- [x] **TV-1106 — P0 / L:** Implement inverse head-and-shoulders separately.
+- [x] **TV-1107 — P0 / M:** Render shoulders, head, neckline, confirmation, target, and invalidation.
 - [ ] **TV-1108 — P0 / L:** Add synthetic and frozen-real positive/negative fixtures.
-- [ ] **TV-1109 — P0 / M:** Add tests for steep neckline rejection and asymmetric shoulders.
+- [x] **TV-1109 — P0 / M:** Add tests for steep neckline rejection and asymmetric shoulders.
 - [ ] **TV-1110 — P0 / M:** Manually label and review a representative BIST sample before enabling alerts by default.
 
 **Exit criterion:** detectors are enabled only after their false-positive behavior has been inspected.

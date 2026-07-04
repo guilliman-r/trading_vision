@@ -22,3 +22,11 @@ The breakout and double-pattern detectors currently calculate pivots independent
 calculation is a possible later optimization, but the present separation keeps each detector easy
 to test and understand.
 
+## 2026-07-04 — Head-and-shoulders milestone
+
+- Input: 500 cached daily `THYAO.IS` candles
+- Standard/inverse head-and-shoulders scan: 100 passes in 4.195 seconds; 41.95 ms average
+
+The complete three-detector pipeline remains comfortably below one second per cached symbol on the
+development machine. Readability remains the priority until full-universe scanning is measured.
+

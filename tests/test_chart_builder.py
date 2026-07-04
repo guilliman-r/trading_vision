@@ -64,3 +64,44 @@ def test_chart_renders_pattern_level_touches_confirmation_and_risk_lines() -> No
     assert "Confirmation" in names
     assert "Target" in names
     assert "Invalidation" in names
+
+
+def test_head_shoulders_boundary_uses_neckline_slope() -> None:
+    times = pd.date_range("2025-01-01", periods=7, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [10, 12, 11, 15, 12, 13, 10],
+            "high": [11, 14, 12, 17, 13, 15, 11],
+            "low": [9, 11, 10, 14, 11, 12, 9],
+            "close": [10, 13, 11, 16, 12, 14, 10],
+            "volume": [100] * 7,
+        }
+    )
+    points = (
+        PatternPoint("left_shoulder", 1, times[1].to_pydatetime(), 14),
+        PatternPoint("neckline_low_1", 2, times[2].to_pydatetime(), 10),
+        PatternPoint("head", 3, times[3].to_pydatetime(), 17),
+        PatternPoint("neckline_low_2", 4, times[4].to_pydatetime(), 11),
+        PatternPoint("right_shoulder", 5, times[5].to_pydatetime(), 15),
+    )
+    pattern = PatternMatch(
+        pattern_type="head_shoulders",
+        direction="bearish",
+        state="forming",
+        started_at=times[1].to_pydatetime(),
+        ended_at=None,
+        confirmed_at=None,
+        score=75,
+        boundary_price=12,
+        target_price=7,
+        invalidation_price=17,
+        points=points,
+        reasons=("sloped neckline",),
+        parameters={},
+        detector_version="test-v1",
+    )
+    figure = build_chart(candles, "TEST", "1d", (pattern,))
+    boundary = next(trace for trace in figure.data if trace.name == "head_shoulders · forming")
+    assert boundary.y[0] == 10
+    assert boundary.y[1] > boundary.y[0]

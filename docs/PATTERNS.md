@@ -67,6 +67,44 @@ Required pivot order: `low → high → low`.
 - A close below the lower bottom plus a buffer invalidates it before confirmation.
 - The measured target projects the formation depth above the neckline.
 
+## Head and shoulders
+
+```text
+                               head
+                                ●
+                              /   \
+             left shoulder  ●     ●  right shoulder
+                           /  \   /  \
+neckline  ───────────────●─────\─●────────────────── breakdown ▼
+```
+
+Required pivot order: `high → low → higher high → low → high`.
+
+- Left and right shoulders must meet explicit percentage and ATR similarity limits.
+- The head must exceed both shoulders by configurable percentage and ATR minimums.
+- Shoulder-to-head timing may differ, but only within the configured imbalance limit.
+- The neckline is a fitted line through both reaction lows; it is not assumed horizontal.
+- Neckline slope is measured as percentage per candle and rejected above the configured limit.
+- The pattern becomes knowable only after the right shoulder's pivot confirmation window closes.
+- A completed close below the fitted neckline plus a buffer confirms it.
+- A close above the head plus a buffer invalidates it.
+- The target projects head-to-neckline height below the neckline at confirmation.
+
+## Inverse head and shoulders
+
+```text
+neckline  ───────────────●─────/─●────────────────── breakout ▲
+                           \  /   \  /
+             left shoulder  ●     ●  right shoulder
+                              \   /
+                                ●
+                          inverse head
+```
+
+Required pivot order: `low → high → lower low → high → low`. Shoulder, timing, slope, and
+prominence checks mirror the standard form. Confirmation requires a completed close above the
+fitted neckline, and the target projects the formation height upward.
+
 ## States
 
 - `forming`: valid geometry exists, but no buffered neckline/level close has occurred.

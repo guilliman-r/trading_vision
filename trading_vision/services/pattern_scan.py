@@ -13,6 +13,8 @@ from trading_vision.patterns.double_patterns import (
     DoublePatternSettings,
     detect_double_patterns,
 )
+from trading_vision.patterns.head_shoulders import detect_head_shoulders_patterns
+from trading_vision.patterns.head_shoulders_settings import HeadShouldersSettings
 from trading_vision.patterns.scoring import stable_pattern_id
 from trading_vision.repositories import upsert_pattern
 
@@ -29,10 +31,12 @@ class PatternScanService:
         connection: sqlite3.Connection,
         breakout_settings: BreakoutSettings | None = None,
         double_pattern_settings: DoublePatternSettings | None = None,
+        head_shoulders_settings: HeadShouldersSettings | None = None,
     ) -> None:
         self.connection = connection
         self.breakout_settings = breakout_settings or BreakoutSettings()
         self.double_pattern_settings = double_pattern_settings or DoublePatternSettings()
+        self.head_shoulders_settings = head_shoulders_settings or HeadShouldersSettings()
 
     def scan(
         self,
@@ -45,6 +49,7 @@ class PatternScanService:
         matches = [
             *detect_horizontal_breakouts(candles, self.breakout_settings),
             *detect_double_patterns(candles, self.double_pattern_settings),
+            *detect_head_shoulders_patterns(candles, self.head_shoulders_settings),
         ]
         transitions = 0
         for match in matches:
