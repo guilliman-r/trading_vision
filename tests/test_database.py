@@ -1,4 +1,13 @@
-from trading_vision.database import MIGRATIONS_DIRECTORY, connect, initialize_database
+import sqlite3
+
+import pytest
+
+from trading_vision.database import (
+    MIGRATIONS_DIRECTORY,
+    connect,
+    connection_scope,
+    initialize_database,
+)
 from trading_vision.models import Symbol
 from trading_vision.repositories import find_symbol, upsert_symbol
 
@@ -27,3 +36,14 @@ def test_bist_display_symbol_wins_over_prior_generic_symbol(database_path) -> No
         bist = upsert_symbol(connection, Symbol("GARAN", "GARAN.IS", is_bist=True))
         found = find_symbol(connection, "GARAN")
     assert found == bist
+
+
+def test_connection_scope_commits_and_closes(database_path) -> None:
+    with connection_scope(database_path) as connection:
+        upsert_symbol(connection, Symbol("TEST", "TEST"))
+
+    with connect(database_path) as verification_connection:
+        assert find_symbol(verification_connection, "TEST") is not None
+
+    with pytest.raises(sqlite3.ProgrammingError, match="closed database"):
+        connection.execute("SELECT 1")

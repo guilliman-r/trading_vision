@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-07-04
+
+- Fix Dash callbacks reusing a SQLite connection created in another thread.
+- Open one short-lived connection inside each callback and close it deterministically.
+- Add explicit transaction commit/rollback behavior around connection scopes.
+- Add a regression test that executes a chart callback on a different thread.
+
 ## 0.2.0 — 2026-07-04
 
 - Add true range, ATR, line, volume-ratio, and confirmed-pivot calculations.
@@ -20,4 +27,3 @@
 - Add the first Dash/Plotly chart workspace with candlesticks and volume.
 - Add BIST quick access, arbitrary Yahoo symbols, intervals, refresh, and theme controls.
 - Add data-quality, repository, service, UI endpoint, and callback tests.
-

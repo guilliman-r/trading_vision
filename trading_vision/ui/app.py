@@ -5,7 +5,7 @@ from __future__ import annotations
 from dash import Dash
 
 from trading_vision.config import PROJECT_ROOT, Settings, load_settings
-from trading_vision.database import connect, initialize_database
+from trading_vision.database import connection_scope, initialize_database
 from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.repositories import import_symbol_catalog, seed_symbols
@@ -28,24 +28,25 @@ FALLBACK_SYMBOLS = (
 def create_app(settings: Settings | None = None, provider=None) -> Dash:
     settings = settings or load_settings()
     initialize_database(settings.database_path)
-    connection = connect(settings.database_path)
-    import_symbol_catalog(connection, CATALOG_PATH)
-    seed_symbols(connection, FALLBACK_SYMBOLS)
-    connection.commit()
+    with connection_scope(settings.database_path) as connection:
+        import_symbol_catalog(connection, CATALOG_PATH)
+        seed_symbols(connection, FALLBACK_SYMBOLS)
 
-    market_data = MarketDataService(
-        connection=connection,
-        provider=provider or YahooFinanceProvider(),
-        candle_limit=settings.chart_candle_limit,
-    )
-    pattern_scan = PatternScanService(connection)
+    data_provider = provider or YahooFinanceProvider()
 
     def load_chart(symbol_query: str, interval: str):
-        result = market_data.load(symbol_query, interval)
-        if not result.candles.empty:
-            scan_result = pattern_scan.scan(result.symbol, interval, result.candles)
-            result.patterns = scan_result.matches
-        return result
+        with connection_scope(settings.database_path) as connection:
+            market_data = MarketDataService(
+                connection=connection,
+                provider=data_provider,
+                candle_limit=settings.chart_candle_limit,
+            )
+            result = market_data.load(symbol_query, interval)
+            if not result.candles.empty:
+                pattern_scan = PatternScanService(connection)
+                scan_result = pattern_scan.scan(result.symbol, interval, result.candles)
+                result.patterns = scan_result.matches
+            return result
 
     app = Dash(
         __name__,

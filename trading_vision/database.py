@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import sqlite3
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 from trading_vision.config import PROJECT_ROOT, load_settings
@@ -23,10 +25,25 @@ def connect(database_path: Path) -> sqlite3.Connection:
     return connection
 
 
+@contextmanager
+def connection_scope(database_path: Path) -> Iterator[sqlite3.Connection]:
+    """Open, commit or roll back, and always close one SQLite connection."""
+
+    connection = connect(database_path)
+    try:
+        yield connection
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+
 def initialize_database(database_path: Path) -> None:
     """Apply every not-yet-recorded SQL migration in filename order."""
 
-    with connect(database_path) as connection:
+    with connection_scope(database_path) as connection:
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS schema_migrations (
