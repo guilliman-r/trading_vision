@@ -31,6 +31,8 @@ class PivotSettings:
 def find_confirmed_pivots(
     candles: pd.DataFrame,
     settings: PivotSettings | None = None,
+    *,
+    keep_same_kind: bool = False,
 ) -> list[Pivot]:
     """Find unique local extremes and record when each became knowable."""
 
@@ -52,7 +54,7 @@ def find_confirmed_pivots(
         if low:
             pivots.append(low)
     pivots.sort(key=lambda pivot: (pivot.index, 0 if pivot.kind == "low" else 1))
-    return _remove_adjacent_same_kind(pivots)
+    return pivots if keep_same_kind else _remove_adjacent_same_kind(pivots)
 
 
 def _candidate(

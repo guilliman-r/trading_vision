@@ -916,15 +916,15 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 10 — Double top and double bottom
 
-- [ ] **TV-1001 — P0 / S:** Write detector definitions and diagrams in developer documentation.
-- [ ] **TV-1002 — P0 / M:** Implement double-top candidate geometry.
-- [ ] **TV-1003 — P0 / S:** Implement neckline confirmation and pre-confirmation invalidation.
-- [ ] **TV-1004 — P0 / S:** Implement measured target calculation.
-- [ ] **TV-1005 — P0 / S:** Implement score and reasons.
-- [ ] **TV-1006 — P0 / M:** Implement double-bottom logic with mirrored domain wording.
-- [ ] **TV-1007 — P0 / S:** Add overlay builders for peaks/troughs, neckline, breakout, target, and invalidation.
-- [ ] **TV-1008 — P0 / M:** Add hand-built perfect, imperfect, too-shallow, too-wide, and false-break fixtures.
-- [ ] **TV-1009 — P0 / M:** Add time-forward tests that reveal exactly when a candidate and confirmation become knowable.
+- [x] **TV-1001 — P0 / S:** Write detector definitions and diagrams in developer documentation.
+- [x] **TV-1002 — P0 / M:** Implement double-top candidate geometry.
+- [x] **TV-1003 — P0 / S:** Implement neckline confirmation and pre-confirmation invalidation.
+- [x] **TV-1004 — P0 / S:** Implement measured target calculation.
+- [x] **TV-1005 — P0 / S:** Implement score and reasons.
+- [x] **TV-1006 — P0 / M:** Implement double-bottom logic with mirrored domain wording.
+- [x] **TV-1007 — P0 / S:** Add overlay builders for peaks/troughs, neckline, breakout, target, and invalidation.
+- [x] **TV-1008 — P0 / M:** Add hand-built perfect, imperfect, too-shallow, too-wide, and false-break fixtures.
+- [x] **TV-1009 — P0 / M:** Add time-forward tests that reveal exactly when a candidate and confirmation become knowable.
 - [ ] **TV-1010 — P0 / M:** Review results on frozen real BIST examples and record false positives.
 - [ ] **TV-1011 — P1 / S:** Add per-detector settings UI with reset-to-default.
 

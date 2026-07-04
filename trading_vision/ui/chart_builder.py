@@ -114,16 +114,18 @@ def _add_pattern_overlays(
             row=1,
             col=1,
         )
-        touches = [point for point in pattern.points if point.label.startswith("touch_")]
+        structure = [point for point in pattern.points if point.label != "confirmation"]
         figure.add_trace(
             go.Scatter(
-                x=[point.occurred_at for point in touches],
-                y=[point.price for point in touches],
-                mode="markers",
+                x=[point.occurred_at for point in structure],
+                y=[point.price for point in structure],
+                text=[point.label.replace("_", " ").title() for point in structure],
+                mode="lines+markers",
+                line={"color": color, "width": 1, "dash": "dot"},
                 marker={"color": color, "size": 9, "symbol": "circle-open", "line_width": 2},
                 opacity=opacity,
-                name="Confirmed touches",
-                hovertemplate="Confirmed level touch<br>%{x}<br>%{y:,.2f}<extra></extra>",
+                name="Pattern structure",
+                hovertemplate="%{text}<br>%{x}<br>%{y:,.2f}<extra></extra>",
             ),
             row=1,
             col=1,

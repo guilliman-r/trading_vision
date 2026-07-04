@@ -10,7 +10,8 @@ from trading_vision.models import PatternMatch
 def stable_pattern_id(symbol: str, interval: str, match: PatternMatch) -> str:
     """Create an ID that remains stable as a forming pattern gains more touches."""
 
-    defining_points = match.points[:2]
+    defining_count = 3 if match.pattern_type in {"double_top", "double_bottom"} else 2
+    defining_points = match.points[:defining_count]
     timestamps = ":".join(point.occurred_at.isoformat() for point in defining_points)
     raw = f"{symbol}:{interval}:{match.pattern_type}:{timestamps}:{match.detector_version}"
     return hashlib.sha256(raw.encode()).hexdigest()[:24]

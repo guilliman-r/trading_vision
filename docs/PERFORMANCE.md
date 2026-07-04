@@ -13,3 +13,12 @@ Pivot extraction dominates the current detector runtime. This is already comfort
 latency relevant to daily, hourly, and 15-minute closed-candle scans, so readability remains more
 valuable than optimization at this stage.
 
+## 2026-07-04 — Double-pattern milestone
+
+- Input: 500 cached daily `THYAO.IS` candles
+- Double-top/bottom scan: 100 passes in 4.387 seconds; 43.87 ms average
+
+The breakout and double-pattern detectors currently calculate pivots independently. Sharing that
+calculation is a possible later optimization, but the present separation keeps each detector easy
+to test and understand.
+

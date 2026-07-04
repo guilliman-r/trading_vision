@@ -40,6 +40,10 @@ The first detector finds repeated horizontal resistance and support levels. It:
 - draws the level, touch points, confirmation, target, and invalidation on the chart;
 - stores stable pattern IDs and immutable state transitions in SQLite.
 
+The pattern engine also detects double tops and double bottoms from confirmed three-pivot
+structures. It requires explicit endpoint similarity, formation depth, leg spacing, and buffered
+neckline confirmation. See [pattern definitions](docs/PATTERNS.md) for diagrams and formulas.
+
 Scores describe how closely a chart matches the configured geometric rules. They are not a
 probability of profit.
 

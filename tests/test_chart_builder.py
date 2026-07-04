@@ -60,7 +60,7 @@ def test_chart_renders_pattern_level_touches_confirmation_and_risk_lines() -> No
     figure = build_chart(candles, "TEST", "1d", (pattern,))
     names = [trace.name for trace in figure.data]
     assert "resistance_breakout · confirmed" in names
-    assert "Confirmed touches" in names
+    assert "Pattern structure" in names
     assert "Confirmation" in names
     assert "Target" in names
     assert "Invalidation" in names

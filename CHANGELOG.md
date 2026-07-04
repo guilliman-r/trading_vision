@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 — 2026-07-04
+
+- Add double-top and double-bottom detection from confirmed pivot triples.
+- Add buffered neckline confirmation, pre-confirmation invalidation, expiry, and measured targets.
+- Add transparent price symmetry, time symmetry, prominence, depth, breakout, and volume scores.
+- Preserve raw same-kind pivots for time-forward invalidation evaluation.
+- Render peaks, troughs, reaction highs, necklines, confirmations, targets, and invalidations.
+- Add forming, confirmation-timing, false-break, shallow, wide, mirrored, and persistence tests.
+- Review default behavior on six cached BIST daily histories and record the results.
+
 ## 0.2.1 — 2026-07-04
 
 - Fix Dash callbacks reusing a SQLite connection created in another thread.
