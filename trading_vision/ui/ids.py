@@ -1,0 +1,13 @@
+"""Component IDs kept in one discoverable place."""
+
+APP_ROOT = "app-root"
+SYMBOL_INPUT = "symbol-input"
+LOAD_BUTTON = "load-button"
+REFRESH_BUTTON = "refresh-button"
+INTERVAL_SELECT = "interval-select"
+THEME_BUTTON = "theme-button"
+CHART = "price-chart"
+CHART_TITLE = "chart-title"
+STATUS = "data-status"
+DETAILS = "chart-details"
+QUICK_SYMBOL_TYPE = "quick-symbol"
