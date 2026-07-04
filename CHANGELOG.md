@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — 2026-07-04
+
+- Add ascending, descending, and symmetrical triangle detection from confirmed four-pivot shapes.
+- Fit separate upper and lower boundaries and reject parallel, diverging, and passed-apex shapes.
+- Add buffered two-direction breakouts, invalidation, expiry, score reasons, and measured targets.
+- Render both fitted boundaries, all touches, the projected apex, confirmation, and risk levels.
+- Preserve stable identities as forming triangles become confirmed and persist each state change.
+- Add synthetic positive, mirrored, false-channel, no-leakage, lifecycle, chart, and persistence tests.
+- Review default behavior across six cached BIST histories and document its overlapping candidates.
+
 ## 0.4.0 — 2026-07-04
 
 - Add standard and inverse head-and-shoulders detection from confirmed five-pivot structures.

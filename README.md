@@ -3,7 +3,7 @@
 Trading Vision is a local-first Python application for interactive financial charts and
 explainable chart-pattern alerts. The current milestone provides a working chart, BIST-aware
 symbol search, generic Yahoo Finance symbols, local candle caching, visible data freshness, and
-closed-candle horizontal breakout detection.
+closed-candle horizontal breakout, reversal, and triangle detection.
 
 See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 
@@ -47,6 +47,11 @@ neckline confirmation. See [pattern definitions](docs/PATTERNS.md) for diagrams 
 Standard and inverse head-and-shoulders patterns use five confirmed pivots, shoulder and timing
 symmetry, explicit head prominence, and a fitted sloped neckline. The chart extends that neckline
 to the pattern's current state boundary instead of flattening it.
+
+Ascending, descending, and symmetrical triangles use two confirmed touches on each fitted
+boundary. The detector rejects parallel and diverging channels, requires a future apex, and marks
+both trendlines, the projected apex, breakout, target, and invalidation on the chart. Triangle
+alerts remain disabled until overlapping real-world candidates have been manually labeled.
 
 Scores describe how closely a chart matches the configured geometric rules. They are not a
 probability of profit.

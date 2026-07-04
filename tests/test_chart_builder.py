@@ -105,3 +105,48 @@ def test_head_shoulders_boundary_uses_neckline_slope() -> None:
     boundary = next(trace for trace in figure.data if trace.name == "head_shoulders · forming")
     assert boundary.y[0] == 10
     assert boundary.y[1] > boundary.y[0]
+
+
+def test_triangle_renders_converging_upper_and_lower_boundaries() -> None:
+    times = pd.date_range("2025-01-01", periods=8, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [10] * 8,
+            "high": [12] * 8,
+            "low": [8] * 8,
+            "close": [10] * 8,
+            "volume": [100] * 8,
+        }
+    )
+    points = (
+        PatternPoint("upper_touch_1", 1, times[1].to_pydatetime(), 12),
+        PatternPoint("lower_touch_1", 2, times[2].to_pydatetime(), 8),
+        PatternPoint("upper_touch_2", 4, times[4].to_pydatetime(), 11),
+        PatternPoint("lower_touch_2", 5, times[5].to_pydatetime(), 9),
+        PatternPoint("apex", 7, times[7].to_pydatetime(), 10),
+    )
+    pattern = PatternMatch(
+        pattern_type="symmetrical_triangle",
+        direction="neutral",
+        state="forming",
+        started_at=times[1].to_pydatetime(),
+        ended_at=None,
+        confirmed_at=None,
+        score=70,
+        boundary_price=11,
+        target_price=None,
+        invalidation_price=None,
+        points=points,
+        reasons=("converging boundaries",),
+        parameters={},
+        detector_version="test-v1",
+    )
+    figure = build_chart(candles, "TEST", "1d", (pattern,))
+    upper = next(trace for trace in figure.data if trace.name == "symmetrical_triangle · forming")
+    lower = next(trace for trace in figure.data if trace.name == "Triangle lower boundary")
+    apex = next(trace for trace in figure.data if trace.name == "Apex")
+    assert upper.y[1] < upper.y[0]
+    assert lower.y[1] > lower.y[0]
+    assert upper.y[1] - lower.y[1] < upper.y[0] - lower.y[0]
+    assert apex.y[0] == 10

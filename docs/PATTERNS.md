@@ -105,13 +105,46 @@ Required pivot order: `low → high → lower low → high → low`. Shoulder, t
 prominence checks mirror the standard form. Confirmation requires a completed close above the
 fitted neckline, and the target projects the formation height upward.
 
+## Triangles
+
+```text
+ascending             descending            symmetrical
+
+upper  ●────●         upper  ●              upper  ●
+       /    /                \\ ●                  \\   ●
+lower ●───●           lower ●────●           lower ●──●
+             × apex               × apex              × apex
+```
+
+All three classes use exactly four consecutive, alternating confirmed pivots as their first
+candidate: two upper touches and two lower touches. A separate straight line is fitted to each
+side. The committed defaults require:
+
+- 8–120 candles between the first and fourth touch;
+- at least two touches on each side;
+- a flat side no steeper than 0.08% of price per candle;
+- a trending side at least 0.03% of price per candle;
+- at least 10% narrowing between the first and fourth touch;
+- an intersection 2–120 candles beyond the fourth touch.
+
+Ascending triangles combine approximately flat resistance with rising support. Descending
+triangles combine falling resistance with approximately flat support. Symmetrical triangles
+require both falling resistance and rising support. Parallel, widening, insufficient-touch, and
+already-past-apex structures are rejected.
+
+A completed close beyond either fitted boundary plus the larger of the percentage and ATR buffers
+confirms direction. A return decisively inside during the configured invalidation window marks the
+match invalidated. If price does not break before the apex or expiry window, it expires. The target
+projects the triangle's starting height from the confirmation boundary; it is an estimate, not a
+forecast. The chart shows both boundaries, touch sequence, projected apex, confirmation, target,
+and invalidation.
+
 ## States
 
-- `forming`: valid geometry exists, but no buffered neckline/level close has occurred.
+- `forming`: valid geometry exists, but no buffered neckline, level, or boundary close has occurred.
 - `confirmed`: a completed candle closed through the buffered confirmation boundary.
 - `invalidated`: price crossed the structural invalidation boundary.
 - `expired`: confirmation did not occur within the configured candle window.
 
 State transitions are stored separately from the current pattern row. Re-running the same scan does
 not create a new transition or alert candidate.
-

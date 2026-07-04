@@ -947,15 +947,15 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 12 — Triangle family
 
-- [ ] **TV-1201 — P1 / S:** Document flat-line tolerance, convergence, touch count, duration, and apex rules.
-- [ ] **TV-1202 — P1 / M:** Build separate high- and low-pivot line fits.
-- [ ] **TV-1203 — P1 / M:** Implement ascending-triangle classification.
-- [ ] **TV-1204 — P1 / M:** Implement descending-triangle classification.
-- [ ] **TV-1205 — P1 / M:** Implement symmetrical-triangle classification.
-- [ ] **TV-1206 — P1 / S:** Reject parallel, diverging, passed-apex, and insufficient-touch structures.
-- [ ] **TV-1207 — P1 / M:** Implement direction-aware confirmations and invalidations.
-- [ ] **TV-1208 — P1 / S:** Add score reasons and target estimates.
-- [ ] **TV-1209 — P1 / M:** Render both boundaries, touch points, apex, confirmation, and target.
+- [x] **TV-1201 — P1 / S:** Document flat-line tolerance, convergence, touch count, duration, and apex rules.
+- [x] **TV-1202 — P1 / M:** Build separate high- and low-pivot line fits.
+- [x] **TV-1203 — P1 / M:** Implement ascending-triangle classification.
+- [x] **TV-1204 — P1 / M:** Implement descending-triangle classification.
+- [x] **TV-1205 — P1 / M:** Implement symmetrical-triangle classification.
+- [x] **TV-1206 — P1 / S:** Reject parallel, diverging, passed-apex, and insufficient-touch structures.
+- [x] **TV-1207 — P1 / M:** Implement direction-aware confirmations and invalidations.
+- [x] **TV-1208 — P1 / S:** Add score reasons and target estimates.
+- [x] **TV-1209 — P1 / M:** Render both boundaries, touch points, apex, confirmation, and target.
 - [ ] **TV-1210 — P1 / L:** Build synthetic and real fixtures for each class and common false positive.
 
 **Exit criterion:** triangle labels are stable under small data extensions and do not classify ordinary channels as triangles.

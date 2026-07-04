@@ -30,3 +30,11 @@ to test and understand.
 The complete three-detector pipeline remains comfortably below one second per cached symbol on the
 development machine. Readability remains the priority until full-universe scanning is measured.
 
+## 2026-07-04 — Triangle milestone
+
+- Input: 500 cached daily `THYAO.IS` candles
+- Ascending/descending/symmetrical triangle scan: 100 passes in 4.359 seconds; 43.59 ms average
+
+The triangle detector fits only consecutive four-pivot candidates. Its runtime is comparable to
+the other pivot-based detectors; candidate overlap and visual density, rather than CPU time, are
+the next validation concern.

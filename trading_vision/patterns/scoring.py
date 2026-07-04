@@ -15,6 +15,9 @@ def stable_pattern_id(symbol: str, interval: str, match: PatternMatch) -> str:
         "double_bottom": 3,
         "head_shoulders": 5,
         "inverse_head_shoulders": 5,
+        "ascending_triangle": 4,
+        "descending_triangle": 4,
+        "symmetrical_triangle": 4,
     }
     defining_count = defining_counts.get(match.pattern_type, 2)
     defining_points = match.points[:defining_count]
