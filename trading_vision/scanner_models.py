@@ -24,6 +24,7 @@ class ScanRunSummary:
     patterns_added: int
     status: str
     errors: tuple[str, ...] = ()
+    warnings: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,3 +44,4 @@ class ScanCycleSummary:
 class JobResult:
     candles_added: int
     patterns_added: int
+    warnings: tuple[str, ...] = ()

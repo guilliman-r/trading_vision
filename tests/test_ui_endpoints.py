@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 
 from trading_vision.config import Settings
-from trading_vision.data_quality import prepare_candles
+from trading_vision.data_quality import prepare_candles, prepare_candles_with_report
 from trading_vision.providers.base import FetchResult, MarketDataProvider
 from trading_vision.ui.app import create_app
 
@@ -44,6 +44,28 @@ class GapProvider(MarketDataProvider):
             index=pd.to_datetime(["2026-01-02", "2026-01-06"], utc=True),
         )
         return FetchResult(symbol=symbol, candles=prepare_candles(frame, interval, self.name))
+
+
+class QuarantineProvider(MarketDataProvider):
+    name = "fixture"
+
+    def fetch_history(self, symbol: str, interval: str) -> FetchResult:
+        frame = pd.DataFrame(
+            {
+                "open": [100.0, 102.0],
+                "high": [104.0, 106.0],
+                "low": [99.0, 101.0],
+                "close": [102.0, 105.0],
+                "volume": [-1.0, 1200.0],
+            },
+            index=pd.to_datetime(["2025-01-01", "2025-01-02"], utc=True),
+        )
+        prepared = prepare_candles_with_report(frame, interval, self.name)
+        return FetchResult(
+            symbol=symbol,
+            candles=prepared.candles,
+            quality_report=prepared.quality_report,
+        )
 
 
 def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None:
@@ -115,6 +137,21 @@ def test_chart_callback_makes_bist_candle_gap_visible(database_path) -> None:
     assert response.status_code == 200
     assert "1 data gap" in payload["chart-meta"]["children"]
     assert "1 missing completed candle" in json.dumps(payload["chart-details"]["children"])
+
+
+def test_chart_callback_makes_quarantined_provider_rows_visible(database_path) -> None:
+    app = create_app(Settings(database_path=database_path), QuarantineProvider())
+    response = app.server.test_client().post(
+        "/_dash-update-component",
+        json=_load_callback_request(app),
+    )
+    payload = response.get_json()["response"]
+
+    assert response.status_code == 200
+    assert "1 quarantined row" in payload["chart-meta"]["children"]
+    details = json.dumps(payload["chart-details"]["children"])
+    assert "Quarantined 1 of 2 provider rows" in details
+    assert "negative volume (1)" in details
 
 
 def test_theme_button_callback_toggles_to_light(database_path) -> None:

@@ -6,12 +6,15 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+from trading_vision.data_quality import DataQualityReport
+
 
 @dataclass(slots=True)
 class FetchResult:
     symbol: str
     candles: pd.DataFrame = field(default_factory=pd.DataFrame)
     error: str | None = None
+    quality_report: DataQualityReport | None = None
 
     @property
     def succeeded(self) -> bool:

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from trading_vision.data_quality import DataQualityReport
 from trading_vision.models import PatternMatch, Symbol
 from trading_vision.providers.base import MarketDataProvider
 from trading_vision.repositories import find_symbol, get_candles, upsert_candles, upsert_symbol
@@ -18,6 +19,7 @@ class ChartLoadResult:
     candles: pd.DataFrame
     provider_message: str | None = None
     patterns: tuple[PatternMatch, ...] = ()
+    quality_report: DataQualityReport | None = None
 
 
 class MarketDataService:
@@ -42,17 +44,23 @@ class MarketDataService:
             upsert_candles(self.connection, symbol.id, interval, fetched.candles)
             self.connection.commit()
             cached = get_candles(self.connection, symbol.id, interval, self.candle_limit)
-            return ChartLoadResult(symbol=symbol, candles=cached)
+            return ChartLoadResult(
+                symbol=symbol,
+                candles=cached,
+                quality_report=fetched.quality_report,
+            )
         if not cached.empty:
             return ChartLoadResult(
                 symbol=symbol,
                 candles=cached,
                 provider_message=f"Showing cached data. {fetched.error}",
+                quality_report=fetched.quality_report,
             )
         return ChartLoadResult(
             symbol=symbol,
             candles=pd.DataFrame(),
             provider_message=fetched.error,
+            quality_report=fetched.quality_report,
         )
 
     def _resolve_symbol(self, query: str) -> Symbol:

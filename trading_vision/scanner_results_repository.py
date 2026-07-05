@@ -64,6 +64,21 @@ def recent_scan_errors(connection: sqlite3.Connection, limit: int = 3) -> list[s
     return errors[:limit]
 
 
+def recent_scan_warnings(connection: sqlite3.Connection, limit: int = 3) -> list[str]:
+    rows = connection.execute(
+        """
+        SELECT warning_summary FROM scan_runs
+        WHERE warning_summary IS NOT NULL
+        ORDER BY id DESC LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
+    warnings: list[str] = []
+    for row in rows:
+        warnings.extend(json.loads(row["warning_summary"]))
+    return warnings[:limit]
+
+
 def _result_from_row(row: sqlite3.Row) -> PatternResultRow:
     provider_symbol = row["provider_symbol"]
     interval = row["interval"]

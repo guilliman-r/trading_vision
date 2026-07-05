@@ -60,6 +60,11 @@ appears beside the chart freshness status and as an instrument warning because p
 then be incomplete. The application never fills a gap with invented prices. See the
 [candle-gap guide](docs/CANDLE_GAPS.md).
 
+Malformed provider rows are quarantined before caching or scanning. If any otherwise usable fetch
+contains invalid rows, the chart shows the count and exact reason categories. Scanner runs retain
+the same information as warnings without falsely marking a successful symbol as failed. See the
+[data-quality guide](docs/DATA_QUALITY.md).
+
 ## Run the scanner
 
 Keep the UI running and start the worker in a second terminal:

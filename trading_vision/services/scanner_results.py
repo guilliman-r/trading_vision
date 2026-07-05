@@ -17,7 +17,11 @@ from trading_vision.scanner_results import (
     PatternResultRow,
     ScannerResultsSnapshot,
 )
-from trading_vision.scanner_results_repository import recent_scan_errors, search_pattern_results
+from trading_vision.scanner_results_repository import (
+    recent_scan_errors,
+    recent_scan_warnings,
+    search_pattern_results,
+)
 
 
 class ScannerResultsService:
@@ -70,6 +74,8 @@ class ScannerResultsService:
             ("Packages", _package_versions()),
         ]
         errors = recent_scan_errors(self.connection)
+        warnings = recent_scan_warnings(self.connection)
+        items.append(("Recent warnings", " | ".join(warnings) if warnings else "None"))
         items.append(("Recent errors", " | ".join(errors) if errors else "None"))
         return tuple(items)
 

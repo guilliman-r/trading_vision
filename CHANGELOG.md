@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.14.0 — 2026-07-05
+
+- Classify invalid timestamps, duplicates, missing/non-numeric prices, non-positive prices,
+  inconsistent OHLC values, non-numeric volume, and negative volume.
+- Quarantine invalid rows while retaining valid provider candles unchanged.
+- Carry structured input, valid, quarantined, and per-reason counts through provider and chart
+  service boundaries.
+- Display quarantine counts in chart metadata and a reasoned instrument warning.
+- Persist scanner quality warnings separately from failures so successful scans remain successful.
+- Add a migration and diagnostics card for recent scanner quality warnings.
+- Add clean, malformed, all-invalid, cache-boundary, scanner, persistence, diagnostics, and UI
+  regression tests.
+
 ## 0.13.0 — 2026-07-05
 
 - Detect missing daily and intraday candles inside valid BIST sessions.

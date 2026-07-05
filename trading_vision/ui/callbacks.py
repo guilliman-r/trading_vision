@@ -212,7 +212,17 @@ def _successful_chart_result(
     gap_report = (
         find_bist_candle_gaps(candles, interval) if result.symbol.is_bist else CandleGapReport()
     )
-    chart_meta = _chart_meta(result, latest, interval, provider_delay_seconds, gap_report.count)
+    quarantined_rows = (
+        result.quality_report.quarantined_rows if result.quality_report is not None else 0
+    )
+    chart_meta = _chart_meta(
+        result,
+        latest,
+        interval,
+        provider_delay_seconds,
+        gap_report.count,
+        quarantined_rows,
+    )
     visible_patterns = select_visible_patterns(candles, result.patterns)
     pattern_word = "pattern" if len(visible_patterns) == 1 else "patterns"
     status_text = (
@@ -240,6 +250,13 @@ def _successful_chart_result(
                 className="inline-warning",
             )
         )
+    if result.quality_report is not None and result.quality_report.has_warnings:
+        details.append(
+            html.P(
+                f"{result.quality_report.summary()}. Invalid rows were not cached or scanned.",
+                className="inline-warning",
+            )
+        )
     return (
         build_chart(
             candles,
@@ -263,6 +280,7 @@ def _chart_meta(
     interval: str,
     provider_delay_seconds: int,
     gap_count: int = 0,
+    quarantined_rows: int = 0,
 ) -> str:
     opened_at = latest["opened_at_utc"].to_pydatetime()
     freshness = evaluate_data_freshness(
@@ -278,7 +296,14 @@ def _chart_meta(
     if gap_count:
         gap_word = "gap" if gap_count == 1 else "gaps"
         gap_label = f" · {gap_count} data {gap_word}"
-    return f"{source} · Latest {local_time:%d %b %Y · %H:%M} · {freshness.label}{gap_label}"
+    quarantine_label = ""
+    if quarantined_rows:
+        row_word = "row" if quarantined_rows == 1 else "rows"
+        quarantine_label = f" · {quarantined_rows} quarantined {row_word}"
+    return (
+        f"{source} · Latest {local_time:%d %b %Y · %H:%M} · "
+        f"{freshness.label}{gap_label}{quarantine_label}"
+    )
 
 
 def _source_label(source) -> str:

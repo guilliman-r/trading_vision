@@ -73,6 +73,7 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
             patterns_added=2,
             status="partial",
             errors=["BAD.IS: provider failed"],
+            warnings=["GOOD.IS: one row quarantined"],
         )
         update_heartbeat(connection, "sleeping", 123, moment, moment, last_run_id=run_id)
         connection.commit()
@@ -88,3 +89,4 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
     assert "fixture" in diagnostics["Provider"]
     assert "dash" in diagnostics["Packages"]
     assert "BAD.IS" in diagnostics["Recent errors"]
+    assert "GOOD.IS" in diagnostics["Recent warnings"]

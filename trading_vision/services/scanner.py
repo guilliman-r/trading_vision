@@ -144,6 +144,7 @@ class ScannerService:
 
         succeeded = 0
         failures: list[str] = []
+        warnings: list[str] = []
         candles_added = 0
         patterns_added = 0
         for batch in _batches(jobs, self.settings.scanner_batch_size):
@@ -153,6 +154,7 @@ class ScannerService:
                     succeeded += 1
                     candles_added += result.candles_added
                     patterns_added += result.patterns_added
+                    warnings.extend(result.warnings)
                 except Exception as error:  # one provider/symbol must not abort the universe
                     failures.append(f"{job.symbol.provider_symbol}: {error}")
 
@@ -168,6 +170,7 @@ class ScannerService:
                 patterns_added,
                 status,
                 failures,
+                warnings,
             )
         return ScanRunSummary(
             run_id=run_id,
@@ -179,6 +182,7 @@ class ScannerService:
             patterns_added=patterns_added,
             status=status,
             errors=tuple(failures),
+            warnings=tuple(warnings),
         )
 
     def _run_job(self, job: ScanJob, dry_run: bool) -> JobResult:
@@ -208,7 +212,10 @@ class ScannerService:
                 transitions = 0
             else:
                 transitions = pattern_scan.scan(job.symbol, job.interval, candles).state_transitions
-        return JobResult(max(0, after - before), transitions)
+        warnings = ()
+        if fetched.quality_report is not None and fetched.quality_report.has_warnings:
+            warnings = (f"{job.symbol.provider_symbol}: {fetched.quality_report.summary()}",)
+        return JobResult(max(0, after - before), transitions, warnings)
 
     def _apply_bist_completion(self, candles, interval: str):
         if interval != "1d":

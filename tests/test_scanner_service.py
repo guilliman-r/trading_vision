@@ -7,6 +7,7 @@ import pandas as pd
 
 from tests.test_breakouts import resistance_fixture
 from trading_vision.config import Settings
+from trading_vision.data_quality import DataQualityReport
 from trading_vision.database import connect
 from trading_vision.models import Symbol
 from trading_vision.providers.base import FetchResult, MarketDataProvider
@@ -52,6 +53,18 @@ class CurrentDailyProvider(MarketDataProvider):
             }
         )
         return FetchResult(symbol=symbol, candles=candles)
+
+
+class QualityWarningProvider(PartialProvider):
+    def fetch_history(self, symbol: str, interval: str) -> FetchResult:
+        result = super().fetch_history(symbol, interval)
+        result.quality_report = DataQualityReport(
+            input_rows=len(result.candles) + 1,
+            valid_rows=len(result.candles),
+            quarantined_rows=1,
+            issue_counts=(("negative_volume", 1),),
+        )
+        return result
 
 
 def scanner_settings(database_path, lock_path) -> Settings:
@@ -136,3 +149,21 @@ def test_daily_candle_is_complete_after_bist_session_close(database_path, tmp_pa
             """
         ).fetchone()[0]
     assert is_complete == 1
+
+
+def test_quality_warning_is_persisted_without_failing_scan(database_path, tmp_path) -> None:
+    seed_scanner_symbols(database_path)
+    service = ScannerService(
+        scanner_settings(database_path, tmp_path / "scanner.lock"),
+        QualityWarningProvider(),
+        now=lambda: datetime(2026, 7, 6, 17, 30, tzinfo=UTC),
+    )
+
+    run = service.run_once(("GOOD",), force=True).runs[0]
+
+    assert run.status == "completed"
+    assert run.failed == 0
+    assert "Quarantined 1" in run.warnings[0]
+    with connect(database_path) as connection:
+        stored = get_latest_scan_run(connection)
+    assert "negative volume" in stored["warning_summary"]

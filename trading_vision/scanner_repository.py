@@ -76,13 +76,16 @@ def finish_scan_run(
     patterns_added: int,
     status: str,
     errors: list[str],
+    warnings: list[str] | None = None,
 ) -> None:
     concise_errors = [error[:300] for error in errors[:20]]
+    concise_warnings = [warning[:300] for warning in (warnings or [])[:20]]
     connection.execute(
         """
         UPDATE scan_runs SET
             finished_at_utc = ?, symbols_succeeded = ?, symbols_failed = ?,
-            candles_added = ?, patterns_added = ?, status = ?, error_summary = ?
+            candles_added = ?, patterns_added = ?, status = ?,
+            error_summary = ?, warning_summary = ?
         WHERE id = ?
         """,
         (
@@ -93,6 +96,7 @@ def finish_scan_run(
             patterns_added,
             status,
             json.dumps(concise_errors, ensure_ascii=False) if concise_errors else None,
+            json.dumps(concise_warnings, ensure_ascii=False) if concise_warnings else None,
             run_id,
         ),
     )

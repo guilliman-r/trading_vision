@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import yfinance as yf
 
-from trading_vision.data_quality import prepare_candles
+from trading_vision.data_quality import DataQualityError, prepare_candles_with_report
 from trading_vision.providers.base import FetchResult, MarketDataProvider
 
 PERIOD_BY_INTERVAL = {
@@ -32,14 +32,24 @@ class YahooFinanceProvider(MarketDataProvider):
             if raw.empty:
                 return FetchResult(symbol=symbol, error="Yahoo Finance returned no candles")
             normalized = self._normalize_columns(raw)
-            candles = prepare_candles(normalized, interval, self.name)
-            return FetchResult(symbol=symbol, candles=candles)
+            prepared = prepare_candles_with_report(normalized, interval, self.name)
+            return FetchResult(
+                symbol=symbol,
+                candles=prepared.candles,
+                quality_report=prepared.quality_report,
+            )
+        except DataQualityError as error:
+            return FetchResult(
+                symbol=symbol,
+                error=f"Yahoo Finance data-quality error: {error}",
+                quality_report=error.quality_report,
+            )
         except Exception as error:  # yfinance emits several transport exception types
             return FetchResult(symbol=symbol, error=f"Yahoo Finance error: {error}")
 
     @staticmethod
     def _normalize_columns(frame: pd.DataFrame) -> pd.DataFrame:
         normalized = frame.rename(columns=lambda value: str(value).strip().lower())
-        normalized.index = pd.to_datetime(normalized.index, utc=True)
+        normalized.index = pd.to_datetime(normalized.index, utc=True, errors="coerce")
         normalized.index.name = "opened_at_utc"
         return normalized

@@ -850,7 +850,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0606 — P0 / S:** Detect gaps relative to expected session candles without inventing missing prices.
 - [x] **TV-0607 — P0 / S:** Define stale thresholds per interval.
 - [x] **TV-0608 — P0 / S:** Distinguish “market closed” from “feed stale.”
-- [ ] **TV-0609 — P0 / S:** Quarantine invalid rows and preserve an error summary instead of silently dropping them.
+- [x] **TV-0609 — P0 / S:** Quarantine invalid rows and preserve an error summary instead of silently dropping them.
 - [ ] **TV-0610 — P1 / M:** Detect suspicious split-like jumps and compare them with corporate-action information.
 - [x] **TV-0611 — P0 / M:** Create fixture tests for DST boundaries, weekends, holidays, half days, duplicates, and malformed OHLC.
 - [ ] **TV-0612 — P1 / S:** Build `scripts/check_data.py` to print coverage and quality by symbol/interval.
