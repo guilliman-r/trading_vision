@@ -9,6 +9,8 @@ from plotly.subplots import make_subplots
 from trading_vision.models import PatternMatch
 from trading_vision.ui.pattern_overlays import add_pattern_overlays
 
+DEFAULT_VISIBLE_CANDLES = 180
+
 
 def build_chart(
     candles: pd.DataFrame,
@@ -83,7 +85,21 @@ def build_chart(
         side="right",
         fixedrange=False,
     )
+    _focus_chart_on_candles(figure, candles)
     return figure
+
+
+def _focus_chart_on_candles(figure: go.Figure, candles: pd.DataFrame) -> None:
+    visible_start = max(0, len(candles) - DEFAULT_VISIBLE_CANDLES)
+    visible = candles.iloc[visible_start:]
+    lowest = float(visible["low"].min())
+    highest = float(visible["high"].max())
+    span = max(highest - lowest, highest * 0.01)
+    padding = span * 0.06
+    time_range = [visible.iloc[0]["opened_at_utc"], visible.iloc[-1]["opened_at_utc"]]
+    figure.update_xaxes(range=time_range, row=1, col=1)
+    figure.update_xaxes(range=time_range, row=2, col=1)
+    figure.update_yaxes(range=[lowest - padding, highest + padding], row=1, col=1)
 
 
 def empty_chart(message: str) -> go.Figure:

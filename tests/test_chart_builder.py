@@ -150,3 +150,76 @@ def test_triangle_renders_converging_upper_and_lower_boundaries() -> None:
     assert lower.y[1] > lower.y[0]
     assert upper.y[1] - lower.y[1] < upper.y[0] - lower.y[0]
     assert apex.y[0] == 10
+
+
+def test_confirmed_triangle_boundaries_stop_at_confirmation() -> None:
+    times = pd.date_range("2025-01-01", periods=100, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [300] * 100,
+            "high": [310] * 100,
+            "low": [290] * 100,
+            "close": [305] * 100,
+            "volume": [100] * 100,
+        }
+    )
+    confirmation_index = 20
+    points = (
+        PatternPoint("upper_touch_1", 5, times[5].to_pydatetime(), 320),
+        PatternPoint("lower_touch_1", 6, times[6].to_pydatetime(), 260),
+        PatternPoint("upper_touch_2", 10, times[10].to_pydatetime(), 315),
+        PatternPoint("lower_touch_2", 11, times[11].to_pydatetime(), 280),
+        PatternPoint(
+            "confirmation",
+            confirmation_index,
+            times[confirmation_index].to_pydatetime(),
+            325,
+        ),
+    )
+    pattern = PatternMatch(
+        pattern_type="ascending_triangle",
+        direction="bullish",
+        state="confirmed",
+        started_at=times[5].to_pydatetime(),
+        ended_at=None,
+        confirmed_at=times[confirmation_index].to_pydatetime(),
+        score=85,
+        boundary_price=315,
+        target_price=1_000,
+        invalidation_price=250,
+        points=points,
+        reasons=("steep lower boundary",),
+        parameters={},
+        detector_version="test-v1",
+    )
+
+    figure = build_chart(candles, "TEST", "1d", (pattern,))
+    upper = next(trace for trace in figure.data if trace.name == "ascending_triangle · confirmed")
+    lower = next(trace for trace in figure.data if trace.name == "Triangle lower boundary")
+    target = next(trace for trace in figure.data if trace.name == "Target")
+
+    assert upper.x[-1] == times[confirmation_index]
+    assert lower.x[-1] == times[confirmation_index]
+    assert lower.y[-1] == 316
+    assert target.x[0] == times[confirmation_index]
+    assert tuple(figure.layout.yaxis.range) == (288.8, 311.2)
+
+
+def test_chart_opens_on_the_most_recent_candles() -> None:
+    times = pd.date_range("2025-01-01", periods=250, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [100] * 250,
+            "high": [105] * 250,
+            "low": [95] * 250,
+            "close": [102] * 250,
+            "volume": [100] * 250,
+        }
+    )
+
+    figure = build_chart(candles, "TEST", "1d")
+
+    assert figure.layout.xaxis.range[0] == times[70]
+    assert figure.layout.xaxis.range[1] == times[-1]

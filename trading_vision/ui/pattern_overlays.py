@@ -15,25 +15,27 @@ def add_pattern_overlays(
 ) -> None:
     last_time = candles.iloc[-1]["opened_at_utc"]
     for pattern in patterns:
-        if pattern.state == "expired":
+        if pattern.state not in {"forming", "confirmed"}:
             continue
         color = _pattern_color(pattern)
-        opacity = 0.45 if pattern.state == "invalidated" else 0.9
-        end_time = pattern.ended_at or last_time
+        opacity = 0.82
+        end_time = _structure_end_time(pattern, last_time)
         _add_boundary_line(figure, candles, pattern, color, opacity, end_time)
         _add_structure(figure, pattern, color, opacity)
-        _add_apex_marker(figure, pattern, color, opacity)
+        if pattern.state == "forming":
+            _add_apex_marker(figure, pattern, color, opacity)
         _add_confirmation_marker(figure, pattern, color)
-        _add_reference_line(figure, pattern, "target_price", "Target", color, "dot", last_time)
-        _add_reference_line(
-            figure,
-            pattern,
-            "invalidation_price",
-            "Invalidation",
-            "#8b96a8",
-            "dash",
-            last_time,
-        )
+        if pattern.state == "confirmed":
+            _add_reference_line(figure, pattern, "target_price", "Target", color, "dot", last_time)
+            _add_reference_line(
+                figure,
+                pattern,
+                "invalidation_price",
+                "Invalidation",
+                "#8b96a8",
+                "dash",
+                last_time,
+            )
 
 
 def _add_structure(
@@ -50,7 +52,7 @@ def _add_structure(
             text=[point.label.replace("_", " ").title() for point in structure],
             mode="lines+markers",
             line={"color": color, "width": 1, "dash": "dot"},
-            marker={"color": color, "size": 9, "symbol": "circle-open", "line_width": 2},
+            marker={"color": color, "size": 7, "symbol": "circle-open", "line_width": 1},
             opacity=opacity,
             name="Pattern structure",
             hovertemplate="%{text}<br>%{x}<br>%{y:,.2f}<extra></extra>",
@@ -112,7 +114,7 @@ def _add_boundary_line(
             x=[pattern.started_at, end_time],
             y=[pattern.boundary_price, pattern.boundary_price],
             mode="lines",
-            line={"color": color, "width": 2},
+            line={"color": color, "width": 1.5},
             opacity=opacity,
             name=f"{pattern.pattern_type} · {pattern.state}",
             hovertemplate=(
@@ -146,7 +148,7 @@ def _add_fitted_boundary(
             x=[first.occurred_at, end_time],
             y=[first.price, end_price],
             mode="lines",
-            line={"color": color, "width": 2},
+            line={"color": color, "width": 1.5},
             opacity=opacity,
             name=name,
             hovertemplate=f"{label}: %{{y:,.2f}}<extra></extra>",
@@ -218,9 +220,10 @@ def _add_reference_line(
     price = getattr(pattern, field)
     if price is None:
         return
+    start_time = pattern.confirmed_at or pattern.started_at
     figure.add_trace(
         go.Scatter(
-            x=[pattern.started_at, last_time],
+            x=[start_time, last_time],
             y=[price, price],
             mode="lines",
             line={"color": color, "width": 1, "dash": dash},
@@ -239,3 +242,12 @@ def _pattern_color(pattern: PatternMatch) -> str:
     if pattern.state == "forming":
         return "#4da3ff"
     return "#19c37d" if pattern.direction == "bullish" else "#f05a67"
+
+
+def _structure_end_time(pattern: PatternMatch, last_time):
+    if pattern.state == "confirmed" and pattern.confirmed_at is not None:
+        return pattern.confirmed_at
+    apex = next((point for point in pattern.points if point.label == "apex"), None)
+    if apex is None:
+        return last_time
+    return min(pd.Timestamp(last_time), pd.Timestamp(apex.occurred_at))

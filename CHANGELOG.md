@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0 — 2026-07-05
+
+- Replace the all-history overlay pile-up with a small actionable chart set.
+- Show forming patterns and confirmations from the latest 40 completed candles only.
+- Hide invalidated, expired, stale confirmed, and overlapping same-family candidates.
+- Prefer forming patterns and cap the visible set at three overlays.
+- Stop confirmed fitted boundaries at confirmation instead of projecting them indefinitely.
+- Draw target and invalidation guides only after confirmation and hide forming targets.
+- Base the initial price scale on visible candle highs and lows so overlay estimates cannot flatten
+  the chart.
+- Open charts on the latest 180 candles while preserving normal zoom and pan controls.
+- Add selection, extrapolation, reference-line, scale, and viewport regression tests.
+
 ## 0.8.0 — 2026-07-05
 
 - Add a full-width scanner operations workspace below the interactive chart.

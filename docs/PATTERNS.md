@@ -148,3 +148,23 @@ and invalidation.
 
 State transitions are stored separately from the current pattern row. Re-running the same scan does
 not create a new transition or alert candidate.
+
+## Live chart overlay policy
+
+Detection history and live chart overlays serve different jobs. The scanner retains every state
+for review, while the chart displays only the small set that can still inform a current decision:
+
+- all `forming` matches from the current detector run;
+- `confirmed` matches whose confirmation falls within the latest 40 completed candles;
+- no `invalidated`, `expired`, or older confirmed matches;
+- at most one overlapping forming candidate per pattern family and direction;
+- at most three overlays, ranked with forming matches first, then recency and score.
+
+Confirmed fitted necklines and triangle boundaries end at their confirmation candle. They are not
+extrapolated through the rest of the loaded history. Targets and invalidation guides begin at
+confirmation and appear only for confirmed matches. Forming triangles may extend to the earlier of
+the latest candle or projected apex.
+
+The initial viewport contains the latest 180 candles. Its price range comes from the visible candle
+highs and lows with a small margin, so a distant measured target or detector boundary cannot
+compress the actual price action. Users can still pan, zoom, and autoscale with Plotly controls.

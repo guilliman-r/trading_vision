@@ -94,9 +94,16 @@ The pattern engine also detects double tops and double bottoms from confirmed th
 structures. It requires explicit endpoint similarity, formation depth, leg spacing, and buffered
 neckline confirmation. See [pattern definitions](docs/PATTERNS.md) for diagrams and formulas.
 
+The chart intentionally shows only actionable geometry: every forming pattern and confirmations
+from the latest 40 completed candles, deduplicated and limited to the three highest-priority
+overlays. Invalidated, expired, and older confirmed patterns remain available in stored scanner
+results but do not crowd the live chart. The initial price scale follows candle highs and lows,
+not projected targets or extended trendlines.
+
 Standard and inverse head-and-shoulders patterns use five confirmed pivots, shoulder and timing
-symmetry, explicit head prominence, and a fitted sloped neckline. The chart extends that neckline
-to the pattern's current state boundary instead of flattening it.
+symmetry, explicit head prominence, and a fitted sloped neckline. The chart extends a forming
+neckline only through the current candle and stops a confirmed neckline at its confirmation
+candle.
 
 Ascending, descending, and symmetrical triangles use two confirmed touches on each fitted
 boundary. The detector rejects parallel and diverging channels, requires a future apex, and marks

@@ -8,7 +8,7 @@ Build a local-first Python application that:
 - includes a maintained universe of Borsa Istanbul (BIST) equities by default;
 - displays an interactive candlestick chart with familiar TradingView-style controls;
 - scans completed candles for chart patterns;
-- shows forming and confirmed patterns on the chart;
+- shows forming and recently confirmed patterns on the chart without stale overlay clutter;
 - creates actionable, deduplicated alerts;
 - remains intentionally simple to read, test, and modify.
 
@@ -878,6 +878,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0717 — P1 / S:** Add show/hide and delete-all controls for user drawings.
 - [ ] **TV-0718 — P1 / M:** Make panels collapsible and usable at tablet width.
 - [x] **TV-0719 — P0 / M:** Add smoke tests for app creation and chart construction from fixed candles.
+- [x] **TV-0720 — P0 / S:** Limit live overlays to forming/recent confirmed patterns and scale the
+  default viewport from visible candle prices rather than projected geometry.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

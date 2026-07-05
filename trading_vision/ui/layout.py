@@ -198,12 +198,11 @@ def _detail_row(label: str, value: str) -> html.Div:
 
 
 def _pattern_summary(patterns: tuple[PatternMatch, ...]) -> html.Div:
-    active = [pattern for pattern in patterns if pattern.state != "expired"]
-    if not active:
-        return _pattern_empty("No active horizontal breakouts in this window.")
-    priority = {"confirmed": 0, "forming": 1, "invalidated": 2}
-    active.sort(key=lambda pattern: (priority.get(pattern.state, 9), -pattern.score))
-    cards = [_pattern_card(pattern) for pattern in active[:3]]
+    if not patterns:
+        return _pattern_empty("No forming or recently confirmed patterns in this window.")
+    priority = {"forming": 0, "confirmed": 1}
+    active = sorted(patterns, key=lambda pattern: (priority.get(pattern.state, 9), -pattern.score))
+    cards = [_pattern_card(pattern) for pattern in active]
     return html.Div(
         [
             html.Div(

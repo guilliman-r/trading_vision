@@ -59,7 +59,7 @@ def test_load_button_callback_returns_chart_and_snapshot(database_path) -> None:
     payload = response.get_json()["response"]
     assert response.status_code == 200
     assert payload["chart-title"]["children"] == "THYAO.IS"
-    assert payload["data-status"]["children"] == "Live · 0 patterns"
+    assert payload["data-status"]["children"] == "Live · 0 active patterns"
     assert len(payload["price-chart"]["figure"]["data"]) == 2
     assert payload["symbol-input"]["value"] == "THYAO.IS"
 
