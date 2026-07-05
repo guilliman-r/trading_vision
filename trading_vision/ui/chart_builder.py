@@ -36,6 +36,8 @@ def build_chart(
             high=candles["high"],
             low=candles["low"],
             close=candles["close"],
+            hovertext=_candle_hover_text(candles, symbol),
+            hoverinfo="text",
             increasing_line_color="#19c37d",
             decreasing_line_color="#f05a67",
             name=symbol,
@@ -87,6 +89,29 @@ def build_chart(
     )
     _focus_chart_on_candles(figure, candles)
     return figure
+
+
+def _candle_hover_text(candles: pd.DataFrame, symbol: str) -> list[str]:
+    previous_closes = candles["close"].shift(1).fillna(candles["open"])
+    labels: list[str] = []
+    for candle, previous_close in zip(
+        candles.itertuples(index=False), previous_closes, strict=True
+    ):
+        change = float(candle.close) - float(previous_close)
+        change_percent = change / float(previous_close) * 100 if previous_close else 0.0
+        timestamp = pd.Timestamp(candle.opened_at_utc).tz_convert("Europe/Istanbul")
+        volume = "—" if pd.isna(candle.volume) else f"{float(candle.volume):,.0f}"
+        labels.append(
+            f"<b>{symbol}</b><br>"
+            f"{timestamp:%d %b %Y · %H:%M} (Istanbul)<br>"
+            f"Open {float(candle.open):,.2f}<br>"
+            f"High {float(candle.high):,.2f}<br>"
+            f"Low {float(candle.low):,.2f}<br>"
+            f"Close {float(candle.close):,.2f}<br>"
+            f"Change {change:+,.2f} ({change_percent:+.2f}%)<br>"
+            f"Volume {volume}"
+        )
+    return labels
 
 
 def _focus_chart_on_candles(figure: go.Figure, candles: pd.DataFrame) -> None:

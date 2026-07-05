@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import UTC, datetime
 from urllib.parse import parse_qs
 
 from dash import ALL, Input, Output, State, ctx, dcc, html
 
+from trading_vision.freshness import evaluate_data_freshness
 from trading_vision.scanner_results import PatternResultFilters, ScannerResultsSnapshot
 from trading_vision.services.market_data import ChartLoadResult
 from trading_vision.ui import ids
@@ -23,10 +25,12 @@ def register_callbacks(
     update_alerts: Callable[[str | None, int | None], tuple[int, tuple]],
     load_scanner: Callable[[PatternResultFilters], ScannerResultsSnapshot],
     export_scanner: Callable[[PatternResultFilters], str],
+    provider_delay_seconds: int,
 ) -> None:
     @app.callback(
         Output(ids.CHART, "figure"),
         Output(ids.CHART_TITLE, "children"),
+        Output(ids.CHART_META, "children"),
         Output(ids.STATUS, "children"),
         Output(ids.STATUS, "className"),
         Output(ids.DETAILS, "children"),
@@ -65,17 +69,19 @@ def register_callbacks(
                 return (
                     empty_chart(message),
                     result.symbol.provider_symbol,
+                    "No latest candle available",
                     "No data",
                     "status-badge error",
                     [html.P(message, className="inline-error")],
                     result.symbol.provider_symbol,
                 )
-            return _successful_chart_result(result, interval)
+            return _successful_chart_result(result, interval, provider_delay_seconds)
         except Exception as error:
             message = str(error) or "Unable to load this symbol"
             return (
                 empty_chart(message),
                 requested.upper() or "Market chart",
+                "Unable to determine data freshness",
                 "Load failed",
                 "status-badge error",
                 [html.P(message, className="inline-error")],
@@ -190,7 +196,11 @@ def register_callbacks(
         return dcc.send_string(export_scanner(filters), "trading-vision-patterns.csv")
 
 
-def _successful_chart_result(result: ChartLoadResult, interval: str):
+def _successful_chart_result(
+    result: ChartLoadResult,
+    interval: str,
+    provider_delay_seconds: int,
+):
     candles = result.candles
     latest = candles.iloc[-1]
     previous_close = candles.iloc[-2]["close"] if len(candles) > 1 else latest["open"]
@@ -198,6 +208,7 @@ def _successful_chart_result(result: ChartLoadResult, interval: str):
     latest_time = latest["opened_at_utc"].tz_convert("Europe/Istanbul")
     latest_label = latest_time.strftime("%d %b %Y · %H:%M")
     provider_message = result.provider_message
+    chart_meta = _chart_meta(result, latest, interval, provider_delay_seconds)
     visible_patterns = select_visible_patterns(candles, result.patterns)
     pattern_word = "pattern" if len(visible_patterns) == 1 else "patterns"
     status_text = (
@@ -219,11 +230,38 @@ def _successful_chart_result(result: ChartLoadResult, interval: str):
     return (
         build_chart(candles, result.symbol.provider_symbol, interval, visible_patterns),
         result.symbol.provider_symbol,
+        chart_meta,
         status_text,
         status_class,
         details,
         result.symbol.provider_symbol,
     )
+
+
+def _chart_meta(
+    result: ChartLoadResult,
+    latest,
+    interval: str,
+    provider_delay_seconds: int,
+) -> str:
+    opened_at = latest["opened_at_utc"].to_pydatetime()
+    freshness = evaluate_data_freshness(
+        latest_candle_at=opened_at,
+        interval=interval,
+        now=datetime.now(UTC),
+        is_bist=result.symbol.is_bist,
+        provider_delay_seconds=provider_delay_seconds,
+    )
+    source = _source_label(latest.get("source"))
+    local_time = latest["opened_at_utc"].tz_convert("Europe/Istanbul")
+    return f"{source} · Latest {local_time:%d %b %Y · %H:%M} · {freshness.label}"
+
+
+def _source_label(source) -> str:
+    normalized = str(source or "unknown").strip().lower()
+    if normalized == "yahoo":
+        return "Yahoo Finance"
+    return normalized.replace("_", " ").title()
 
 
 def _result_filters(

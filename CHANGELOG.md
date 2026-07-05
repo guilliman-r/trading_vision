@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.0 — 2026-07-05
+
+- Add explicit post-boundary freshness grace windows for every supported interval.
+- Reuse the BIST session calendar to distinguish current closed-market data from a stale feed.
+- Avoid guessing freshness for arbitrary Yahoo symbols whose exchange calendar is unavailable.
+- Show data source, latest candle time in Istanbul, and freshness state directly above the chart.
+- Add a complete candle hover summary with timestamp, OHLC, absolute change, percentage change,
+  and volume.
+- Add calendar, grace-window, generic-symbol, callback metadata, and hover-content tests.
+
 ## 0.10.0 — 2026-07-05
 
 - Populate the chart symbol typeahead from every active symbol in SQLite.

@@ -848,8 +848,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0604 — P0 / S:** Define when daily candles become eligible for scanning.
 - [x] **TV-0605 — P0 / M:** Validate OHLC relationships, positive prices, non-negative volume, duplicates, ordering, and timezone awareness.
 - [ ] **TV-0606 — P0 / S:** Detect gaps relative to expected session candles without inventing missing prices.
-- [ ] **TV-0607 — P0 / S:** Define stale thresholds per interval.
-- [ ] **TV-0608 — P0 / S:** Distinguish “market closed” from “feed stale.”
+- [x] **TV-0607 — P0 / S:** Define stale thresholds per interval.
+- [x] **TV-0608 — P0 / S:** Distinguish “market closed” from “feed stale.”
 - [ ] **TV-0609 — P0 / S:** Quarantine invalid rows and preserve an error summary instead of silently dropping them.
 - [ ] **TV-0610 — P1 / M:** Detect suspicious split-like jumps and compare them with corporate-action information.
 - [x] **TV-0611 — P0 / M:** Create fixture tests for DST boundaries, weekends, holidays, half days, duplicates, and malformed OHLC.
@@ -867,10 +867,10 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0706 — P0 / M:** Build a pure `build_chart(candles, patterns, drawings, options)` function.
 - [x] **TV-0707 — P0 / S:** Add candlesticks and a synchronized volume subplot.
 - [ ] **TV-0708 — P0 / S:** Configure range breaks so closed-market gaps are understandable.
-- [ ] **TV-0709 — P0 / S:** Add hover details for timestamp, OHLC, absolute change, percent change, and volume.
+- [x] **TV-0709 — P0 / S:** Add hover details for timestamp, OHLC, absolute change, percent change, and volume.
 - [x] **TV-0710 — P0 / S:** Add zoom, pan, autoscale, reset, and image export controls.
 - [x] **TV-0711 — P0 / S:** Add spike lines/crosshair behavior supported by Plotly.
-- [ ] **TV-0712 — P0 / S:** Show latest-candle timestamp, source, and stale state above the chart.
+- [x] **TV-0712 — P0 / S:** Show latest-candle timestamp, source, and stale state above the chart.
 - [x] **TV-0713 — P0 / S:** Keep network loading out of the chart builder.
 - [x] **TV-0714 — P0 / S:** Preserve user zoom with stable `uirevision` values.
 - [x] **TV-0715 — P0 / S:** Add loading, invalid-symbol, no-data, and provider-error states.

@@ -130,7 +130,10 @@ def _chart_panel() -> html.Section:
             html.Div(
                 [
                     html.Div(
-                        [html.H1("Market chart", id=ids.CHART_TITLE), html.P("Waiting for data")]
+                        [
+                            html.H1("Market chart", id=ids.CHART_TITLE),
+                            html.P("Waiting for data", id=ids.CHART_META),
+                        ]
                     ),
                     html.Div("Ready", id=ids.STATUS, className="status-badge neutral"),
                 ],

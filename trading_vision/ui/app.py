@@ -89,7 +89,14 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         suppress_callback_exceptions=False,
     )
     app.layout = build_layout(settings, scanner_status, symbols)
-    register_callbacks(app, load_chart, update_alerts, load_scanner, export_scanner)
+    register_callbacks(
+        app,
+        load_chart,
+        update_alerts,
+        load_scanner,
+        export_scanner,
+        settings.provider_delay_seconds,
+    )
     return app
 
 

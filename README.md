@@ -40,6 +40,17 @@ The field is still free-form: enter any Yahoo Finance ticker such as `AAPL`, `MS
 and press Enter or **Load**. Known BIST display codes resolve to their `.IS` provider symbols.
 See the [symbol search guide](docs/SYMBOL_SEARCH.md) for matching and duplicate rules.
 
+## Read the chart
+
+The line below the symbol name identifies the data source, latest candle time in Istanbul, and
+whether BIST data is current, stale, or simply unchanged because the market is closed. Freshness
+uses the maintained BIST calendar and interval-specific provider grace windows. Non-BIST symbols
+are not judged against BIST trading hours.
+
+Hover over a candle to see its timestamp, open, high, low, close, absolute and percentage change,
+and volume in one compact summary. See the [freshness guide](docs/DATA_FRESHNESS.md) for the exact
+states and thresholds.
+
 ## Run the scanner
 
 Keep the UI running and start the worker in a second terminal:
