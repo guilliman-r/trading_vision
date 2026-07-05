@@ -27,6 +27,7 @@ class BistSessionCalendar:
 
     def __init__(self, directory: Path = CALENDAR_DIRECTORY) -> None:
         self.overrides = _load_overrides(directory)
+        self.covered_years = frozenset(day.year for day in self.overrides)
 
     def session_for(self, trading_date: date) -> MarketSession | None:
         if trading_date.weekday() >= 5:

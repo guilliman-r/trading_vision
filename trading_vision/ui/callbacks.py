@@ -8,6 +8,7 @@ from urllib.parse import parse_qs
 
 from dash import ALL, Input, Output, State, ctx, dcc, html
 
+from trading_vision.candle_gaps import CandleGapReport, find_bist_candle_gaps
 from trading_vision.freshness import evaluate_data_freshness
 from trading_vision.scanner_results import PatternResultFilters, ScannerResultsSnapshot
 from trading_vision.services.market_data import ChartLoadResult
@@ -208,7 +209,10 @@ def _successful_chart_result(
     latest_time = latest["opened_at_utc"].tz_convert("Europe/Istanbul")
     latest_label = latest_time.strftime("%d %b %Y · %H:%M")
     provider_message = result.provider_message
-    chart_meta = _chart_meta(result, latest, interval, provider_delay_seconds)
+    gap_report = (
+        find_bist_candle_gaps(candles, interval) if result.symbol.is_bist else CandleGapReport()
+    )
+    chart_meta = _chart_meta(result, latest, interval, provider_delay_seconds, gap_report.count)
     visible_patterns = select_visible_patterns(candles, result.patterns)
     pattern_word = "pattern" if len(visible_patterns) == 1 else "patterns"
     status_text = (
@@ -227,6 +231,15 @@ def _successful_chart_result(
     )
     if provider_message:
         details.append(html.P(provider_message, className="inline-warning"))
+    if gap_report.count:
+        candle_word = "candle" if gap_report.count == 1 else "candles"
+        details.append(
+            html.P(
+                f"{gap_report.count} missing completed {candle_word} detected inside covered "
+                "BIST sessions. Pattern results may be incomplete.",
+                className="inline-warning",
+            )
+        )
     return (
         build_chart(
             candles,
@@ -249,6 +262,7 @@ def _chart_meta(
     latest,
     interval: str,
     provider_delay_seconds: int,
+    gap_count: int = 0,
 ) -> str:
     opened_at = latest["opened_at_utc"].to_pydatetime()
     freshness = evaluate_data_freshness(
@@ -260,7 +274,11 @@ def _chart_meta(
     )
     source = _source_label(latest.get("source"))
     local_time = latest["opened_at_utc"].tz_convert("Europe/Istanbul")
-    return f"{source} · Latest {local_time:%d %b %Y · %H:%M} · {freshness.label}"
+    gap_label = ""
+    if gap_count:
+        gap_word = "gap" if gap_count == 1 else "gaps"
+        gap_label = f" · {gap_count} data {gap_word}"
+    return f"{source} · Latest {local_time:%d %b %Y · %H:%M} · {freshness.label}{gap_label}"
 
 
 def _source_label(source) -> str:

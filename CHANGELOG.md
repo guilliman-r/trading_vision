@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.0 — 2026-07-05
+
+- Detect missing daily and intraday candles inside valid BIST sessions.
+- Exclude weekends, configured holidays, half-day closures, and out-of-range endpoints.
+- Restrict gap judgments to years backed by a committed exchange-calendar file.
+- Preserve source OHLCV exactly; gap detection never creates replacement candles.
+- Show gap counts in chart metadata and a plain warning in instrument details.
+- Add daily, weekend, holiday, intraday, uncovered-year, and end-to-end UI tests.
+
 ## 0.12.0 — 2026-07-05
 
 - Compress BIST chart timelines using the maintained exchange-session calendar.

@@ -55,6 +55,11 @@ BIST charts also compress known closed-market periods so price action is not sep
 empty overnight, weekend, or holiday gaps. Price and volume remain synchronized, and no candle is
 created or removed. See the [chart timeline guide](docs/CHART_TIMELINE.md).
 
+Trading Vision separately checks for missing candles *inside* valid BIST sessions. A detected gap
+appears beside the chart freshness status and as an instrument warning because pattern results may
+then be incomplete. The application never fills a gap with invented prices. See the
+[candle-gap guide](docs/CANDLE_GAPS.md).
+
 ## Run the scanner
 
 Keep the UI running and start the worker in a second terminal:

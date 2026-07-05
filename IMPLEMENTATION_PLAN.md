@@ -847,7 +847,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0603 — P0 / S:** Handle half days and exceptional closures through a small override data file.
 - [x] **TV-0604 — P0 / S:** Define when daily candles become eligible for scanning.
 - [x] **TV-0605 — P0 / M:** Validate OHLC relationships, positive prices, non-negative volume, duplicates, ordering, and timezone awareness.
-- [ ] **TV-0606 — P0 / S:** Detect gaps relative to expected session candles without inventing missing prices.
+- [x] **TV-0606 — P0 / S:** Detect gaps relative to expected session candles without inventing missing prices.
 - [x] **TV-0607 — P0 / S:** Define stale thresholds per interval.
 - [x] **TV-0608 — P0 / S:** Distinguish “market closed” from “feed stale.”
 - [ ] **TV-0609 — P0 / S:** Quarantine invalid rows and preserve an error summary instead of silently dropping them.

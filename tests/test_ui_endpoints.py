@@ -29,6 +29,23 @@ class StaticProvider(MarketDataProvider):
         return FetchResult(symbol=symbol, candles=prepare_candles(frame, interval, self.name))
 
 
+class GapProvider(MarketDataProvider):
+    name = "fixture"
+
+    def fetch_history(self, symbol: str, interval: str) -> FetchResult:
+        frame = pd.DataFrame(
+            {
+                "open": [100.0, 102.0],
+                "high": [104.0, 106.0],
+                "low": [99.0, 101.0],
+                "close": [102.0, 105.0],
+                "volume": [1000.0, 1200.0],
+            },
+            index=pd.to_datetime(["2026-01-02", "2026-01-06"], utc=True),
+        )
+        return FetchResult(symbol=symbol, candles=prepare_candles(frame, interval, self.name))
+
+
 def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None:
     app = create_app(Settings(database_path=database_path), StaticProvider())
     client = app.server.test_client()
@@ -85,6 +102,19 @@ def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:
     assert callback_thread != creating_thread
     assert status_code == 200
     assert payload["response"]["chart-title"]["children"] == "THYAO.IS"
+
+
+def test_chart_callback_makes_bist_candle_gap_visible(database_path) -> None:
+    app = create_app(Settings(database_path=database_path), GapProvider())
+    response = app.server.test_client().post(
+        "/_dash-update-component",
+        json=_load_callback_request(app),
+    )
+    payload = response.get_json()["response"]
+
+    assert response.status_code == 200
+    assert "1 data gap" in payload["chart-meta"]["children"]
+    assert "1 missing completed candle" in json.dumps(payload["chart-details"]["children"])
 
 
 def test_theme_button_callback_toggles_to_light(database_path) -> None:
