@@ -51,6 +51,10 @@ whether BIST data is current, stale, or simply unchanged because the market is c
 uses the maintained BIST calendar and interval-specific provider grace windows. Non-BIST symbols
 are not judged against BIST trading hours.
 
+If Yahoo supplies the currently open BIST bar, the chart keeps it visible but labels it
+`forming candle`. Detectors ignore it until the proper exchange boundary and provider delay have
+passed. See the [candle-completion guide](docs/CANDLE_COMPLETION.md).
+
 Hover over a candle to see its timestamp, open, high, low, close, absolute and percentage change,
 and volume in one compact summary. See the [freshness guide](docs/DATA_FRESHNESS.md) for the exact
 states and thresholds.

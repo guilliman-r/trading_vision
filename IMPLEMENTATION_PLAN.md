@@ -826,7 +826,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0506 — P0 / S:** Convert provider timestamps to UTC and retain exchange metadata separately.
 - [x] **TV-0507 — P0 / XS:** Choose adjusted-price behavior explicitly rather than accepting a changing library default.
   - Default: use adjusted OHLC for pattern continuity and record `is_adjusted=True`.
-- [ ] **TV-0508 — P0 / S:** Remove or flag the still-open candle based on interval and exchange session.
+- [x] **TV-0508 — P0 / S:** Remove or flag the still-open candle based on interval and exchange session.
 - [ ] **TV-0509 — P0 / M:** Implement bounded retries with exponential backoff and random jitter.
 - [ ] **TV-0510 — P0 / S:** Treat invalid ticker, empty history, rate limiting, timeout, and partial batch failure separately.
 - [ ] **TV-0511 — P0 / S:** Log request duration and returned candle range without logging secrets.

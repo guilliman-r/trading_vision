@@ -300,9 +300,10 @@ def _chart_meta(
     if quarantined_rows:
         row_word = "row" if quarantined_rows == 1 else "rows"
         quarantine_label = f" · {quarantined_rows} quarantined {row_word}"
+    forming_label = " · forming candle" if not bool(latest.get("is_complete", True)) else ""
     return (
         f"{source} · Latest {local_time:%d %b %Y · %H:%M} · "
-        f"{freshness.label}{gap_label}{quarantine_label}"
+        f"{freshness.label}{forming_label}{gap_label}{quarantine_label}"
     )
 
 

@@ -6,6 +6,7 @@ import os
 from collections.abc import Callable
 from datetime import UTC, datetime
 
+from trading_vision.candle_completion import mark_bist_candle_completion
 from trading_vision.config import PROJECT_ROOT, Settings
 from trading_vision.database import connection_scope, initialize_database
 from trading_vision.market_calendar import BistSessionCalendar
@@ -218,15 +219,13 @@ class ScannerService:
         return JobResult(max(0, after - before), transitions, warnings)
 
     def _apply_bist_completion(self, candles, interval: str):
-        if interval != "1d":
-            return candles
-        completed_session = self.calendar.latest_completed_session(
-            self.now(), self.settings.provider_delay_seconds
+        return mark_bist_candle_completion(
+            candles,
+            interval,
+            self.now(),
+            self.settings.provider_delay_seconds,
+            self.calendar,
         )
-        prepared = candles.copy()
-        local_dates = prepared["opened_at_utc"].dt.tz_convert("Europe/Istanbul").dt.date
-        prepared["is_complete"] = local_dates <= completed_session.trading_date
-        return prepared
 
 
 def _batches(jobs: list[ScanJob], size: int):

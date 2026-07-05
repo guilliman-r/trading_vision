@@ -77,6 +77,23 @@ class QuarantineProvider(MarketDataProvider):
         )
 
 
+class FutureCandleProvider(MarketDataProvider):
+    name = "fixture"
+
+    def fetch_history(self, symbol: str, interval: str) -> FetchResult:
+        frame = pd.DataFrame(
+            {
+                "open": [100.0],
+                "high": [104.0],
+                "low": [99.0],
+                "close": [102.0],
+                "volume": [1000.0],
+            },
+            index=pd.to_datetime(["2099-01-05"], utc=True),
+        )
+        return FetchResult(symbol=symbol, candles=prepare_candles(frame, interval, self.name))
+
+
 def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None:
     app = create_app(Settings(database_path=database_path), StaticProvider())
     client = app.server.test_client()
@@ -183,6 +200,18 @@ def test_chart_callback_makes_quarantined_provider_rows_visible(database_path) -
     details = json.dumps(payload["chart-details"]["children"])
     assert "Quarantined 1 of 2 provider rows" in details
     assert "negative volume (1)" in details
+
+
+def test_chart_callback_labels_still_forming_bist_candle(database_path) -> None:
+    app = create_app(Settings(database_path=database_path), FutureCandleProvider())
+    response = app.server.test_client().post(
+        "/_dash-update-component",
+        json=_load_callback_request(app),
+    )
+    payload = response.get_json()["response"]
+
+    assert response.status_code == 200
+    assert "forming candle" in payload["chart-meta"]["children"]
 
 
 def test_theme_button_callback_toggles_to_light(database_path) -> None:

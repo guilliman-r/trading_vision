@@ -55,6 +55,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
                     connection=connection,
                     provider=data_provider,
                     candle_limit=settings.chart_candle_limit,
+                    provider_delay_seconds=settings.provider_delay_seconds,
                 )
                 result = market_data.load(symbol_query, interval)
                 if not result.candles.empty:

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.16.0 — 2026-07-06
+
+- Centralize BIST candle-completion decisions in one calendar-aware function.
+- Keep daily candles forming until the exchange data close plus provider delay.
+- Keep intraday candles forming until their interval boundary plus provider delay.
+- Resolve pre-open, weekend, holiday, and half-day completion through the maintained calendar.
+- Use identical completion flags in chart loads, cached fallback data, and scanner jobs.
+- Show a `forming candle` label above the chart when the newest BIST bar is still open.
+- Add daily, intraday, provider-delay, weekend, market-service, scanner, and UI tests.
+
 ## 0.15.0 — 2026-07-05
 
 - Add a configurable short in-process cooldown for identical UI chart loads.
