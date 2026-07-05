@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.15.0 — 2026-07-05
+
+- Add a configurable short in-process cooldown for identical UI chart loads.
+- Reuse the complete chart result, including detector output, without reopening SQLite or Yahoo.
+- Serialize concurrent requests for the same symbol and interval so only one provider call runs.
+- Treat BIST display and `.IS` provider symbols as the same cooldown key.
+- Keep different symbols and intervals independent.
+- Make the Refresh button explicitly bypass the cooldown.
+- Add expiry, forced refresh, interval isolation, concurrency, settings, and Dash callback tests.
+
 ## 0.14.0 — 2026-07-05
 
 - Classify invalid timestamps, duplicates, missing/non-numeric prices, non-positive prices,

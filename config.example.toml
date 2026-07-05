@@ -11,6 +11,10 @@ chart_candle_limit = 500
 [storage]
 database_path = "var/trading_vision.sqlite3"
 
+[provider]
+# Reuse identical UI chart loads briefly; the Refresh button always bypasses this.
+cooldown_seconds = 30
+
 [scanner]
 # Start conservatively. Add "1h" after measuring provider throughput for your universe.
 intervals = ["1d"]

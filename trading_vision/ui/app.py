@@ -17,6 +17,7 @@ from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.repositories import import_symbol_catalog, search_symbols, seed_symbols
 from trading_vision.scanner_repository import get_heartbeat
+from trading_vision.services.chart_load_cache import ChartLoadCooldown
 from trading_vision.services.market_data import MarketDataService
 from trading_vision.services.pattern_scan import PatternScanService
 from trading_vision.services.scanner_results import ScannerResultsService
@@ -45,24 +46,33 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         symbols = _unique_display_symbols(search_symbols(connection, limit=10_000))
 
     data_provider = provider or YahooFinanceProvider()
+    chart_load_cooldown = ChartLoadCooldown(settings.provider_cooldown_seconds)
 
-    def load_chart(symbol_query: str, interval: str):
-        with connection_scope(settings.database_path) as connection:
-            market_data = MarketDataService(
-                connection=connection,
-                provider=data_provider,
-                candle_limit=settings.chart_candle_limit,
-            )
-            result = market_data.load(symbol_query, interval)
-            if not result.candles.empty:
-                pattern_scan = PatternScanService(
-                    connection,
-                    minimum_alert_score=settings.minimum_alert_score,
-                    alert_pattern_types=settings.alert_pattern_types,
+    def load_chart(symbol_query: str, interval: str, force_refresh: bool = False):
+        def load_from_provider():
+            with connection_scope(settings.database_path) as connection:
+                market_data = MarketDataService(
+                    connection=connection,
+                    provider=data_provider,
+                    candle_limit=settings.chart_candle_limit,
                 )
-                scan_result = pattern_scan.scan(result.symbol, interval, result.candles)
-                result.patterns = scan_result.matches
-            return result
+                result = market_data.load(symbol_query, interval)
+                if not result.candles.empty:
+                    pattern_scan = PatternScanService(
+                        connection,
+                        minimum_alert_score=settings.minimum_alert_score,
+                        alert_pattern_types=settings.alert_pattern_types,
+                    )
+                    scan_result = pattern_scan.scan(result.symbol, interval, result.candles)
+                    result.patterns = scan_result.matches
+                return result
+
+        return chart_load_cooldown.get_or_load(
+            symbol_query,
+            interval,
+            load_from_provider,
+            force=force_refresh,
+        )
 
     def update_alerts(action: str | None, alert_id: int | None):
         with connection_scope(settings.database_path) as connection:

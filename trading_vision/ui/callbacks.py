@@ -22,7 +22,7 @@ from trading_vision.ui.scanner_views import diagnostic_cards, render_result_tabl
 
 def register_callbacks(
     app,
-    load_chart: Callable[[str, str], ChartLoadResult],
+    load_chart: Callable[[str, str, bool], ChartLoadResult],
     update_alerts: Callable[[str | None, int | None], tuple[int, tuple]],
     load_scanner: Callable[[PatternResultFilters], ScannerResultsSnapshot],
     export_scanner: Callable[[PatternResultFilters], str],
@@ -64,7 +64,7 @@ def register_callbacks(
             if requested_interval in {"1d", "1h", "15m", "5m"}:
                 interval = requested_interval
         try:
-            result = load_chart(requested, interval)
+            result = load_chart(requested, interval, triggered == ids.REFRESH_BUTTON)
             if result.candles.empty:
                 message = result.provider_message or "No candles returned"
                 return (

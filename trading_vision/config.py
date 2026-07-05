@@ -37,6 +37,7 @@ class Settings:
     scanner_batch_size: int = 25
     scanner_lookback_bars: int = 500
     provider_delay_seconds: int = 60
+    provider_cooldown_seconds: int = 30
     scanner_lock_path: Path = PROJECT_ROOT / "var" / "scanner.lock"
     minimum_alert_score: float = 70.0
     alert_pattern_types: tuple[str, ...] = (
@@ -64,6 +65,8 @@ class Settings:
             raise ValueError("scanner_lookback_bars must be between 350 and 5000")
         if not 0 <= self.provider_delay_seconds <= 3_600:
             raise ValueError("provider_delay_seconds must be between 0 and 3600")
+        if not 0 <= self.provider_cooldown_seconds <= 300:
+            raise ValueError("provider_cooldown_seconds must be between 0 and 300")
         if not 0 <= self.minimum_alert_score <= 100:
             raise ValueError("minimum_alert_score must be between 0 and 100")
         invalid_pattern_types = set(self.alert_pattern_types).difference(SUPPORTED_PATTERN_TYPES)
@@ -84,6 +87,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
         app = document.get("app", {})
         storage = document.get("storage", {})
         scanner = document.get("scanner", {})
+        provider = document.get("provider", {})
         alerts = document.get("alerts", {})
         raw_database_path = storage.get("database_path", str(settings.database_path))
         database_path = Path(raw_database_path)
@@ -107,6 +111,9 @@ def load_settings(config_path: Path | None = None) -> Settings:
             scanner_lookback_bars=int(scanner.get("lookback_bars", settings.scanner_lookback_bars)),
             provider_delay_seconds=int(
                 scanner.get("provider_delay_seconds", settings.provider_delay_seconds)
+            ),
+            provider_cooldown_seconds=int(
+                provider.get("cooldown_seconds", settings.provider_cooldown_seconds)
             ),
             scanner_lock_path=scanner_lock_path,
             minimum_alert_score=float(alerts.get("minimum_score", settings.minimum_alert_score)),

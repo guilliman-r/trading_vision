@@ -44,3 +44,12 @@ def test_loads_and_validates_alert_settings(tmp_path: Path) -> None:
     assert settings.alert_pattern_types == ("double_top",)
     with pytest.raises(ValueError, match="minimum_alert_score"):
         Settings(minimum_alert_score=101).validate()
+
+
+def test_loads_and_validates_provider_cooldown(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text("[provider]\ncooldown_seconds = 45\n")
+
+    assert load_settings(config_path).provider_cooldown_seconds == 45
+    with pytest.raises(ValueError, match="provider_cooldown_seconds"):
+        Settings(provider_cooldown_seconds=301).validate()

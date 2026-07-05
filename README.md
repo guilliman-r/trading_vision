@@ -27,8 +27,12 @@ See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 .venv/bin/trading-vision
 ```
 
-Open <http://127.0.0.1:8050>. The first symbol load may take a few seconds; subsequent loads
-use the local SQLite cache when fresh enough.
+Open <http://127.0.0.1:8050>. The first symbol load may take a few seconds. Downloaded candles are
+stored in SQLite and remain available as a visible fallback when the provider fails.
+
+Identical chart requests made within the short provider cooldown reuse the in-process result so UI
+callbacks do not repeatedly call Yahoo or rescan the same candles. **Refresh** always bypasses the
+cooldown. See the [provider request guide](docs/PROVIDER_REQUESTS.md).
 
 ## Find a symbol
 

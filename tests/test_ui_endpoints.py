@@ -29,6 +29,15 @@ class StaticProvider(MarketDataProvider):
         return FetchResult(symbol=symbol, candles=prepare_candles(frame, interval, self.name))
 
 
+class CountingProvider(StaticProvider):
+    def __init__(self) -> None:
+        self.requests = 0
+
+    def fetch_history(self, symbol: str, interval: str) -> FetchResult:
+        self.requests += 1
+        return super().fetch_history(symbol, interval)
+
+
 class GapProvider(MarketDataProvider):
     name = "fixture"
 
@@ -124,6 +133,28 @@ def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:
     assert callback_thread != creating_thread
     assert status_code == 200
     assert payload["response"]["chart-title"]["children"] == "THYAO.IS"
+
+
+def test_repeated_chart_load_uses_cooldown_and_refresh_bypasses_it(database_path) -> None:
+    provider = CountingProvider()
+    app = create_app(
+        Settings(database_path=database_path, provider_cooldown_seconds=30),
+        provider,
+    )
+    client = app.server.test_client()
+
+    first = client.post("/_dash-update-component", json=_load_callback_request(app))
+    repeated = client.post("/_dash-update-component", json=_load_callback_request(app))
+    refresh_request = _load_callback_request(app)
+    refresh_input = next(
+        item for item in refresh_request["inputs"] if item["id"] == "refresh-button"
+    )
+    refresh_input["value"] = 1
+    refresh_request["changedPropIds"] = ["refresh-button.n_clicks"]
+    refreshed = client.post("/_dash-update-component", json=refresh_request)
+
+    assert first.status_code == repeated.status_code == refreshed.status_code == 200
+    assert provider.requests == 2
 
 
 def test_chart_callback_makes_bist_candle_gap_visible(database_path) -> None:
