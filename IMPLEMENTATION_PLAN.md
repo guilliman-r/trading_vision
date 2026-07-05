@@ -866,7 +866,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0705 — P0 / XS:** Add the interval selector and validate supported combinations.
 - [ ] **TV-0706 — P0 / M:** Build a pure `build_chart(candles, patterns, drawings, options)` function.
 - [x] **TV-0707 — P0 / S:** Add candlesticks and a synchronized volume subplot.
-- [ ] **TV-0708 — P0 / S:** Configure range breaks so closed-market gaps are understandable.
+- [x] **TV-0708 — P0 / S:** Configure range breaks so closed-market gaps are understandable.
 - [x] **TV-0709 — P0 / S:** Add hover details for timestamp, OHLC, absolute change, percent change, and volume.
 - [x] **TV-0710 — P0 / S:** Add zoom, pan, autoscale, reset, and image export controls.
 - [x] **TV-0711 — P0 / S:** Add spike lines/crosshair behavior supported by Plotly.

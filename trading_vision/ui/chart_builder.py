@@ -8,6 +8,7 @@ from plotly.subplots import make_subplots
 
 from trading_vision.models import PatternMatch
 from trading_vision.ui.pattern_overlays import add_pattern_overlays
+from trading_vision.ui.range_breaks import bist_range_breaks
 
 DEFAULT_VISIBLE_CANDLES = 180
 
@@ -17,6 +18,7 @@ def build_chart(
     symbol: str,
     interval: str,
     patterns: tuple[PatternMatch, ...] = (),
+    is_bist: bool = False,
 ) -> go.Figure:
     if candles.empty:
         return empty_chart("No chart data is available")
@@ -80,6 +82,8 @@ def build_chart(
         spikecolor="#607086",
         spikethickness=1,
     )
+    if is_bist:
+        figure.update_xaxes(rangebreaks=bist_range_breaks(candles, interval))
     figure.update_yaxes(
         showgrid=True,
         gridcolor="#18202d",

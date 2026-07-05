@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.12.0 — 2026-07-05
+
+- Compress BIST chart timelines using the maintained exchange-session calendar.
+- Hide weekends and official full-day holidays without inventing or deleting candle data.
+- Hide the regular 18:00–10:00 BIST intraday closure on intraday charts.
+- Hide the non-trading remainder after configured BIST half-day closes.
+- Apply identical range breaks to the synchronized price and volume axes.
+- Leave arbitrary Yahoo symbols untouched because their exchange calendars are not yet modeled.
+- Add weekend, holiday, overnight, half-day, BIST-only, and synchronized-axis tests.
+
 ## 0.11.0 — 2026-07-05
 
 - Add explicit post-boundary freshness grace windows for every supported interval.

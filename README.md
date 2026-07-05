@@ -51,6 +51,10 @@ Hover over a candle to see its timestamp, open, high, low, close, absolute and p
 and volume in one compact summary. See the [freshness guide](docs/DATA_FRESHNESS.md) for the exact
 states and thresholds.
 
+BIST charts also compress known closed-market periods so price action is not separated by large
+empty overnight, weekend, or holiday gaps. Price and volume remain synchronized, and no candle is
+created or removed. See the [chart timeline guide](docs/CHART_TIMELINE.md).
+
 ## Run the scanner
 
 Keep the UI running and start the worker in a second terminal:

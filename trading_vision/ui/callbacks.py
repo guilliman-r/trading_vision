@@ -228,7 +228,13 @@ def _successful_chart_result(
     if provider_message:
         details.append(html.P(provider_message, className="inline-warning"))
     return (
-        build_chart(candles, result.symbol.provider_symbol, interval, visible_patterns),
+        build_chart(
+            candles,
+            result.symbol.provider_symbol,
+            interval,
+            visible_patterns,
+            is_bist=result.symbol.is_bist,
+        ),
         result.symbol.provider_symbol,
         chart_meta,
         status_text,
