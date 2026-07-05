@@ -3,6 +3,7 @@
 APP_ROOT = "app-root"
 URL = "app-url"
 SYMBOL_INPUT = "symbol-input"
+SYMBOL_SUGGESTIONS = "symbol-suggestions"
 LOAD_BUTTON = "load-button"
 REFRESH_BUTTON = "refresh-button"
 INTERVAL_SELECT = "interval-select"

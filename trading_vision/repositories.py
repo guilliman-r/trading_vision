@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import sqlite3
+import unicodedata
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -70,22 +71,22 @@ def find_symbol(connection: sqlite3.Connection, query: str) -> Symbol | None:
 def search_symbols(
     connection: sqlite3.Connection, query: str = "", limit: int = 100
 ) -> list[Symbol]:
-    normalized = f"%{query.strip().upper()}%"
+    if limit <= 0:
+        return []
     rows = connection.execute(
         """
         SELECT * FROM symbols
         WHERE is_active = 1
-          AND (
-              UPPER(display_symbol) LIKE ?
-              OR UPPER(provider_symbol) LIKE ?
-              OR UPPER(COALESCE(name, '')) LIKE ?
-          )
         ORDER BY is_bist DESC, display_symbol
-        LIMIT ?
-        """,
-        (normalized, normalized, normalized, limit),
+        """
     ).fetchall()
-    return [_symbol_from_row(row) for row in rows]
+    symbols = [_symbol_from_row(row) for row in rows]
+    normalized_query = _normalize_search_text(query)
+    if not normalized_query:
+        return symbols[:limit]
+    matches = [symbol for symbol in symbols if _symbol_matches(symbol, normalized_query)]
+    matches.sort(key=lambda symbol: _symbol_search_rank(symbol, normalized_query))
+    return matches[:limit]
 
 
 def import_symbol_catalog(connection: sqlite3.Connection, catalog_path: Path) -> int:
@@ -203,3 +204,46 @@ def _symbol_from_row(row: sqlite3.Row) -> Symbol:
         source=row["source"],
         source_date=row["source_date"],
     )
+
+
+_TURKISH_SEARCH_TRANSLATION = str.maketrans(
+    "ÇĞİÖŞÜçğıöşü",
+    "CGIOSUcgiosu",
+)
+
+
+def _normalize_search_text(value: str | None) -> str:
+    translated = (value or "").translate(_TURKISH_SEARCH_TRANSLATION)
+    decomposed = unicodedata.normalize("NFKD", translated)
+    return (
+        "".join(character for character in decomposed if not unicodedata.combining(character))
+        .casefold()
+        .strip()
+    )
+
+
+def _symbol_matches(symbol: Symbol, normalized_query: str) -> bool:
+    searchable = " ".join(
+        _normalize_search_text(value)
+        for value in (symbol.display_symbol, symbol.provider_symbol, symbol.name)
+    )
+    return normalized_query in searchable
+
+
+def _symbol_search_rank(symbol: Symbol, normalized_query: str) -> tuple[int, str]:
+    display = _normalize_search_text(symbol.display_symbol)
+    provider = _normalize_search_text(symbol.provider_symbol)
+    name = _normalize_search_text(symbol.name)
+    if normalized_query == display:
+        priority = 0
+    elif normalized_query == provider:
+        priority = 1
+    elif display.startswith(normalized_query):
+        priority = 2
+    elif provider.startswith(normalized_query):
+        priority = 3
+    elif name.startswith(normalized_query):
+        priority = 4
+    else:
+        priority = 5
+    return priority, display

@@ -15,7 +15,7 @@ from trading_vision.config import PROJECT_ROOT, Settings, load_settings
 from trading_vision.database import connection_scope, initialize_database
 from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
-from trading_vision.repositories import import_symbol_catalog, seed_symbols
+from trading_vision.repositories import import_symbol_catalog, search_symbols, seed_symbols
 from trading_vision.scanner_repository import get_heartbeat
 from trading_vision.services.market_data import MarketDataService
 from trading_vision.services.pattern_scan import PatternScanService
@@ -42,6 +42,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         import_symbol_catalog(connection, CATALOG_PATH)
         seed_symbols(connection, FALLBACK_SYMBOLS)
         scanner_status = scanner_status_text(get_heartbeat(connection))
+        symbols = _unique_display_symbols(search_symbols(connection, limit=10_000))
 
     data_provider = provider or YahooFinanceProvider()
 
@@ -87,9 +88,21 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         update_title="Loading market data…",
         suppress_callback_exceptions=False,
     )
-    app.layout = build_layout(settings, scanner_status)
+    app.layout = build_layout(settings, scanner_status, symbols)
     register_callbacks(app, load_chart, update_alerts, load_scanner, export_scanner)
     return app
+
+
+def _unique_display_symbols(symbols: list[Symbol]) -> tuple[Symbol, ...]:
+    unique: list[Symbol] = []
+    seen: set[str] = set()
+    for symbol in symbols:
+        key = symbol.display_symbol.upper()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(symbol)
+    return tuple(unique)
 
 
 def main() -> None:

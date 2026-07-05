@@ -5,7 +5,7 @@ from __future__ import annotations
 from dash import dcc, html
 
 from trading_vision.config import SUPPORTED_INTERVALS, Settings
-from trading_vision.models import PatternMatch
+from trading_vision.models import PatternMatch, Symbol
 from trading_vision.ui import ids
 from trading_vision.ui.chart_builder import CHART_CONFIG, empty_chart
 from trading_vision.ui.scanner_views import build_scanner_workspace
@@ -13,14 +13,18 @@ from trading_vision.ui.scanner_views import build_scanner_workspace
 QUICK_SYMBOLS = ("THYAO", "GARAN", "ASELS", "TUPRS", "BIMAS", "EREGL")
 
 
-def build_layout(settings: Settings, scanner_status: str = "Scanner not started") -> html.Div:
+def build_layout(
+    settings: Settings,
+    scanner_status: str = "Scanner not started",
+    symbols: tuple[Symbol, ...] = (),
+) -> html.Div:
     return html.Div(
         id=ids.APP_ROOT,
         className="app-shell theme-dark",
         children=[
             dcc.Location(id=ids.URL, refresh=False),
             dcc.Interval(id=ids.ALERT_POLL, interval=15_000, n_intervals=0),
-            _top_bar(settings),
+            _top_bar(settings, symbols),
             html.Main(
                 className="workspace",
                 children=[
@@ -34,7 +38,7 @@ def build_layout(settings: Settings, scanner_status: str = "Scanner not started"
     )
 
 
-def _top_bar(settings: Settings) -> html.Header:
+def _top_bar(settings: Settings, symbols: tuple[Symbol, ...]) -> html.Header:
     return html.Header(
         className="top-bar",
         children=[
@@ -52,9 +56,20 @@ def _top_bar(settings: Settings) -> html.Header:
                         id=ids.SYMBOL_INPUT,
                         value=settings.default_symbol,
                         type="text",
+                        list=ids.SYMBOL_SUGGESTIONS,
                         debounce=False,
                         placeholder="THYAO, AAPL, BTC-USD…",
                         autoComplete="off",
+                    ),
+                    html.Datalist(
+                        id=ids.SYMBOL_SUGGESTIONS,
+                        children=[
+                            html.Option(
+                                value=symbol.display_symbol,
+                                label=_symbol_option_label(symbol),
+                            )
+                            for symbol in symbols
+                        ],
                     ),
                     html.Button("Load", id=ids.LOAD_BUTTON, className="button primary"),
                 ],
@@ -75,6 +90,10 @@ def _top_bar(settings: Settings) -> html.Header:
             html.Button("Light mode", id=ids.THEME_BUTTON, className="button ghost"),
         ],
     )
+
+
+def _symbol_option_label(symbol: Symbol) -> str:
+    return f"{symbol.display_symbol} · {symbol.name}" if symbol.name else symbol.display_symbol
 
 
 def _watchlist(scanner_status: str) -> html.Aside:

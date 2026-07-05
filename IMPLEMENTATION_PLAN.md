@@ -803,11 +803,11 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0402 — P0 / M:** Obtain the initial active-equity list from Borsa Istanbul/KAP and store a versioned snapshot.
 - [ ] **TV-0403 — P0 / S:** Explicitly decide whether ETFs, warrants, rights, and investment funds are excluded.
   - Default: include ordinary listed equities; exclude non-equity instruments.
-- [ ] **TV-0404 — P0 / S:** Normalize Turkish characters only in search aliases, never by damaging official company names.
+- [x] **TV-0404 — P0 / S:** Normalize Turkish characters only in search aliases, never by damaging official company names.
 - [x] **TV-0405 — P0 / S:** Map BIST display symbols to Yahoo `.IS` provider symbols in the catalog builder.
 - [ ] **TV-0406 — P0 / M:** Validate catalog provider symbols in rate-limited batches and record failures.
 - [x] **TV-0407 — P0 / S:** Import the snapshot into `symbols` on first run.
-- [ ] **TV-0408 — P0 / S:** Build symbol search across exact ticker, provider ticker, company name, and aliases.
+- [x] **TV-0408 — P0 / S:** Build symbol search across exact ticker, provider ticker, company name, and aliases.
 - [ ] **TV-0409 — P1 / M:** Implement a manual refresh script that downloads/reads the official source and generates a diff.
 - [ ] **TV-0410 — P1 / S:** Require user review before catalog changes mark many symbols inactive.
 - [ ] **TV-0411 — P1 / S:** Record additions, removals, renames, and provider failures in a refresh report.
@@ -862,7 +862,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0701 — P0 / S:** Create the Dash app factory without fetching network data at import time.
 - [x] **TV-0702 — P0 / S:** Build a page shell with top bar, left panel, chart area, and right details panel.
 - [x] **TV-0703 — P0 / S:** Add a dark theme using one readable CSS file and CSS variables.
-- [ ] **TV-0704 — P0 / S:** Populate the symbol selector from the database.
+- [x] **TV-0704 — P0 / S:** Populate the symbol selector from the database.
 - [x] **TV-0705 — P0 / XS:** Add the interval selector and validate supported combinations.
 - [ ] **TV-0706 — P0 / M:** Build a pure `build_chart(candles, patterns, drawings, options)` function.
 - [x] **TV-0707 — P0 / S:** Add candlesticks and a synchronized volume subplot.

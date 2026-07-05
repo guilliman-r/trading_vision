@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0 — 2026-07-05
+
+- Populate the chart symbol typeahead from every active symbol in SQLite.
+- Show ticker and company name together while submitting the unambiguous display ticker.
+- Preserve free-form entry for arbitrary Yahoo Finance symbols outside the catalog.
+- Normalize Turkish characters only for matching so ASCII searches find official Turkish names
+  without altering stored or displayed company data.
+- Prioritize exact display/provider tickers ahead of prefix and company-name matches.
+- Remove duplicate visible suggestions when legacy generic and curated BIST records share a ticker.
+- Add repository and rendered-layout tests for search fields, inactive rows, Turkish normalization,
+  database population, and BIST preference.
+
 ## 0.9.0 — 2026-07-05
 
 - Replace the all-history overlay pile-up with a small actionable chart set.

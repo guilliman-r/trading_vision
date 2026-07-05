@@ -30,6 +30,16 @@ See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 Open <http://127.0.0.1:8050>. The first symbol load may take a few seconds; subsequent loads
 use the local SQLite cache when fresh enough.
 
+## Find a symbol
+
+Start typing a BIST ticker or company name in the top symbol field and choose a suggestion. The
+list comes from active symbols in SQLite and includes the full committed BIST catalog. Turkish and
+plain-ASCII spellings match the same company without changing its official displayed name.
+
+The field is still free-form: enter any Yahoo Finance ticker such as `AAPL`, `MSFT`, or `BTC-USD`
+and press Enter or **Load**. Known BIST display codes resolve to their `.IS` provider symbols.
+See the [symbol search guide](docs/SYMBOL_SEARCH.md) for matching and duplicate rules.
+
 ## Run the scanner
 
 Keep the UI running and start the worker in a second terminal:
