@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.41.0 — 2026-07-07
+
+- Expand scanner diagnostics provider health with success rate, run latency, and latest bar age.
+- Add deterministic diagnostics coverage by injecting a fixed clock into the scanner-results service.
+- Mark `TV-0518` complete in the implementation checklist.
+
 ## 0.40.0 — 2026-07-07
 
 - Add counted candle upserts with added, updated, unchanged, and changed totals.

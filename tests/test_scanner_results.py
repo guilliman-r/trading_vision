@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
+import pandas as pd
+
 from tests.test_alerts import alert_scanner, fresh_breakout_fixture, stored_test_symbol
 from trading_vision import __version__
 from trading_vision.config import Settings
 from trading_vision.database import connect
+from trading_vision.repositories import upsert_candles
 from trading_vision.scanner_repository import finish_scan_run, start_scan_run, update_heartbeat
 from trading_vision.scanner_results import PatternResultFilters
 from trading_vision.scanner_results_repository import search_pattern_results
@@ -77,9 +80,33 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
             warnings=["GOOD.IS: one row quarantined"],
         )
         update_heartbeat(connection, "sleeping", 123, moment, moment, last_run_id=run_id)
+        symbol = stored_test_symbol(connection)
+        upsert_candles(
+            connection,
+            symbol.id,
+            "1d",
+            pd.DataFrame(
+                {
+                    "opened_at_utc": [pd.Timestamp("2026-07-05T10:30:00Z")],
+                    "open": [10.0],
+                    "high": [11.0],
+                    "low": [9.0],
+                    "close": [10.5],
+                    "volume": [100.0],
+                    "is_complete": [True],
+                    "is_adjusted": [True],
+                    "source": ["fixture"],
+                    "fetched_at_utc": [moment],
+                }
+            ),
+        )
         connection.commit()
         diagnostics = dict(
-            ScannerResultsService(connection, Settings(database_path=database_path))
+            ScannerResultsService(
+                connection,
+                Settings(database_path=database_path),
+                now=lambda: moment,
+            )
             .load(PatternResultFilters())
             .diagnostics
         )
@@ -90,6 +117,9 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
     assert diagnostics["Last success/fail"] == "1 / 1"
     assert "test.sqlite3" in diagnostics["Database"]
     assert "fixture" in diagnostics["Provider"]
+    assert "success 1/2 (50%)" in diagnostics["Provider"]
+    assert "latency 0.00s" in diagnostics["Provider"]
+    assert "latest bar 1h 30m old" in diagnostics["Provider"]
     assert "dash" in diagnostics["Packages"]
     assert "yfinance" in diagnostics["Packages"]
     assert "BAD.IS" in diagnostics["Recent errors"]
