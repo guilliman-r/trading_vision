@@ -91,5 +91,6 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
     assert "test.sqlite3" in diagnostics["Database"]
     assert "fixture" in diagnostics["Provider"]
     assert "dash" in diagnostics["Packages"]
+    assert "yfinance" in diagnostics["Packages"]
     assert "BAD.IS" in diagnostics["Recent errors"]
     assert "GOOD.IS" in diagnostics["Recent warnings"]

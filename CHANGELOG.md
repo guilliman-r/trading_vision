@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.35.0 — 2026-07-07
+
+- Add explicit diagnostics regression coverage for the installed `yfinance` version.
+- Mark `TV-0517` complete in the implementation checklist.
+
 ## 0.34.0 — 2026-07-07
 
 - Document the BIST catalog policy: ordinary equities are in scope; ETFs, warrants, rights, funds,

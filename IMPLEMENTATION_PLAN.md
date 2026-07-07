@@ -835,7 +835,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0514 — P0 / S:** Add a generic Yahoo symbol through the UI without appending `.IS` unless it matches the BIST catalog.
 - [ ] **TV-0515 — P0 / S:** Add frozen provider-shape tests so most tests never contact Yahoo.
 - [ ] **TV-0516 — P1 / M:** Add a manually invoked live integration test for representative BIST and non-BIST symbols.
-- [ ] **TV-0517 — P1 / S:** Capture the installed `yfinance` version in diagnostic output.
+- [x] **TV-0517 — P1 / S:** Capture the installed `yfinance` version in diagnostic output.
 - [ ] **TV-0518 — P1 / S:** Add a provider health result showing success rate, latency, and latest returned bar age.
 
 **Exit criterion:** `THYAO.IS` and a non-BIST Yahoo ticker can be fetched, normalized, validated, stored, and diagnosed.
