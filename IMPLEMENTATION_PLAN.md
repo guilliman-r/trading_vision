@@ -790,7 +790,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0309 — P0 / S:** Implement watchlist create, reorder, add, and remove operations.
 - [x] **TV-0310 — P0 / M:** Implement alert rule/event queries and unique deduplication fingerprints.
 - [x] **TV-0311 — P1 / S:** Implement drawings save/load/delete operations.
-- [ ] **TV-0312 — P0 / M:** Test every repository against a fresh temporary database.
+- [x] **TV-0312 — P0 / M:** Test every repository against a fresh temporary database.
 - [x] **TV-0313 — P0 / S:** Test migration idempotency and upgrade from each committed schema fixture.
 - [x] **TV-0314 — P1 / S:** Add a database backup command using SQLite's backup API.
 - [x] **TV-0315 — P1 / XS:** Add a command that prints table counts and database size.

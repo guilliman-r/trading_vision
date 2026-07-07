@@ -137,6 +137,9 @@ controls are still a later UI task. See the [watchlist guide](docs/WATCHLISTS.md
 Drawing persistence is also available at the repository layer. UI drawing tools are still tracked
 as a later chart task. See the [drawing persistence guide](docs/DRAWINGS.md).
 
+Repository modules are tested against fresh migrated SQLite databases. See the
+[repository coverage note](docs/REPOSITORY_TEST_COVERAGE.md).
+
 ## Database utilities
 
 Initialize the configured SQLite database:

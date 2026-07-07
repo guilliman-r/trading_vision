@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.31.0 — 2026-07-07
+
+- Add a direct fresh-database smoke test covering every repository module.
+- Document the repository-to-test coverage map.
+- Mark `TV-0312` complete in the implementation checklist.
+
 ## 0.30.0 — 2026-07-07
 
 - Add an additive `drawings` table for saved chart annotations.
