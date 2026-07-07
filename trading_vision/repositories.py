@@ -6,12 +6,24 @@ import csv
 import sqlite3
 import unicodedata
 from collections.abc import Iterable
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
 from trading_vision.models import Symbol
+
+
+@dataclass(frozen=True, slots=True)
+class CandleUpsertSummary:
+    added: int = 0
+    updated: int = 0
+    unchanged: int = 0
+
+    @property
+    def changed(self) -> int:
+        return self.added + self.updated
 
 
 def upsert_symbol(connection: sqlite3.Connection, symbol: Symbol) -> Symbol:
@@ -165,6 +177,15 @@ def upsert_candles(
     interval: str,
     candles: pd.DataFrame,
 ) -> int:
+    return upsert_candles_with_summary(connection, symbol_id, interval, candles).changed
+
+
+def upsert_candles_with_summary(
+    connection: sqlite3.Connection,
+    symbol_id: int,
+    interval: str,
+    candles: pd.DataFrame,
+) -> CandleUpsertSummary:
     rows: list[tuple[object, ...]] = []
     for candle in candles.itertuples(index=False):
         rows.append(
@@ -183,6 +204,33 @@ def upsert_candles(
                 candle.fetched_at_utc.isoformat(),
             )
         )
+    if not rows:
+        return CandleUpsertSummary()
+
+    existing = _existing_candle_rows(connection, symbol_id, interval, rows)
+    added_rows = []
+    updated_rows = []
+    unchanged = 0
+    for row in rows:
+        existing_row = existing.get(row[2])
+        if existing_row is None:
+            added_rows.append(row)
+        elif _candle_row_changed(existing_row, row):
+            updated_rows.append(row)
+        else:
+            unchanged += 1
+
+    _execute_candle_upserts(connection, added_rows + updated_rows)
+    return CandleUpsertSummary(
+        added=len(added_rows),
+        updated=len(updated_rows),
+        unchanged=unchanged,
+    )
+
+
+def _execute_candle_upserts(connection: sqlite3.Connection, rows: list[tuple[object, ...]]) -> None:
+    if not rows:
+        return
     connection.executemany(
         """
         INSERT INTO candles (
@@ -202,7 +250,57 @@ def upsert_candles(
         """,
         rows,
     )
-    return len(rows)
+
+
+def _existing_candle_rows(
+    connection: sqlite3.Connection,
+    symbol_id: int,
+    interval: str,
+    rows: list[tuple[object, ...]],
+) -> dict[str, sqlite3.Row]:
+    opened_values = [str(row[2]) for row in rows]
+    existing_rows = []
+    for opened_chunk in _chunks(opened_values, 500):
+        placeholders = ",".join("?" for _ in opened_chunk)
+        existing_rows.extend(
+            connection.execute(
+                f"""
+                SELECT opened_at_utc, open, high, low, close, volume,
+                       is_complete, is_adjusted, source
+                FROM candles
+                WHERE symbol_id = ? AND interval = ? AND opened_at_utc IN ({placeholders})
+                """,
+                (symbol_id, interval, *opened_chunk),
+            ).fetchall()
+        )
+    return {row["opened_at_utc"]: row for row in existing_rows}
+
+
+def _candle_row_changed(existing: sqlite3.Row, incoming: tuple[object, ...]) -> bool:
+    comparable = (
+        ("open", incoming[3]),
+        ("high", incoming[4]),
+        ("low", incoming[5]),
+        ("close", incoming[6]),
+        ("volume", incoming[7]),
+        ("is_complete", incoming[8]),
+        ("is_adjusted", incoming[9]),
+        ("source", incoming[10]),
+    )
+    return any(_existing_value_changed(existing[column], value) for column, value in comparable)
+
+
+def _existing_value_changed(existing: object, incoming: object) -> bool:
+    if existing is None or incoming is None:
+        return existing is not incoming
+    if isinstance(incoming, float | int):
+        return float(existing) != float(incoming)
+    return existing != incoming
+
+
+def _chunks(values: list[str], size: int):
+    for index in range(0, len(values), size):
+        yield values[index : index + size]
 
 
 def get_candles(

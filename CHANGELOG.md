@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.40.0 — 2026-07-07
+
+- Add counted candle upserts with added, updated, unchanged, and changed totals.
+- Skip rewriting unchanged candles while preserving the existing simple changed-count API.
+- Mark `TV-0513` complete in the implementation checklist.
+
 ## 0.39.0 — 2026-07-07
 
 - Add bounded Yahoo history retries with exponential backoff and jitter.

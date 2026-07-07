@@ -28,6 +28,7 @@ from trading_vision.repositories import (
     mark_symbol_inactive,
     search_symbols,
     upsert_candles,
+    upsert_candles_with_summary,
     upsert_symbol,
 )
 
@@ -183,6 +184,40 @@ def test_candle_range_and_latest_queries(database_path) -> None:
     assert latest is not None
     assert latest["opened_at_utc"] == pd.Timestamp("2026-01-03", tz="UTC")
     assert latest["close"] == 13.0
+
+
+def test_candle_upserts_only_write_new_or_changed_rows(database_path) -> None:
+    with connect(database_path) as connection:
+        symbol = upsert_symbol(connection, Symbol("TEST", "TEST.IS", is_bist=True))
+        frame = pd.DataFrame(
+            {
+                "open": [10.0, 11.0],
+                "high": [12.0, 13.0],
+                "low": [9.0, 10.0],
+                "close": [11.0, 12.0],
+                "volume": [100.0, 150.0],
+            },
+            index=pd.to_datetime(["2026-01-01", "2026-01-02"], utc=True),
+        )
+        candles = prepare_candles(frame, "1d", "fixture")
+
+        first = upsert_candles_with_summary(connection, symbol.id, "1d", candles)
+        second = upsert_candles_with_summary(connection, symbol.id, "1d", candles)
+        changed = candles.copy()
+        changed.loc[1, "close"] = 12.5
+        third = upsert_candles_with_summary(connection, symbol.id, "1d", changed)
+        changed_count = upsert_candles(connection, symbol.id, "1d", changed)
+
+    assert first.added == 2
+    assert first.updated == 0
+    assert first.unchanged == 0
+    assert second.added == 0
+    assert second.updated == 0
+    assert second.unchanged == 2
+    assert third.added == 0
+    assert third.updated == 1
+    assert third.unchanged == 1
+    assert changed_count == 0
 
 
 def test_connection_scope_commits_and_closes(database_path) -> None:

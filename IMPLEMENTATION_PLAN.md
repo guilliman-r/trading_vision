@@ -831,7 +831,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0510 — P0 / S:** Treat invalid ticker, empty history, rate limiting, timeout, and partial batch failure separately.
 - [x] **TV-0511 — P0 / S:** Log request duration and returned candle range without logging secrets.
 - [x] **TV-0512 — P0 / S:** Add a small in-process cooldown to avoid repeated identical requests from UI callbacks.
-- [ ] **TV-0513 — P0 / M:** Upsert only new/changed candles and report added/updated counts.
+- [x] **TV-0513 — P0 / M:** Upsert only new/changed candles and report added/updated counts.
 - [x] **TV-0514 — P0 / S:** Add a generic Yahoo symbol through the UI without appending `.IS` unless it matches the BIST catalog.
 - [x] **TV-0515 — P0 / S:** Add frozen provider-shape tests so most tests never contact Yahoo.
 - [ ] **TV-0516 — P1 / M:** Add a manually invoked live integration test for representative BIST and non-BIST symbols.
