@@ -131,6 +131,9 @@ The same workspace shows scanner heartbeat, next wake time, latest run duration 
 counts, database path and size, package versions, provider run state, and recent errors. See the
 [scanner results guide](docs/SCANNER_RESULTS.md).
 
+Watchlist tables and repository operations are available for saved symbol groups. Full management
+controls are still a later UI task. See the [watchlist guide](docs/WATCHLISTS.md).
+
 ## Logs
 
 The UI and scanner both write concise console logs and a rotating local file at

@@ -36,7 +36,7 @@ def test_schema_version_reports_latest_applied_migration(database_path) -> None:
     with connect(database_path) as connection:
         version = schema_version(connection)
 
-    assert "005_quality_warnings.sql" in version
+    assert "006_watchlists_settings.sql" in version
     assert f"{len(list(MIGRATIONS_DIRECTORY.glob('*.sql')))} migrations" in version
 
 

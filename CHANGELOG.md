@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.26.0 — 2026-07-07
+
+- Add an additive migration for watchlists, ordered watchlist items, and simple app settings.
+- Complete the core persistence schema across committed migrations without rewriting existing
+  migration history.
+- Add typed watchlist and watchlist-item value objects.
+- Add repository operations to create, list, add, reorder, and remove watchlist items.
+- Limit watchlist scanner intervals to `1d`, `1h`, and `15m`.
+- Add fresh SQLite tests for watchlist creation, ordering, compaction, and validation.
+- Mark `TV-0302` and `TV-0309` complete in the implementation checklist.
+
 ## 0.25.0 — 2026-07-07
 
 - Add a version 1 product contract covering local single-user scope, no authentication, and no

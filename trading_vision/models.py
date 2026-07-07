@@ -125,6 +125,21 @@ class AlertRule:
 
 
 @dataclass(frozen=True, slots=True)
+class Watchlist:
+    id: int
+    name: str
+    description: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class WatchlistItem:
+    watchlist_id: int
+    symbol: Symbol
+    position: int
+    scan_intervals: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class AlertEvent:
     id: int
     fingerprint: str
