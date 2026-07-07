@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.28.0 — 2026-07-07
+
+- Fix CI formatting by applying `ruff format` output for the files reported by GitHub Actions.
+- Add the `asset_type` symbol column through an additive migration.
+- Persist and load symbol asset type through catalog import, repositories, scanner queries, and
+  watchlist items.
+- Mark BIST catalog rows as `equity` in the generated CSV snapshot.
+- Mark `TV-0401` complete in the implementation checklist.
+
 ## 0.27.0 — 2026-07-07
 
 - Add a committed SQLite schema fixture representing the database before watchlist/settings tables.

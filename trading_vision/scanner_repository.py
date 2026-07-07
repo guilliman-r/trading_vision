@@ -159,4 +159,5 @@ def _symbol_from_row(row: sqlite3.Row) -> Symbol:
         is_active=bool(row["is_active"]),
         source=row["source"],
         source_date=row["source_date"],
+        asset_type=row["asset_type"],
     )

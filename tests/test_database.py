@@ -39,7 +39,7 @@ def test_schema_version_reports_latest_applied_migration(database_path) -> None:
     with connect(database_path) as connection:
         version = schema_version(connection)
 
-    assert "006_watchlists_settings.sql" in version
+    assert "007_symbol_asset_type.sql" in version
     assert f"{len(list(MIGRATIONS_DIRECTORY.glob('*.sql')))} migrations" in version
 
 
@@ -64,21 +64,34 @@ def test_database_upgrades_from_committed_schema_fixture(tmp_path: Path) -> None
         app_settings = connection.execute(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'app_settings'"
         ).fetchone()
+        asset_type_column = connection.execute(
+            "SELECT name FROM pragma_table_info('symbols') WHERE name = 'asset_type'"
+        ).fetchone()
 
     assert migrations == sorted(path.name for path in MIGRATIONS_DIRECTORY.glob("*.sql"))
     assert watchlists is not None
     assert app_settings is not None
+    assert asset_type_column is not None
 
 
 def test_symbol_can_be_inserted_and_found(database_path) -> None:
     with connect(database_path) as connection:
         stored = upsert_symbol(
             connection,
-            Symbol("THYAO", "THYAO.IS", "Türk Hava Yolları", "XIST", "TRY", True),
+            Symbol(
+                "THYAO",
+                "THYAO.IS",
+                "Türk Hava Yolları",
+                "XIST",
+                "TRY",
+                True,
+                asset_type="equity",
+            ),
         )
         found = find_symbol(connection, "thyao")
     assert stored.id is not None
     assert found == stored
+    assert found.asset_type == "equity"
 
 
 def test_bist_display_symbol_wins_over_prior_generic_symbol(database_path) -> None:

@@ -46,9 +46,7 @@ def test_hourly_scanner_wakes_on_yahoo_bar_boundary() -> None:
 
     next_hourly = next_poll_at(before_first_boundary, ("1h",), 60, calendar)
 
-    assert next_hourly.astimezone(ISTANBUL) == datetime(
-        2026, 7, 6, 10, 31, tzinfo=ISTANBUL
-    )
+    assert next_hourly.astimezone(ISTANBUL) == datetime(2026, 7, 6, 10, 31, tzinfo=ISTANBUL)
 
 
 def test_closed_market_wakes_at_next_relevant_boundary() -> None:

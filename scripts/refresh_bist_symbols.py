@@ -39,6 +39,7 @@ def parse_companies(page: str) -> list[dict[str, str]]:
                 "name": name,
                 "exchange": "XIST",
                 "currency": "TRY",
+                "asset_type": "equity",
                 "is_bist": "true",
                 "is_active": "true",
                 "source": SOURCE_URL,

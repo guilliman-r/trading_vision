@@ -19,6 +19,7 @@ class Symbol:
     source: str | None = None
     source_date: str | None = None
     id: int | None = None
+    asset_type: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

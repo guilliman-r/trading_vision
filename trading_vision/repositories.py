@@ -19,8 +19,8 @@ def upsert_symbol(connection: sqlite3.Connection, symbol: Symbol) -> Symbol:
         """
         INSERT INTO symbols (
             display_symbol, provider_symbol, name, exchange, currency,
-            is_bist, is_active, source, source_date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            is_bist, is_active, source, source_date, asset_type
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(provider_symbol) DO UPDATE SET
             display_symbol = excluded.display_symbol,
             name = COALESCE(excluded.name, symbols.name),
@@ -30,6 +30,7 @@ def upsert_symbol(connection: sqlite3.Connection, symbol: Symbol) -> Symbol:
             is_active = excluded.is_active,
             source = COALESCE(excluded.source, symbols.source),
             source_date = COALESCE(excluded.source_date, symbols.source_date),
+            asset_type = COALESCE(excluded.asset_type, symbols.asset_type),
             updated_at_utc = CURRENT_TIMESTAMP
         """,
         (
@@ -42,6 +43,7 @@ def upsert_symbol(connection: sqlite3.Connection, symbol: Symbol) -> Symbol:
             int(symbol.is_active),
             symbol.source,
             symbol.source_date,
+            symbol.asset_type,
         ),
     )
     row = connection.execute(
@@ -150,6 +152,7 @@ def import_symbol_catalog(connection: sqlite3.Connection, catalog_path: Path) ->
                     is_active=row.get("is_active", "true").lower() == "true",
                     source=row.get("source") or None,
                     source_date=row.get("source_date") or None,
+                    asset_type=row.get("asset_type") or None,
                 ),
             )
             count += 1
@@ -296,6 +299,7 @@ def _symbol_from_row(row: sqlite3.Row) -> Symbol:
         is_active=bool(row["is_active"]),
         source=row["source"],
         source_date=row["source_date"],
+        asset_type=row["asset_type"],
     )
 
 

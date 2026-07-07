@@ -799,7 +799,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 4 — BIST symbol catalog
 
-- [ ] **TV-0401 — P0 / S:** Define CSV columns for display symbol, provider symbol, company name, exchange, currency, asset type, active flag, and source date.
+- [x] **TV-0401 — P0 / S:** Define CSV columns for display symbol, provider symbol, company name, exchange, currency, asset type, active flag, and source date.
 - [ ] **TV-0402 — P0 / M:** Obtain the initial active-equity list from Borsa Istanbul/KAP and store a versioned snapshot.
 - [ ] **TV-0403 — P0 / S:** Explicitly decide whether ETFs, warrants, rights, and investment funds are excluded.
   - Default: include ordinary listed equities; exclude non-equity instruments.

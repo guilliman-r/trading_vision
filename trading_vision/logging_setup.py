@@ -16,9 +16,7 @@ def configure_logging(process_name: str, log_path: Path, level: str = "INFO") ->
     root.handlers.clear()
     root.setLevel(level.upper())
 
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s %(tv_process)s %(name)s %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(tv_process)s %(name)s %(message)s")
     process_filter = _ProcessFilter(process_name)
 
     console = logging.StreamHandler(sys.stderr)

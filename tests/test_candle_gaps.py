@@ -54,9 +54,7 @@ def test_hourly_gap_grid_matches_yahoo_half_hour_timestamps() -> None:
 
 
 def test_hourly_gap_finds_missing_half_hour_aligned_bar() -> None:
-    local_times = pd.DatetimeIndex(
-        ["2026-07-06 09:30", "2026-07-06 10:30", "2026-07-06 12:30"]
-    )
+    local_times = pd.DatetimeIndex(["2026-07-06 09:30", "2026-07-06 10:30", "2026-07-06 12:30"])
     timestamps = local_times.tz_localize(ISTANBUL).tz_convert("UTC")
     candles = pd.DataFrame({"opened_at_utc": timestamps, "is_complete": True})
 

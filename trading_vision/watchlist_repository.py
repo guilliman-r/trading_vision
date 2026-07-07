@@ -205,6 +205,7 @@ def _item_from_row(row: sqlite3.Row) -> WatchlistItem:
         is_active=bool(row["is_active"]),
         source=row["source"],
         source_date=row["source_date"],
+        asset_type=row["asset_type"],
     )
     return WatchlistItem(
         watchlist_id=int(row["watchlist_id"]),

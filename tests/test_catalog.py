@@ -11,3 +11,4 @@ def test_kap_catalog_parser_extracts_multiple_stock_codes() -> None:
     )
     rows = module["parse_companies"](page)
     assert [row["provider_symbol"] for row in rows] == ["AAAAB.IS", "BBBBC.IS"]
+    assert {row["asset_type"] for row in rows} == {"equity"}
