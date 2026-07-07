@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import tomllib
 from dataclasses import dataclass, replace
+from ipaddress import ip_address
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -20,6 +21,7 @@ SUPPORTED_PATTERN_TYPES = (
     "descending_triangle",
     "symmetrical_triangle",
 )
+LOOPBACK_HOSTNAMES = {"localhost", "127.0.0.1", "::1"}
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,3 +132,25 @@ def load_settings(config_path: Path | None = None) -> Settings:
     if os.getenv("TV_PORT"):
         environment_values["port"] = int(os.environ["TV_PORT"])
     return replace(settings, **environment_values).validate()
+
+
+def host_binding_warning(settings: Settings) -> str | None:
+    """Warn when the unauthenticated local app is bound beyond loopback."""
+
+    host = settings.host.strip().lower()
+    if _is_loopback_host(host):
+        return None
+    return (
+        f"Warning: Trading Vision is configured to bind to {settings.host!r}. "
+        "Version 1 has no authentication, so prefer 127.0.0.1 unless you are deliberately "
+        "exposing the local app on a trusted network."
+    )
+
+
+def _is_loopback_host(host: str) -> bool:
+    if host in LOOPBACK_HOSTNAMES:
+        return True
+    try:
+        return ip_address(host).is_loopback
+    except ValueError:
+        return False

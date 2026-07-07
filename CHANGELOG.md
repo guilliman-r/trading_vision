@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.21.0 — 2026-07-07
+
+- Keep the documented default server bind address on loopback-only `127.0.0.1`.
+- Add a startup warning when the unauthenticated local app is bound to a non-loopback host.
+- Document the host-setting safety tradeoff in `config.example.toml`.
+- Add tests for loopback and non-loopback host warning behavior.
+- Mark `TV-1708` and `TV-1709` complete in the implementation checklist.
+
 ## 0.20.0 — 2026-07-07
 
 - Add a schema-version helper that reports the latest applied SQLite migration and total count.

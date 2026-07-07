@@ -1,6 +1,8 @@
 # Copy this file to config.toml to override these defaults.
 
 [app]
+# Keep this on 127.0.0.1 for normal local use. Binding to 0.0.0.0 exposes the unauthenticated app
+# to other devices on your network and will print a startup warning.
 host = "127.0.0.1"
 port = 8050
 debug = false

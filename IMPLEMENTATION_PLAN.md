@@ -1049,8 +1049,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-1705 — P0 / S:** Limit detector lookback per pattern/interval.
 - [ ] **TV-1706 — P1 / M:** Add retention cleanup with dry-run and backup prompts.
 - [ ] **TV-1707 — P0 / S:** Ensure logs do not contain tokens or full environment dumps.
-- [ ] **TV-1708 — P0 / S:** Bind the local server to `127.0.0.1` by default.
-- [ ] **TV-1709 — P0 / XS:** Warn when binding to a non-loopback address without authentication.
+- [x] **TV-1708 — P0 / S:** Bind the local server to `127.0.0.1` by default.
+- [x] **TV-1709 — P0 / XS:** Warn when binding to a non-loopback address without authentication.
 - [ ] **TV-1710 — P0 / S:** Escape/sanitize user-visible metadata and constrain imported file paths.
 - [ ] **TV-1711 — P0 / S:** Cap batch size, candle lookback, export size, and retry count.
 - [ ] **TV-1712 — P1 / M:** Add startup database integrity check and documented restore procedure.

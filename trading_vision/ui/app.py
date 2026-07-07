@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from dash import Dash
 
 from trading_vision.alert_repository import (
@@ -11,7 +13,7 @@ from trading_vision.alert_repository import (
     mute_alert_pattern,
     unread_alert_count,
 )
-from trading_vision.config import PROJECT_ROOT, Settings, load_settings
+from trading_vision.config import PROJECT_ROOT, Settings, host_binding_warning, load_settings
 from trading_vision.database import connection_scope, initialize_database
 from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
@@ -127,6 +129,9 @@ def _unique_display_symbols(symbols: list[Symbol]) -> tuple[Symbol, ...]:
 
 def main() -> None:
     settings = load_settings()
+    warning = host_binding_warning(settings)
+    if warning:
+        print(warning, file=sys.stderr)
     app = create_app(settings)
     app.run(host=settings.host, port=settings.port, debug=settings.debug)
 

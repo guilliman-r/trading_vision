@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from trading_vision.config import Settings, load_settings
+from trading_vision.config import Settings, host_binding_warning, load_settings
 
 
 def test_default_settings_are_valid() -> None:
@@ -53,3 +53,17 @@ def test_loads_and_validates_provider_cooldown(tmp_path: Path) -> None:
     assert load_settings(config_path).provider_cooldown_seconds == 45
     with pytest.raises(ValueError, match="provider_cooldown_seconds"):
         Settings(provider_cooldown_seconds=301).validate()
+
+
+def test_loopback_host_does_not_warn() -> None:
+    assert host_binding_warning(Settings(host="127.0.0.1")) is None
+    assert host_binding_warning(Settings(host="localhost")) is None
+    assert host_binding_warning(Settings(host="::1")) is None
+
+
+def test_non_loopback_host_warns_about_missing_authentication() -> None:
+    warning = host_binding_warning(Settings(host="0.0.0.0"))
+
+    assert warning is not None
+    assert "no authentication" in warning
+    assert "127.0.0.1" in warning

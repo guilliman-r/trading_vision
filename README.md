@@ -191,6 +191,8 @@ Provider validation and an equity-only review are tracked in the implementation 
   do not delete the lock file while it is running.
 - Yahoo errors or empty symbols: retry a small `--once --dry-run` selection. The worker records a
   partial run and continues past bad tickers.
+- Non-loopback host warning: keep `host = "127.0.0.1"` for normal local use. `0.0.0.0` exposes the
+  unauthenticated app to other devices on your network.
 - Stale heartbeat in the UI: reload the page. Live scanner dashboards are tracked in Phase 15.
 - No job fetched: due-job mode intentionally skips current candles; add `--force` for a manual run.
 
