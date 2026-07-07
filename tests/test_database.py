@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -24,6 +25,8 @@ from trading_vision.repositories import (
     upsert_symbol,
 )
 
+FIXTURES_DIRECTORY = Path(__file__).parent / "fixtures"
+
 
 def test_migrations_are_idempotent(database_path) -> None:
     initialize_database(database_path)
@@ -38,6 +41,33 @@ def test_schema_version_reports_latest_applied_migration(database_path) -> None:
 
     assert "006_watchlists_settings.sql" in version
     assert f"{len(list(MIGRATIONS_DIRECTORY.glob('*.sql')))} migrations" in version
+
+
+def test_database_upgrades_from_committed_schema_fixture(tmp_path: Path) -> None:
+    database_path = tmp_path / "schema_005.sqlite3"
+    fixture = FIXTURES_DIRECTORY / "schema_005.sql"
+    with sqlite3.connect(database_path) as connection:
+        connection.executescript(fixture.read_text(encoding="utf-8"))
+
+    initialize_database(database_path)
+
+    with connect(database_path) as connection:
+        migrations = [
+            row["filename"]
+            for row in connection.execute(
+                "SELECT filename FROM schema_migrations ORDER BY filename"
+            )
+        ]
+        watchlists = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'watchlists'"
+        ).fetchone()
+        app_settings = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'app_settings'"
+        ).fetchone()
+
+    assert migrations == sorted(path.name for path in MIGRATIONS_DIRECTORY.glob("*.sql"))
+    assert watchlists is not None
+    assert app_settings is not None
 
 
 def test_symbol_can_be_inserted_and_found(database_path) -> None:

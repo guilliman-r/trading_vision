@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.27.0 — 2026-07-07
+
+- Add a committed SQLite schema fixture representing the database before watchlist/settings tables.
+- Test that the migration runner upgrades the committed fixture to the current schema.
+- Verify the upgrade records every committed migration and creates watchlist/settings tables.
+- Mark `TV-0313` complete in the implementation checklist.
+
 ## 0.26.0 — 2026-07-07
 
 - Add an additive migration for watchlists, ordered watchlist items, and simple app settings.
