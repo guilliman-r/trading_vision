@@ -120,7 +120,8 @@ Telegram is intentionally excluded. No external delivery channel is currently en
 
 Scroll below the chart to inspect persisted detections across the scanned universe. The operations
 workspace filters by symbol, interval, pattern, direction, state, score, and age. Every row links
-back to its chart and expands to show all score reasons. CSV export uses the active filters.
+back to its chart with a focused pattern date range and expands to show all score reasons. CSV
+export uses the active filters.
 
 The same workspace shows scanner heartbeat, next wake time, latest run duration and success/failure
 counts, database path and size, package versions, provider run state, and recent errors. See the

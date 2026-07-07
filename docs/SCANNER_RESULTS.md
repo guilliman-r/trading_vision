@@ -24,7 +24,9 @@ rows. Filters never interpolate user-entered values into SQL.
 Each row shows symbol, interval, pattern, direction, state, score, confirmation/start time,
 boundary, target, and the first score reason. Expand `Reasons` to inspect the full explainable score
 without opening source code. `Open` navigates through the same application URL contract used by
-alerts and loads the corresponding symbol and interval.
+alerts and loads the corresponding symbol, interval, and a focused date range around the pattern.
+If the range parameters are missing or malformed, the chart safely falls back to the normal recent
+candles viewport.
 
 Rows are immutable result views over the current `patterns` state. Historical state changes remain
 in `pattern_transitions`; the table does not erase audit history.
@@ -37,7 +39,7 @@ in `pattern_transitions`; the table does not erase audit history.
 - start and confirmation timestamps in UTC;
 - boundary, target, and invalidation prices;
 - all reasons joined into one field;
-- local chart context link.
+- local chart context link with symbol, interval, pattern id, and focused date range.
 
 CSV generation happens server-side from the current filters, not from whichever rows happen to be
 visible in the browser.

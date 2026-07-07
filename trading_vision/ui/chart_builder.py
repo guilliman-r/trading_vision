@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -19,6 +21,7 @@ def build_chart(
     interval: str,
     patterns: tuple[PatternMatch, ...] = (),
     is_bist: bool = False,
+    focus_range: tuple[datetime, datetime] | None = None,
 ) -> go.Figure:
     if candles.empty:
         return empty_chart("No chart data is available")
@@ -91,7 +94,7 @@ def build_chart(
         side="right",
         fixedrange=False,
     )
-    _focus_chart_on_candles(figure, candles)
+    _focus_chart_on_candles(figure, candles, focus_range)
     return figure
 
 
@@ -118,14 +121,51 @@ def _candle_hover_text(candles: pd.DataFrame, symbol: str) -> list[str]:
     return labels
 
 
-def _focus_chart_on_candles(figure: go.Figure, candles: pd.DataFrame) -> None:
+def _focus_chart_on_candles(
+    figure: go.Figure,
+    candles: pd.DataFrame,
+    focus_range: tuple[datetime, datetime] | None,
+) -> None:
+    if focus_range is not None:
+        focused = _candles_inside_focus(candles, focus_range)
+        if not focused.empty:
+            _apply_visible_range(figure, focused, list(focus_range))
+            return
+
     visible_start = max(0, len(candles) - DEFAULT_VISIBLE_CANDLES)
     visible = candles.iloc[visible_start:]
+    _apply_visible_range(
+        figure,
+        visible,
+        [visible.iloc[0]["opened_at_utc"], visible.iloc[-1]["opened_at_utc"]],
+    )
+
+
+def _candles_inside_focus(
+    candles: pd.DataFrame,
+    focus_range: tuple[datetime, datetime],
+) -> pd.DataFrame:
+    start = pd.Timestamp(focus_range[0])
+    end = pd.Timestamp(focus_range[1])
+    if start.tzinfo is None:
+        start = start.tz_localize("UTC")
+    if end.tzinfo is None:
+        end = end.tz_localize("UTC")
+    if end <= start:
+        return candles.iloc[0:0]
+    opened_at = pd.to_datetime(candles["opened_at_utc"], utc=True)
+    return candles.loc[opened_at.between(start, end)]
+
+
+def _apply_visible_range(
+    figure: go.Figure,
+    visible: pd.DataFrame,
+    time_range: list,
+) -> None:
     lowest = float(visible["low"].min())
     highest = float(visible["high"].max())
     span = max(highest - lowest, highest * 0.01)
     padding = span * 0.06
-    time_range = [visible.iloc[0]["opened_at_utc"], visible.iloc[-1]["opened_at_utc"]]
     figure.update_xaxes(range=time_range, row=1, col=1)
     figure.update_xaxes(range=time_range, row=2, col=1)
     figure.update_yaxes(range=[lowest - padding, highest + padding], row=1, col=1)

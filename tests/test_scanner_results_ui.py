@@ -20,6 +20,8 @@ def test_scanner_workspace_callback_renders_filtered_result(database_path) -> No
     assert response.status_code == 200
     assert "TEST.IS" in str(payload["scanner-results-table"]["children"])
     assert "?symbol=TEST.IS" in str(payload["scanner-results-table"]["children"])
+    assert "range_from=" in str(payload["scanner-results-table"]["children"])
+    assert "range_to=" in str(payload["scanner-results-table"]["children"])
     assert payload["scanner-result-count"]["children"].endswith("results")
     assert len(payload["scanner-diagnostics"]["children"]) >= 10
 
@@ -37,6 +39,7 @@ def test_scanner_export_callback_downloads_current_filter(database_path) -> None
     assert response.status_code == 200
     assert payload["filename"] == "trading-vision-patterns.csv"
     assert "TEST.IS,1d,resistance_breakout" in payload["content"]
+    assert "range_from=" in payload["content"]
 
 
 def _scanner_request(app) -> dict:

@@ -1007,7 +1007,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 - [x] **TV-1501 — P0 / M:** Build the scanner results table with server-side repository filtering.
 - [x] **TV-1502 — P0 / S:** Add pattern, direction, state, interval, score, symbol, and time filters.
-- [ ] **TV-1503 — P0 / S:** Link table rows to the relevant chart and visible date range.
+- [x] **TV-1503 — P0 / S:** Link table rows to the relevant chart and visible date range.
 - [x] **TV-1504 — P0 / S:** Add score-reason preview and full detail panel.
 - [x] **TV-1505 — P0 / S:** Display last scanner heartbeat, last run, duration, successes, and failures.
 - [x] **TV-1506 — P0 / S:** Add CSV export for the currently filtered table.

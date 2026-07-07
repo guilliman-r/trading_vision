@@ -229,3 +229,24 @@ def test_chart_opens_on_the_most_recent_candles() -> None:
 
     assert figure.layout.xaxis.range[0] == times[70]
     assert figure.layout.xaxis.range[1] == times[-1]
+
+
+def test_chart_can_open_on_a_scanner_focus_range() -> None:
+    times = pd.date_range("2025-01-01", periods=250, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [100] * 250,
+            "high": [105] * 250,
+            "low": [95] * 250,
+            "close": [102] * 250,
+            "volume": [100] * 250,
+        }
+    )
+    focus_range = (times[20].to_pydatetime(), times[40].to_pydatetime())
+
+    figure = build_chart(candles, "TEST", "1d", focus_range=focus_range)
+
+    assert figure.layout.xaxis.range[0] == focus_range[0]
+    assert figure.layout.xaxis.range[1] == focus_range[1]
+    assert tuple(figure.layout.yaxis.range) == (94.4, 105.6)

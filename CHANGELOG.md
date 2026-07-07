@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.18.0 — 2026-07-07
+
+- Add focused scanner result links with `range_from` and `range_to` chart context.
+- Open charts around the selected pattern window instead of only loading the symbol and interval.
+- Keep invalid, missing, or mismatched range parameters harmless by falling back to the normal
+  recent-candles viewport.
+- Include the same focused chart link in scanner CSV exports.
+- Mark `TV-1503` complete in the implementation checklist.
+- Add chart-focus and scanner-link regression tests.
+
 ## 0.17.0 — 2026-07-06
 
 - Load previously fetched chart candles from SQLite during ordinary symbol and interval changes.

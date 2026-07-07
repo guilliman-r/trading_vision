@@ -55,14 +55,15 @@ def register_callbacks(
     ):
         requested = typed_symbol or ""
         triggered = ctx.triggered_id
+        query = parse_qs((url_search or "").lstrip("?"))
         if isinstance(triggered, dict) and triggered.get("type") == ids.QUICK_SYMBOL_TYPE:
             requested = triggered["symbol"]
         elif triggered == ids.URL or (triggered is None and url_search):
-            query = parse_qs((url_search or "").lstrip("?"))
             requested = query.get("symbol", [requested])[0]
             requested_interval = query.get("interval", [interval])[0]
             if requested_interval in {"1d", "1h", "15m", "5m"}:
                 interval = requested_interval
+        focus_range = _focus_range_from_query(query, requested)
         try:
             result = load_chart(requested, interval, triggered == ids.REFRESH_BUTTON)
             if result.candles.empty:
@@ -76,7 +77,7 @@ def register_callbacks(
                     [html.P(message, className="inline-error")],
                     result.symbol.provider_symbol,
                 )
-            return _successful_chart_result(result, interval, provider_delay_seconds)
+            return _successful_chart_result(result, interval, provider_delay_seconds, focus_range)
         except Exception as error:
             message = str(error) or "Unable to load this symbol"
             return (
@@ -201,6 +202,7 @@ def _successful_chart_result(
     result: ChartLoadResult,
     interval: str,
     provider_delay_seconds: int,
+    focus_range: tuple[datetime, datetime] | None = None,
 ):
     candles = result.candles
     latest = candles.iloc[-1]
@@ -268,6 +270,7 @@ def _successful_chart_result(
             interval,
             visible_patterns,
             is_bist=result.symbol.is_bist,
+            focus_range=focus_range,
         ),
         result.symbol.provider_symbol,
         chart_meta,
@@ -276,6 +279,31 @@ def _successful_chart_result(
         details,
         result.symbol.provider_symbol,
     )
+
+
+def _focus_range_from_query(
+    query: dict[str, list[str]],
+    requested_symbol: str,
+) -> tuple[datetime, datetime] | None:
+    link_symbol = query.get("symbol", [""])[0]
+    if not link_symbol or link_symbol.upper() != requested_symbol.upper():
+        return None
+    range_from = _query_time(query, "range_from")
+    range_to = _query_time(query, "range_to")
+    if range_from is None or range_to is None or range_to <= range_from:
+        return None
+    return range_from, range_to
+
+
+def _query_time(query: dict[str, list[str]], key: str) -> datetime | None:
+    value = query.get(key, [""])[0]
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    return parsed.replace(tzinfo=UTC) if parsed.tzinfo is None else parsed.astimezone(UTC)
 
 
 def _chart_meta(
