@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.23.0 — 2026-07-07
+
+- Add a typed frozen `Candle` model matching the project OHLCV contract.
+- Validate candle timezone awareness, positive prices, OHLC consistency, and non-negative volume.
+- Add model construction tests for candles, symbols, pivots, pattern matches, and alert events.
+- Confirm domain models stay free of database and UI behavior.
+- Mark `TV-0207`, `TV-0208`, and `TV-0209` complete in the implementation checklist.
+
 ## 0.22.0 — 2026-07-07
 
 - Add an explicit `timezone` setting with `Europe/Istanbul` as the default.

@@ -770,9 +770,9 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0204 — P0 / XS:** Validate intervals, timezones, positive polling values, and score ranges at startup.
 - [ ] **TV-0205 — P0 / S:** Implement standard logging configuration for console and rotating local file output.
 - [ ] **TV-0206 — P0 / XS:** Give UI and scanner logs a process name and scan-run identifier.
-- [ ] **TV-0207 — P0 / S:** Create typed models for `Symbol`, `Candle`, `Pivot`, `PatternMatch`, and `AlertEvent`.
-- [ ] **TV-0208 — P0 / XS:** Keep models free of database and UI methods.
-- [ ] **TV-0209 — P0 / S:** Add unit tests for valid/invalid settings and model construction.
+- [x] **TV-0207 — P0 / S:** Create typed models for `Symbol`, `Candle`, `Pivot`, `PatternMatch`, and `AlertEvent`.
+- [x] **TV-0208 — P0 / XS:** Keep models free of database and UI methods.
+- [x] **TV-0209 — P0 / S:** Add unit tests for valid/invalid settings and model construction.
 - [ ] **TV-0210 — P1 / XS:** Add a command that prints effective non-secret configuration.
 
 **Exit criterion:** all processes use one validated configuration model and consistent logging.

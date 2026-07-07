@@ -22,6 +22,36 @@ class Symbol:
 
 
 @dataclass(frozen=True, slots=True)
+class Candle:
+    """One validated OHLCV bar independent of storage and chart rendering."""
+
+    interval: str
+    opened_at_utc: datetime
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float | None
+    is_complete: bool
+    is_adjusted: bool
+    source: str
+    fetched_at_utc: datetime
+    symbol_id: int | None = None
+
+    def __post_init__(self) -> None:
+        _require_aware_time(self.opened_at_utc, "opened_at_utc")
+        _require_aware_time(self.fetched_at_utc, "fetched_at_utc")
+        if min(self.open, self.high, self.low, self.close) <= 0:
+            raise ValueError("Candle prices must be positive")
+        if self.high < max(self.open, self.close, self.low):
+            raise ValueError("Candle high must be greater than or equal to open, close, and low")
+        if self.low > min(self.open, self.close, self.high):
+            raise ValueError("Candle low must be less than or equal to open, close, and high")
+        if self.volume is not None and self.volume < 0:
+            raise ValueError("Candle volume must be null or non-negative")
+
+
+@dataclass(frozen=True, slots=True)
 class ChartSnapshot:
     symbol: Symbol
     interval: str
@@ -111,3 +141,8 @@ class AlertEvent:
     app_link: str
     created_at: datetime
     acknowledged_at: datetime | None
+
+
+def _require_aware_time(value: datetime, field_name: str) -> None:
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError(f"{field_name} must be timezone-aware")
