@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.42.0 — 2026-07-07
+
+- Add an explicit `trading-vision-ui` command while keeping `trading-vision` as a UI alias.
+- Document installed UI and scanner commands in the README.
+- Add project metadata coverage for explicit UI and scanner entry points.
+- Mark `TV-1801` complete in the implementation checklist.
+
 ## 0.41.0 — 2026-07-07
 
 - Expand scanner diagnostics provider health with success rate, run latency, and latest bar age.

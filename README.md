@@ -25,13 +25,14 @@ Version 1 is local and single-user. It has no authentication and never places or
 .venv/bin/python -m pip install -e '.[dev]'
 ```
 
-## Run
+## Run the UI
 
 ```bash
-.venv/bin/trading-vision
+.venv/bin/trading-vision-ui
 ```
 
-Open <http://127.0.0.1:8050>. The first symbol load may take a few seconds. Downloaded candles are
+Open <http://127.0.0.1:8050>. The shorter `.venv/bin/trading-vision` command is kept as a
+backward-compatible UI alias. The first symbol load may take a few seconds. Downloaded candles are
 stored in SQLite and remain available as a visible fallback when the provider fails.
 
 Identical chart requests made within the short provider cooldown reuse the in-process result so UI
@@ -86,7 +87,7 @@ the same information as warnings without falsely marking a successful symbol as 
 Keep the UI running and start the worker in a second terminal:
 
 ```bash
-.venv/bin/python -m trading_vision.worker
+.venv/bin/trading-vision-worker
 ```
 
 It scans only jobs due after completed BIST candles, catches up stale symbols after a restart,
@@ -94,14 +95,14 @@ sleeps until the next relevant boundary, and stops cleanly with `Ctrl-C`. Start 
 non-persisting smoke run before requesting a large Yahoo universe:
 
 ```bash
-.venv/bin/python -m trading_vision.worker \
+.venv/bin/trading-vision-worker \
   --once --force --dry-run --max-symbols 5 --intervals 1d
 ```
 
 To scan known symbols once and persist pattern transitions:
 
 ```bash
-.venv/bin/python -m trading_vision.worker \
+.venv/bin/trading-vision-worker \
   --once --force --symbols THYAO GARAN --intervals 1d
 ```
 
