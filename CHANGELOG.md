@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.25.0 — 2026-07-07
+
+- Add a version 1 product contract covering local single-user scope, no authentication, and no
+  order placement.
+- Add a glossary for candle, pivot, pattern candidate, confirmation, invalidation, expiration, and
+  alert.
+- Define first scanner intervals as `1d`, `1h`, and `15m`.
+- Keep `5m` as a manual chart interval while rejecting it in scanner configuration and CLI choices.
+- Document closed-candle semantics with a concrete 15-minute BIST example.
+- Record detector order and conservative BIST scan policy.
+- Mark Phase 0 product-contract checklist items complete.
+
 ## 0.24.0 — 2026-07-07
 
 - Add shared logging setup for console and rotating local file output.

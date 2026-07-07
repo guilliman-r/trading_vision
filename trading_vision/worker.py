@@ -8,7 +8,7 @@ import signal
 from datetime import UTC, datetime
 from threading import Event
 
-from trading_vision.config import SUPPORTED_INTERVALS, load_settings
+from trading_vision.config import SUPPORTED_SCAN_INTERVALS, load_settings
 from trading_vision.logging_setup import configure_logging
 from trading_vision.market_calendar import BistSessionCalendar
 from trading_vision.providers.yahoo import YahooFinanceProvider
@@ -96,7 +96,7 @@ def _argument_parser() -> argparse.ArgumentParser:
         help="Cache candles and run detectors without persisting pattern transitions",
     )
     parser.add_argument("--symbols", nargs="+", help="Stored display or provider symbols")
-    parser.add_argument("--intervals", nargs="+", choices=SUPPORTED_INTERVALS)
+    parser.add_argument("--intervals", nargs="+", choices=SUPPORTED_SCAN_INTERVALS)
     parser.add_argument(
         "--max-symbols",
         type=_positive_integer,

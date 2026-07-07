@@ -4,6 +4,10 @@ The scanner is a separate local process. It fetches due BIST candles, validates 
 contract, upserts the cache, reads a bounded window, runs every enabled detector, and persists
 pattern state transitions. One symbol failing never aborts the rest of the interval run.
 
+The first supported scanner intervals are `1d`, `1h`, and `15m`. Manual `5m` chart loads remain
+available for investigation, but `5m` is deliberately excluded from scanner configuration and the
+scanner CLI until throughput and provider limits are measured.
+
 ## Start and stop
 
 Continuous mode:

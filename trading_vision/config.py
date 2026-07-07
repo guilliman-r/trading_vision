@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SUPPORTED_INTERVALS = ("1d", "1h", "15m", "5m")
+SUPPORTED_SCAN_INTERVALS = ("1d", "1h", "15m")
 SUPPORTED_PATTERN_TYPES = (
     "resistance_breakout",
     "support_breakdown",
@@ -65,10 +66,11 @@ class Settings:
             raise ValueError(f"Unsupported timezone: {self.timezone}") from error
         if not 50 <= self.chart_candle_limit <= 5_000:
             raise ValueError("chart_candle_limit must be between 50 and 5000")
-        invalid_scan_intervals = set(self.scan_intervals).difference(SUPPORTED_INTERVALS)
+        invalid_scan_intervals = set(self.scan_intervals).difference(SUPPORTED_SCAN_INTERVALS)
         if invalid_scan_intervals:
             invalid = ", ".join(sorted(invalid_scan_intervals))
-            raise ValueError(f"Unsupported scan intervals: {invalid}")
+            allowed = ", ".join(SUPPORTED_SCAN_INTERVALS)
+            raise ValueError(f"Unsupported scan intervals: {invalid}; use {allowed}")
         if not self.scan_intervals:
             raise ValueError("At least one scan interval is required")
         if not 1 <= self.scanner_batch_size <= 100:

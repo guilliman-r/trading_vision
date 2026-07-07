@@ -725,20 +725,20 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 0 — Confirm the product contract
 
-- [ ] **TV-0001 — P0 / XS:** Record that version 1 is local and single-user.
+- [x] **TV-0001 — P0 / XS:** Record that version 1 is local and single-user.
   - Acceptance: README states who runs it, where it runs, and that authentication is absent.
-- [ ] **TV-0002 — P0 / XS:** Define the first scan intervals as `1d`, `1h`, and `15m`.
+- [x] **TV-0002 — P0 / XS:** Define the first scan intervals as `1d`, `1h`, and `15m`.
   - Acceptance: config validates only supported values; `5m` is explicitly experimental/deferred.
-- [ ] **TV-0003 — P0 / XS:** Define “closed candle” semantics for every interval.
+- [x] **TV-0003 — P0 / XS:** Define “closed candle” semantics for every interval.
   - Acceptance: one written example shows when a 15-minute candle is eligible for detection.
-- [ ] **TV-0004 — P0 / XS:** Choose initial detector order: breakout, double top/bottom, head-and-shoulders, triangles.
+- [x] **TV-0004 — P0 / XS:** Choose initial detector order: breakout, double top/bottom, head-and-shoulders, triangles.
   - Acceptance: backlog and settings use the same names.
-- [ ] **TV-0005 — P0 / XS:** Set the initial BIST scan policy.
+- [x] **TV-0005 — P0 / XS:** Set the initial BIST scan policy.
   - Default: all active BIST equities on `1d` and `1h`; user watchlist on `15m`.
   - Acceptance: the policy is configurable and visible in settings.
-- [ ] **TV-0006 — P0 / XS:** State that the app never places orders.
+- [x] **TV-0006 — P0 / XS:** State that the app never places orders.
   - Acceptance: no broker credentials or order models exist in version 1.
-- [ ] **TV-0007 — P0 / XS:** Write a one-page glossary for candle, pivot, candidate, confirmation, invalidation, and alert.
+- [x] **TV-0007 — P0 / XS:** Write a one-page glossary for candle, pivot, candidate, confirmation, invalidation, and alert.
   - Acceptance: detector docs use these terms consistently.
 
 **Exit criterion:** product boundaries and default behavior are unambiguous.

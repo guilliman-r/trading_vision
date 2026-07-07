@@ -44,6 +44,12 @@ def test_rejects_unknown_interval() -> None:
         Settings(default_interval="2h").validate()
 
 
+def test_five_minute_interval_is_not_a_first_scanner_interval() -> None:
+    assert Settings(default_interval="5m").validate().default_interval == "5m"
+    with pytest.raises(ValueError, match="Unsupported scan intervals: 5m"):
+        Settings(scan_intervals=("5m",)).validate()
+
+
 def test_loads_scanner_settings_and_resolves_lock_path(tmp_path: Path) -> None:
     config_path = tmp_path / "config.toml"
     config_path.write_text(

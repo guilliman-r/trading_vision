@@ -7,11 +7,15 @@ closed-candle horizontal breakout, reversal, and triangle detection, plus a sepa
 process for continuous BIST monitoring.
 
 See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
+See the version 1 [product contract](docs/PRODUCT_CONTRACT.md) and
+[glossary](docs/GLOSSARY.md) for operating boundaries and domain terms.
 
 ## Requirements
 
 - Python 3.12 or 3.13
 - Internet access for fresh Yahoo Finance data
+
+Version 1 is local and single-user. It has no authentication and never places orders.
 
 ## Install
 

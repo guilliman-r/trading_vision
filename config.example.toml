@@ -23,7 +23,9 @@ level = "INFO"
 cooldown_seconds = 30
 
 [scanner]
-# Start conservatively. Add "1h" after measuring provider throughput for your universe.
+# First scanner intervals are 1d, 1h, and 15m. Start conservatively; use 15m on a small
+# explicit symbol set until watchlist controls and provider throughput are measured.
+# 5m remains a manual chart interval and is intentionally not accepted by the scanner.
 intervals = ["1d"]
 batch_size = 25
 lookback_bars = 500
