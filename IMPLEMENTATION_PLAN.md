@@ -829,7 +829,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0508 — P0 / S:** Remove or flag the still-open candle based on interval and exchange session.
 - [ ] **TV-0509 — P0 / M:** Implement bounded retries with exponential backoff and random jitter.
 - [ ] **TV-0510 — P0 / S:** Treat invalid ticker, empty history, rate limiting, timeout, and partial batch failure separately.
-- [ ] **TV-0511 — P0 / S:** Log request duration and returned candle range without logging secrets.
+- [x] **TV-0511 — P0 / S:** Log request duration and returned candle range without logging secrets.
 - [x] **TV-0512 — P0 / S:** Add a small in-process cooldown to avoid repeated identical requests from UI callbacks.
 - [ ] **TV-0513 — P0 / M:** Upsert only new/changed candles and report added/updated counts.
 - [x] **TV-0514 — P0 / S:** Add a generic Yahoo symbol through the UI without appending `.IS` unless it matches the BIST catalog.

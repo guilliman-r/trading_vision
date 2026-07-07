@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.38.0 — 2026-07-07
+
+- Log Yahoo history request duration, returned row count, and returned candle range.
+- Add a monkeypatched Yahoo provider test so logging coverage does not contact the network.
+- Mark `TV-0511` complete in the implementation checklist.
+
 ## 0.37.0 — 2026-07-07
 
 - Add small provider contract result objects for symbol validation and lightweight metadata.

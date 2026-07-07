@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
+
 import pandas as pd
 import pytest
 
-from trading_vision.providers.yahoo import normalize_yahoo_history_frame
+from trading_vision.providers import yahoo
+from trading_vision.providers.yahoo import YahooFinanceProvider, normalize_yahoo_history_frame
 
 
 def test_normalizes_single_symbol_yahoo_history_shape() -> None:
@@ -69,3 +72,39 @@ def test_multi_symbol_yahoo_history_requires_a_symbol_choice() -> None:
 
     with pytest.raises(ValueError, match="requires a symbol"):
         normalize_yahoo_history_frame(raw)
+
+
+def test_fetch_history_logs_duration_and_returned_candle_range(monkeypatch, caplog) -> None:
+    class FakeTicker:
+        def __init__(self, symbol: str) -> None:
+            self.symbol = symbol
+
+        def history(self, **kwargs) -> pd.DataFrame:
+            assert self.symbol == "THYAO.IS"
+            assert kwargs == {
+                "period": "2y",
+                "interval": "1d",
+                "auto_adjust": True,
+                "actions": False,
+            }
+            return pd.DataFrame(
+                {
+                    "Open": [10.0, 11.0],
+                    "High": [12.0, 13.0],
+                    "Low": [9.0, 10.0],
+                    "Close": [11.0, 12.0],
+                    "Volume": [100.0, 150.0],
+                },
+                index=pd.to_datetime(["2026-07-01", "2026-07-02"], utc=True),
+            )
+
+    monkeypatch.setattr(yahoo.yf, "Ticker", FakeTicker)
+    caplog.set_level(logging.INFO, logger="trading_vision.providers.yahoo")
+
+    result = YahooFinanceProvider().fetch_history("THYAO.IS", "1d")
+
+    assert result.succeeded
+    assert "provider_history symbol=THYAO.IS interval=1d rows=2" in caplog.text
+    assert "duration_ms=" in caplog.text
+    assert "range_start=2026-07-01T00:00:00+00:00" in caplog.text
+    assert "range_end=2026-07-02T00:00:00+00:00" in caplog.text
