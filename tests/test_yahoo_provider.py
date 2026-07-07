@@ -6,7 +6,11 @@ import pandas as pd
 import pytest
 
 from trading_vision.providers import yahoo
-from trading_vision.providers.yahoo import YahooFinanceProvider, normalize_yahoo_history_frame
+from trading_vision.providers.yahoo import (
+    YahooFinanceProvider,
+    classify_yahoo_failure,
+    normalize_yahoo_history_frame,
+)
 
 
 def test_normalizes_single_symbol_yahoo_history_shape() -> None:
@@ -110,6 +114,57 @@ def test_fetch_history_logs_duration_and_returned_candle_range(monkeypatch, capl
     assert "range_end=2026-07-02T00:00:00+00:00" in caplog.text
 
 
+def test_fetch_history_classifies_unsupported_interval() -> None:
+    result = YahooFinanceProvider().fetch_history("THYAO.IS", "3h")
+
+    assert not result.succeeded
+    assert result.failure_kind == "unsupported_interval"
+    assert result.error == "Unsupported interval: 3h"
+
+
+def test_fetch_history_classifies_blank_symbol_as_invalid_ticker() -> None:
+    result = YahooFinanceProvider().fetch_history(" ", "1d")
+
+    assert not result.succeeded
+    assert result.failure_kind == "invalid_ticker"
+    assert result.error == "Yahoo Finance invalid ticker: symbol is required"
+
+
+def test_fetch_history_classifies_empty_history(monkeypatch) -> None:
+    class EmptyTicker:
+        def __init__(self, symbol: str) -> None:
+            self.symbol = symbol
+
+        def history(self, **kwargs) -> pd.DataFrame:
+            return pd.DataFrame()
+
+    monkeypatch.setattr(yahoo.yf, "Ticker", EmptyTicker)
+
+    result = YahooFinanceProvider().fetch_history("THYAO.IS", "1d")
+
+    assert not result.succeeded
+    assert result.failure_kind == "empty_history"
+    assert result.error == "Yahoo Finance returned no candles"
+
+
+def test_fetch_history_classifies_rate_limits(monkeypatch) -> None:
+    class RateLimitedTicker:
+        def __init__(self, symbol: str) -> None:
+            self.symbol = symbol
+
+        def history(self, **kwargs) -> pd.DataFrame:
+            raise RuntimeError("Too Many Requests: rate limit 429")
+
+    monkeypatch.setattr(yahoo.yf, "Ticker", RateLimitedTicker)
+    provider = YahooFinanceProvider(max_attempts=1)
+
+    result = provider.fetch_history("THYAO.IS", "1d")
+
+    assert not result.succeeded
+    assert result.failure_kind == "rate_limited"
+    assert result.error == "Yahoo Finance rate limit: Too Many Requests: rate limit 429"
+
+
 def test_fetch_history_retries_provider_errors_with_bounded_backoff(monkeypatch) -> None:
     attempts = []
 
@@ -171,6 +226,16 @@ def test_fetch_history_stops_after_max_retry_attempts(monkeypatch) -> None:
     result = provider.fetch_history("THYAO.IS", "1d")
 
     assert not result.succeeded
-    assert result.error == "Yahoo Finance error: still down"
+    assert result.failure_kind == "timeout"
+    assert result.error == "Yahoo Finance timeout: still down"
     assert len(attempts) == 2
     assert waits == [1.0]
+
+
+def test_yahoo_failure_classifier_recognizes_invalid_and_partial_batch_errors() -> None:
+    assert classify_yahoo_failure(RuntimeError("No timezone found, symbol may be delisted")) == (
+        "invalid_ticker"
+    )
+    assert classify_yahoo_failure(RuntimeError("partial batch failure: GARAN.IS failed")) == (
+        "partial_batch_failure"
+    )

@@ -44,14 +44,29 @@ class YahooFinanceProvider(MarketDataProvider):
         self.jitter = jitter
 
     def fetch_history(self, symbol: str, interval: str) -> FetchResult:
+        if not symbol.strip():
+            return FetchResult(
+                symbol=symbol,
+                error="Yahoo Finance invalid ticker: symbol is required",
+                failure_kind="invalid_ticker",
+            )
         if interval not in PERIOD_BY_INTERVAL:
-            return FetchResult(symbol=symbol, error=f"Unsupported interval: {interval}")
+            return FetchResult(
+                symbol=symbol,
+                error=f"Unsupported interval: {interval}",
+                failure_kind="unsupported_interval",
+            )
         started = perf_counter()
         try:
             raw = self._download_history(symbol, interval)
             if raw.empty:
-                _log_history_failure(symbol, interval, started, "no candles")
-                return FetchResult(symbol=symbol, error="Yahoo Finance returned no candles")
+                failure_kind = "empty_history"
+                _log_history_failure(symbol, interval, started, failure_kind)
+                return FetchResult(
+                    symbol=symbol,
+                    error="Yahoo Finance returned no candles",
+                    failure_kind=failure_kind,
+                )
             normalized = normalize_yahoo_history_frame(raw, symbol)
             prepared = prepare_candles_with_report(normalized, interval, self.name)
             _log_history_success(symbol, interval, started, prepared.candles)
@@ -61,15 +76,22 @@ class YahooFinanceProvider(MarketDataProvider):
                 quality_report=prepared.quality_report,
             )
         except DataQualityError as error:
-            _log_history_failure(symbol, interval, started, "data-quality error")
+            failure_kind = "data_quality"
+            _log_history_failure(symbol, interval, started, failure_kind)
             return FetchResult(
                 symbol=symbol,
                 error=f"Yahoo Finance data-quality error: {error}",
                 quality_report=error.quality_report,
+                failure_kind=failure_kind,
             )
         except Exception as error:  # yfinance emits several transport exception types
-            _log_history_failure(symbol, interval, started, "provider error")
-            return FetchResult(symbol=symbol, error=f"Yahoo Finance error: {error}")
+            failure_kind = classify_yahoo_failure(error)
+            _log_history_failure(symbol, interval, started, failure_kind)
+            return FetchResult(
+                symbol=symbol,
+                error=f"{_failure_title(failure_kind)}: {error}",
+                failure_kind=failure_kind,
+            )
 
     def _download_history(self, symbol: str, interval: str) -> pd.DataFrame:
         for attempt in range(1, self.max_attempts + 1):
@@ -177,6 +199,35 @@ def _log_history_failure(symbol: str, interval: str, started: float, reason: str
         _elapsed_ms(started),
         reason,
     )
+
+
+def classify_yahoo_failure(error: Exception) -> str:
+    """Return a stable failure kind for common Yahoo/yfinance failures."""
+
+    message = str(error).lower()
+    error_name = error.__class__.__name__.lower()
+    if "partial batch" in message or "partially failed" in message:
+        return "partial_batch_failure"
+    if "rate" in message and "limit" in message:
+        return "rate_limited"
+    if "too many requests" in message or "429" in message or "ratelimit" in error_name:
+        return "rate_limited"
+    if isinstance(error, TimeoutError) or "timeout" in message or "timed out" in message:
+        return "timeout"
+    if "invalid ticker" in message or "no timezone found" in message or "delisted" in message:
+        return "invalid_ticker"
+    return "provider_error"
+
+
+def _failure_title(failure_kind: str) -> str:
+    labels = {
+        "invalid_ticker": "Yahoo Finance invalid ticker",
+        "partial_batch_failure": "Yahoo Finance partial batch failure",
+        "provider_error": "Yahoo Finance error",
+        "rate_limited": "Yahoo Finance rate limit",
+        "timeout": "Yahoo Finance timeout",
+    }
+    return labels.get(failure_kind, "Yahoo Finance error")
 
 
 def _opened_range(candles: pd.DataFrame) -> tuple[str, str]:

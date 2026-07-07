@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.46.0 — 2026-07-07
+
+- Add explicit provider failure kinds for invalid tickers, empty history, rate limits, timeouts,
+  partial batch failures, data-quality errors, and unsupported intervals.
+- Classify Yahoo Finance failures while preserving simple user-facing error messages.
+- Mark `TV-0510` complete in the implementation checklist.
+
 ## 0.45.0 — 2026-07-07
 
 - Expand BIST catalog tests for `.IS` provider mapping, invalid-code skipping, duplicate collapse,

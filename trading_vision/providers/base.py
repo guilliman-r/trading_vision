@@ -40,6 +40,7 @@ class FetchResult:
     candles: pd.DataFrame = field(default_factory=pd.DataFrame)
     error: str | None = None
     quality_report: DataQualityReport | None = None
+    failure_kind: str | None = None
 
     @property
     def succeeded(self) -> bool:
