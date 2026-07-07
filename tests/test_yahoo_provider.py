@@ -108,3 +108,69 @@ def test_fetch_history_logs_duration_and_returned_candle_range(monkeypatch, capl
     assert "duration_ms=" in caplog.text
     assert "range_start=2026-07-01T00:00:00+00:00" in caplog.text
     assert "range_end=2026-07-02T00:00:00+00:00" in caplog.text
+
+
+def test_fetch_history_retries_provider_errors_with_bounded_backoff(monkeypatch) -> None:
+    attempts = []
+
+    class FlakyTicker:
+        def __init__(self, symbol: str) -> None:
+            self.symbol = symbol
+
+        def history(self, **kwargs) -> pd.DataFrame:
+            attempts.append((self.symbol, kwargs))
+            if len(attempts) < 3:
+                raise TimeoutError("temporary timeout")
+            return pd.DataFrame(
+                {
+                    "Open": [10.0],
+                    "High": [12.0],
+                    "Low": [9.0],
+                    "Close": [11.0],
+                    "Volume": [100.0],
+                },
+                index=pd.to_datetime(["2026-07-01"], utc=True),
+            )
+
+    waits = []
+    monkeypatch.setattr(yahoo.yf, "Ticker", FlakyTicker)
+    provider = YahooFinanceProvider(
+        base_retry_delay_seconds=1.0,
+        max_retry_delay_seconds=3.0,
+        sleeper=waits.append,
+        jitter=lambda _low, _high: 0.25,
+    )
+
+    result = provider.fetch_history("THYAO.IS", "1d")
+
+    assert result.succeeded
+    assert len(attempts) == 3
+    assert waits == [1.25, 2.25]
+
+
+def test_fetch_history_stops_after_max_retry_attempts(monkeypatch) -> None:
+    attempts = []
+
+    class BrokenTicker:
+        def __init__(self, symbol: str) -> None:
+            self.symbol = symbol
+
+        def history(self, **kwargs) -> pd.DataFrame:
+            attempts.append((self.symbol, kwargs))
+            raise TimeoutError("still down")
+
+    waits = []
+    monkeypatch.setattr(yahoo.yf, "Ticker", BrokenTicker)
+    provider = YahooFinanceProvider(
+        max_attempts=2,
+        base_retry_delay_seconds=1.0,
+        sleeper=waits.append,
+        jitter=lambda _low, _high: 0.0,
+    )
+
+    result = provider.fetch_history("THYAO.IS", "1d")
+
+    assert not result.succeeded
+    assert result.error == "Yahoo Finance error: still down"
+    assert len(attempts) == 2
+    assert waits == [1.0]

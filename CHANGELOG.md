@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.39.0 — 2026-07-07
+
+- Add bounded Yahoo history retries with exponential backoff and jitter.
+- Keep retry sleeps and jitter injectable so tests remain instant and deterministic.
+- Mark `TV-0509` complete in the implementation checklist.
+
 ## 0.38.0 — 2026-07-07
 
 - Log Yahoo history request duration, returned row count, and returned candle range.

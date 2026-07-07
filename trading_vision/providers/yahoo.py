@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
-from time import perf_counter
+import random
+from collections.abc import Callable
+from time import perf_counter, sleep
 
 import pandas as pd
 import yfinance as yf
@@ -25,17 +27,28 @@ LOGGER = logging.getLogger(__name__)
 class YahooFinanceProvider(MarketDataProvider):
     name = "Yahoo Finance"
 
+    def __init__(
+        self,
+        max_attempts: int = 3,
+        base_retry_delay_seconds: float = 0.5,
+        max_retry_delay_seconds: float = 5.0,
+        sleeper: Callable[[float], None] = sleep,
+        jitter: Callable[[float, float], float] = random.uniform,
+    ) -> None:
+        if max_attempts < 1:
+            raise ValueError("max_attempts must be at least 1")
+        self.max_attempts = max_attempts
+        self.base_retry_delay_seconds = base_retry_delay_seconds
+        self.max_retry_delay_seconds = max_retry_delay_seconds
+        self.sleeper = sleeper
+        self.jitter = jitter
+
     def fetch_history(self, symbol: str, interval: str) -> FetchResult:
         if interval not in PERIOD_BY_INTERVAL:
             return FetchResult(symbol=symbol, error=f"Unsupported interval: {interval}")
         started = perf_counter()
         try:
-            raw = yf.Ticker(symbol).history(
-                period=PERIOD_BY_INTERVAL[interval],
-                interval=interval,
-                auto_adjust=True,
-                actions=False,
-            )
+            raw = self._download_history(symbol, interval)
             if raw.empty:
                 _log_history_failure(symbol, interval, started, "no candles")
                 return FetchResult(symbol=symbol, error="Yahoo Finance returned no candles")
@@ -57,6 +70,35 @@ class YahooFinanceProvider(MarketDataProvider):
         except Exception as error:  # yfinance emits several transport exception types
             _log_history_failure(symbol, interval, started, "provider error")
             return FetchResult(symbol=symbol, error=f"Yahoo Finance error: {error}")
+
+    def _download_history(self, symbol: str, interval: str) -> pd.DataFrame:
+        for attempt in range(1, self.max_attempts + 1):
+            try:
+                return yf.Ticker(symbol).history(
+                    period=PERIOD_BY_INTERVAL[interval],
+                    interval=interval,
+                    auto_adjust=True,
+                    actions=False,
+                )
+            except Exception:
+                if attempt == self.max_attempts:
+                    raise
+                delay = self._retry_delay_seconds(attempt)
+                LOGGER.warning(
+                    "provider_history_retry symbol=%s interval=%s attempt=%s "
+                    "next_delay_seconds=%.2f",
+                    symbol,
+                    interval,
+                    attempt,
+                    delay,
+                )
+                self.sleeper(delay)
+        raise RuntimeError("Provider retry loop ended unexpectedly")
+
+    def _retry_delay_seconds(self, attempt: int) -> float:
+        base_delay = self.base_retry_delay_seconds * (2 ** (attempt - 1))
+        capped_delay = min(base_delay, self.max_retry_delay_seconds)
+        return capped_delay + self.jitter(0, capped_delay)
 
 
 def normalize_yahoo_history_frame(frame: pd.DataFrame, symbol: str | None = None) -> pd.DataFrame:
