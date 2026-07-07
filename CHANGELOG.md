@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.34.0 — 2026-07-07
+
+- Document the BIST catalog policy: ordinary equities are in scope; ETFs, warrants, rights, funds,
+  debt instruments, and non-equity member codes are excluded from the active scan universe.
+- Document a monthly manual catalog refresh cadence and require review before broad catalog changes.
+- Mark `TV-0403` and `TV-0412` complete in the implementation checklist.
+
 ## 0.33.0 — 2026-07-07
 
 - Add `trading-vision-config` to print effective non-secret runtime settings.

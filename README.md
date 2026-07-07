@@ -221,7 +221,10 @@ The committed catalog is generated from KAP's BIST Companies page:
 
 The source list includes KAP member codes as well as listed equity codes. The application keeps
 the raw catalog provenance and handles unavailable Yahoo symbols as visible provider errors.
-Provider validation and an equity-only review are tracked in the implementation plan.
+Version 1 targets ordinary listed equities and excludes ETFs, warrants, rights, funds, debt
+instruments, and non-equity member codes from the active scan universe. See the
+[BIST catalog policy](docs/BIST_CATALOG_POLICY.md). Provider validation and an equity-only review
+are tracked in the implementation plan.
 
 ## Test and format
 

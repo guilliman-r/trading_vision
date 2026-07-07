@@ -801,7 +801,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 - [x] **TV-0401 — P0 / S:** Define CSV columns for display symbol, provider symbol, company name, exchange, currency, asset type, active flag, and source date.
 - [ ] **TV-0402 — P0 / M:** Obtain the initial active-equity list from Borsa Istanbul/KAP and store a versioned snapshot.
-- [ ] **TV-0403 — P0 / S:** Explicitly decide whether ETFs, warrants, rights, and investment funds are excluded.
+- [x] **TV-0403 — P0 / S:** Explicitly decide whether ETFs, warrants, rights, and investment funds are excluded.
   - Default: include ordinary listed equities; exclude non-equity instruments.
 - [x] **TV-0404 — P0 / S:** Normalize Turkish characters only in search aliases, never by damaging official company names.
 - [x] **TV-0405 — P0 / S:** Map BIST display symbols to Yahoo `.IS` provider symbols in the catalog builder.
@@ -811,7 +811,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0409 — P1 / M:** Implement a manual refresh script that downloads/reads the official source and generates a diff.
 - [ ] **TV-0410 — P1 / S:** Require user review before catalog changes mark many symbols inactive.
 - [ ] **TV-0411 — P1 / S:** Record additions, removals, renames, and provider failures in a refresh report.
-- [ ] **TV-0412 — P1 / S:** Schedule a monthly reminder or documented manual catalog refresh—not an opaque scrape at every startup.
+- [x] **TV-0412 — P1 / S:** Schedule a monthly reminder or documented manual catalog refresh—not an opaque scrape at every startup.
 - [ ] **TV-0413 — P0 / M:** Add tests for `.IS` mapping, duplicate detection, invalid rows, and inactive symbols.
 
 **Exit criterion:** all intended BIST equities are searchable, and catalog provenance is visible.
