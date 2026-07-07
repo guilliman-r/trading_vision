@@ -8,7 +8,8 @@ process for continuous BIST monitoring.
 
 See the complete [implementation plan](IMPLEMENTATION_PLAN.md).
 See the version 1 [product contract](docs/PRODUCT_CONTRACT.md) and
-[glossary](docs/GLOSSARY.md) for operating boundaries and domain terms.
+[glossary](docs/GLOSSARY.md) for operating boundaries and domain terms. For day-to-day running,
+updates, backup, and restore, use the [operations guide](docs/OPERATIONS.md).
 
 ## Requirements
 

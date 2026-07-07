@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.43.0 — 2026-07-07
+
+- Add an operations guide for first run, normal run, shutdown, update, backup, and restore.
+- Link the operations guide from the README.
+- Mark `TV-1803` complete in the implementation checklist.
+
 ## 0.42.0 — 2026-07-07
 
 - Add an explicit `trading-vision-ui` command while keeping `trading-vision` as a UI alias.

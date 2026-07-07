@@ -1063,7 +1063,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 - [x] **TV-1801 — P0 / S:** Provide two explicit commands: run UI and run scanner.
 - [ ] **TV-1802 — P0 / S:** Add a startup check that creates directories, migrates the database, and imports the catalog safely.
-- [ ] **TV-1803 — P0 / S:** Document first run, normal run, shutdown, update, backup, and restore.
+- [x] **TV-1803 — P0 / S:** Document first run, normal run, shutdown, update, backup, and restore.
 - [x] **TV-1804 — P0 / S:** Display the application version and database schema version.
 - [ ] **TV-1805 — P1 / M:** Add a simple macOS launch-agent or equivalent user-service example if unattended local scanning is desired.
 - [ ] **TV-1806 — P1 / M:** Optionally add one Dockerfile and Compose file with UI/scanner services sharing a data volume.
