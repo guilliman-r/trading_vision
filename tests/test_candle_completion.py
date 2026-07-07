@@ -63,6 +63,46 @@ def test_intraday_current_interval_waits_for_boundary_and_delay() -> None:
     assert after_delay["is_complete"].tolist() == [True, False]
 
 
+def test_hourly_candles_use_yahoo_half_hour_boundaries() -> None:
+    candles = _candles(
+        "2026-07-06 09:30",
+        "2026-07-06 10:30",
+        "2026-07-06 11:30",
+    )
+
+    before_delay = mark_bist_candle_completion(
+        candles,
+        "1h",
+        datetime(2026, 7, 6, 11, 30, 30, tzinfo=ISTANBUL),
+        provider_delay_seconds=60,
+        calendar=BistSessionCalendar(),
+    )
+    after_delay = mark_bist_candle_completion(
+        candles,
+        "1h",
+        datetime(2026, 7, 6, 11, 31, tzinfo=ISTANBUL),
+        provider_delay_seconds=60,
+        calendar=BistSessionCalendar(),
+    )
+
+    assert before_delay["is_complete"].tolist() == [True, False, False]
+    assert after_delay["is_complete"].tolist() == [True, True, False]
+
+
+def test_last_hourly_candle_completes_at_exchange_data_close() -> None:
+    candles = _candles("2026-07-06 17:30")
+
+    prepared = mark_bist_candle_completion(
+        candles,
+        "1h",
+        datetime(2026, 7, 6, 18, 1, tzinfo=ISTANBUL),
+        provider_delay_seconds=60,
+        calendar=BistSessionCalendar(),
+    )
+
+    assert prepared["is_complete"].tolist() == [True]
+
+
 def test_weekend_uses_fridays_last_completed_interval() -> None:
     candles = _candles("2026-07-03 17:45", "2026-07-06 10:00")
 

@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from math import floor
 
+from trading_vision.bist_intervals import (
+    bist_intraday_close,
+    bist_intraday_opens,
+    latest_completed_intraday_open,
+)
 from trading_vision.data_quality import INTERVAL_LENGTHS
-from trading_vision.market_calendar import ISTANBUL, BistSessionCalendar, MarketSession
+from trading_vision.market_calendar import ISTANBUL, BistSessionCalendar
 
 
 def is_job_due(
@@ -37,13 +41,14 @@ def expected_latest_open(
         session = calendar.latest_completed_session(now, provider_delay_seconds)
         return datetime.combine(session.trading_date, datetime.min.time(), ISTANBUL)
 
-    duration = _duration(interval)
     local_effective = effective.astimezone(ISTANBUL)
     current = calendar.session_for(local_effective.date())
-    if current and local_effective >= current.opens_at + duration:
-        return _latest_open_within_session(current, local_effective, duration)
+    if current:
+        latest = latest_completed_intraday_open(current, interval, local_effective)
+        if latest is not None:
+            return latest
     previous = calendar.latest_completed_session(now, provider_delay_seconds)
-    return previous.data_closes_at - duration
+    return bist_intraday_opens(previous, interval)[-1]
 
 
 def next_poll_at(
@@ -57,17 +62,6 @@ def next_poll_at(
         for interval in intervals
     ]
     return min(candidates).astimezone(UTC)
-
-
-def _latest_open_within_session(
-    session: MarketSession,
-    effective: datetime,
-    duration: timedelta,
-) -> datetime:
-    if effective >= session.data_closes_at:
-        return session.data_closes_at - duration
-    completed = floor((effective - session.opens_at) / duration)
-    return session.opens_at + duration * (completed - 1)
 
 
 def _next_interval_poll(
@@ -85,13 +79,10 @@ def _next_interval_poll(
             if candidate > local_now:
                 return candidate
             continue
-        duration = _duration(interval)
-        boundary = session.opens_at + duration
-        while boundary <= session.data_closes_at:
-            candidate = boundary + delay
+        for opened_at in bist_intraday_opens(session, interval):
+            candidate = bist_intraday_close(opened_at, session, interval) + delay
             if candidate > local_now:
                 return candidate
-            boundary += duration
     raise RuntimeError("Unable to calculate the next scanner wake time")
 
 

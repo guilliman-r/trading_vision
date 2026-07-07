@@ -174,6 +174,29 @@ def test_repeated_chart_load_uses_cooldown_and_refresh_bypasses_it(database_path
     assert provider.requests == 2
 
 
+def test_chart_reuses_persisted_candles_until_explicit_refresh(database_path) -> None:
+    provider = CountingProvider()
+    app = create_app(
+        Settings(database_path=database_path, provider_cooldown_seconds=0),
+        provider,
+    )
+    client = app.server.test_client()
+
+    first = client.post("/_dash-update-component", json=_load_callback_request(app))
+    cached = client.post("/_dash-update-component", json=_load_callback_request(app))
+    refresh_request = _load_callback_request(app)
+    refresh_input = next(
+        item for item in refresh_request["inputs"] if item["id"] == "refresh-button"
+    )
+    refresh_input["value"] = 1
+    refresh_request["changedPropIds"] = ["refresh-button.n_clicks"]
+    refreshed = client.post("/_dash-update-component", json=refresh_request)
+
+    assert first.status_code == cached.status_code == refreshed.status_code == 200
+    assert provider.requests == 2
+    assert cached.get_json()["response"]["data-status"]["children"].startswith("Cached")
+
+
 def test_chart_callback_makes_bist_candle_gap_visible(database_path) -> None:
     app = create_app(Settings(database_path=database_path), GapProvider())
     response = app.server.test_client().post(

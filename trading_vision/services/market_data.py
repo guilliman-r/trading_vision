@@ -21,6 +21,7 @@ from trading_vision.repositories import find_symbol, get_candles, upsert_candles
 class ChartLoadResult:
     symbol: Symbol
     candles: pd.DataFrame
+    from_cache: bool = False
     provider_message: str | None = None
     patterns: tuple[PatternMatch, ...] = ()
     quality_report: DataQualityReport | None = None
@@ -48,7 +49,7 @@ class MarketDataService:
         cached = get_candles(self.connection, symbol.id, interval, self.candle_limit)
         cached = self._completion_flags(symbol, cached, interval)
         if not refresh and not cached.empty:
-            return ChartLoadResult(symbol=symbol, candles=cached)
+            return ChartLoadResult(symbol=symbol, candles=cached, from_cache=True)
 
         fetched = self.provider.fetch_history(symbol.provider_symbol, interval)
         if fetched.succeeded:
@@ -65,6 +66,7 @@ class MarketDataService:
             return ChartLoadResult(
                 symbol=symbol,
                 candles=cached,
+                from_cache=True,
                 provider_message=f"Showing cached data. {fetched.error}",
                 quality_report=fetched.quality_report,
             )

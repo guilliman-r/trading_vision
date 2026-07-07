@@ -225,10 +225,14 @@ def _successful_chart_result(
     )
     visible_patterns = select_visible_patterns(candles, result.patterns)
     pattern_word = "pattern" if len(visible_patterns) == 1 else "patterns"
-    status_text = (
-        "Cached" if provider_message else f"Live · {len(visible_patterns)} active {pattern_word}"
-    )
-    status_class = "status-badge warning" if provider_message else "status-badge success"
+    status_prefix = "Cached" if result.from_cache or provider_message else "Live"
+    status_text = f"{status_prefix} · {len(visible_patterns)} active {pattern_word}"
+    if provider_message:
+        status_class = "status-badge warning"
+    elif result.from_cache:
+        status_class = "status-badge neutral"
+    else:
+        status_class = "status-badge success"
     details = detail_rows(
         symbol=result.symbol.provider_symbol,
         name=result.symbol.name,

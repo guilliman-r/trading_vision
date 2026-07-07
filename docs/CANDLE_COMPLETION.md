@@ -15,6 +15,11 @@ For `5m`, `15m`, and `1h`, only bars whose full interval boundary has passed plu
 complete. Before the first eligible boundary of a new session, the previous session's last bar is
 the newest completed candle.
 
+Yahoo Finance labels BIST hourly bars on the half-hour, from `09:30` through `17:30` Istanbul time.
+Trading Vision follows those provider timestamps rather than inventing round-hour boundaries. The
+last hourly bar is a short bar and becomes complete at the `18:00` exchange data close plus the
+provider delay.
+
 ## UI and detector behavior
 
 A forming candle remains on the chart because it is useful live price context. The chart heading

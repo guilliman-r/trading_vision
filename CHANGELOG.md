@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.17.0 — 2026-07-06
+
+- Load previously fetched chart candles from SQLite during ordinary symbol and interval changes.
+- Reserve the Refresh button for explicit Yahoo Finance network requests.
+- Reduce repeat 1H switches from provider-bound waits to local cache and detector work.
+- Align BIST hourly completion, scanner scheduling, gap checks, and chart range breaks with Yahoo's
+  half-hour candle timestamps.
+- Treat the final 17:30 hourly candle as complete at the 18:00 exchange data close plus provider
+  delay.
+- Replace hundreds of false hourly gap warnings with the actual missing provider bars.
+- Label locally restored chart results as `Cached` while retaining the independent freshness state.
+- Add hourly phase, final-bar, scanner wake, gap, cache-reuse, and range-break regression tests.
+
 ## 0.16.0 — 2026-07-06
 
 - Centralize BIST candle-completion decisions in one calendar-aware function.

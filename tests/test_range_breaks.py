@@ -51,7 +51,7 @@ def test_intraday_breaks_hide_overnight_and_half_day_remainder() -> None:
     )
     half_day_times = [pd.Timestamp(value).astimezone(ISTANBUL) for value in half_days["values"]]
 
-    assert overnight["bounds"] == [15, 7]
+    assert overnight["bounds"] == [15, 6.5]
     assert half_day_times[0].date() == date(2026, 5, 26)
     assert (half_day_times[0].hour, half_day_times[0].minute) == (12, 30)
 

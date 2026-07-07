@@ -11,10 +11,11 @@ not gaps.
 
 ## Intraday candles
 
-For `5m`, `15m`, and `1h` data, expected candle openings begin at the configured session open and
-continue while a complete interval fits before the data close. Half-day closing times are honored.
-Only missing intervals between the first and last loaded candle are reported; trailing freshness
-is handled separately by the freshness evaluator.
+For `5m` and `15m` data, expected candle openings begin at the configured session open. Yahoo's
+BIST `1h` feed instead uses half-hour labels from `09:30` through `17:30`, so gap checks use that
+same provider grid. Half-day closing times are honored. Only missing intervals between the first
+and last loaded candle are reported; trailing freshness is handled separately by the freshness
+evaluator.
 
 ## Calendar coverage
 

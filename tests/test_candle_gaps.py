@@ -43,6 +43,29 @@ def test_intraday_gap_finds_missing_completed_interval() -> None:
     assert report.missing_at[0].astimezone(ISTANBUL).strftime("%H:%M") == "10:30"
 
 
+def test_hourly_gap_grid_matches_yahoo_half_hour_timestamps() -> None:
+    local_times = pd.date_range("2026-07-06 09:30", "2026-07-06 17:30", freq="1h")
+    timestamps = local_times.tz_localize(ISTANBUL).tz_convert("UTC")
+    candles = pd.DataFrame({"opened_at_utc": timestamps, "is_complete": True})
+
+    report = find_bist_candle_gaps(candles, "1h", BistSessionCalendar())
+
+    assert report.count == 0
+
+
+def test_hourly_gap_finds_missing_half_hour_aligned_bar() -> None:
+    local_times = pd.DatetimeIndex(
+        ["2026-07-06 09:30", "2026-07-06 10:30", "2026-07-06 12:30"]
+    )
+    timestamps = local_times.tz_localize(ISTANBUL).tz_convert("UTC")
+    candles = pd.DataFrame({"opened_at_utc": timestamps, "is_complete": True})
+
+    report = find_bist_candle_gaps(candles, "1h", BistSessionCalendar())
+
+    assert report.count == 1
+    assert report.missing_at[0].astimezone(ISTANBUL).strftime("%H:%M") == "11:30"
+
+
 def test_uncovered_calendar_year_does_not_create_false_gap() -> None:
     candles = _daily_candles("2025-01-02", "2025-01-06")
 

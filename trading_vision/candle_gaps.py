@@ -7,6 +7,7 @@ from datetime import UTC, date, datetime, time, timedelta
 
 import pandas as pd
 
+from trading_vision.bist_intervals import bist_intraday_opens
 from trading_vision.data_quality import INTERVAL_LENGTHS
 from trading_vision.market_calendar import ISTANBUL, BistSessionCalendar
 
@@ -66,7 +67,6 @@ def _intraday_gaps(
     first, last = min(actual), max(actual)
     first_date = first.astimezone(ISTANBUL).date()
     last_date = last.astimezone(ISTANBUL).date()
-    duration = INTERVAL_LENGTHS[interval].to_pytimedelta()
     missing: list[datetime] = []
     for day in _dates_between(first_date, last_date):
         if day.year not in calendar.covered_years:
@@ -74,12 +74,10 @@ def _intraday_gaps(
         session = calendar.session_for(day)
         if session is None:
             continue
-        expected = session.opens_at
-        while expected + duration <= session.data_closes_at:
+        for expected in bist_intraday_opens(session, interval):
             expected_utc = expected.astimezone(UTC)
             if first <= expected_utc <= last and expected_utc not in actual:
                 missing.append(expected_utc)
-            expected += duration
     return missing
 
 

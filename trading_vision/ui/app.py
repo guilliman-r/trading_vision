@@ -57,7 +57,9 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
                     candle_limit=settings.chart_candle_limit,
                     provider_delay_seconds=settings.provider_delay_seconds,
                 )
-                result = market_data.load(symbol_query, interval)
+                # Interval changes should be instant when candles already exist locally.
+                # The explicit Refresh button is the only UI action that forces Yahoo.
+                result = market_data.load(symbol_query, interval, refresh=force_refresh)
                 if not result.candles.empty:
                     pattern_scan = PatternScanService(
                         connection,

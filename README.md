@@ -55,6 +55,10 @@ If Yahoo supplies the currently open BIST bar, the chart keeps it visible but la
 `forming candle`. Detectors ignore it until the proper exchange boundary and provider delay have
 passed. See the [candle-completion guide](docs/CANDLE_COMPLETION.md).
 
+Ordinary symbol and interval changes reuse SQLite candles immediately when available. The
+**Refresh** button explicitly asks Yahoo for new candles, so revisiting the 1H chart does not block
+the interface on a repeated provider request.
+
 Hover over a candle to see its timestamp, open, high, low, close, absolute and percentage change,
 and volume in one compact summary. See the [freshness guide](docs/DATA_FRESHNESS.md) for the exact
 states and thresholds.
