@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.29.0 — 2026-07-07
+
+- Add `trading-vision-db backup --output ...` using SQLite's backup API.
+- Add `trading-vision-db stats` with schema version, database size, and table row counts.
+- Keep the existing no-argument database command as the initialize/default action.
+- Add regression tests for backup integrity and database stats output.
+- Mark `TV-0314` and `TV-0315` complete in the implementation checklist.
+
 ## 0.28.0 — 2026-07-07
 
 - Fix CI formatting by applying `ruff format` output for the files reported by GitHub Actions.

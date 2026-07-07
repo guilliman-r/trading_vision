@@ -134,6 +134,26 @@ counts, database path and size, package versions, provider run state, and recent
 Watchlist tables and repository operations are available for saved symbol groups. Full management
 controls are still a later UI task. See the [watchlist guide](docs/WATCHLISTS.md).
 
+## Database utilities
+
+Initialize the configured SQLite database:
+
+```bash
+.venv/bin/trading-vision-db
+```
+
+Print the schema version, database/WAL/SHM size, and row counts for every application table:
+
+```bash
+.venv/bin/trading-vision-db stats
+```
+
+Create a safe SQLite backup copy with the backup API:
+
+```bash
+.venv/bin/trading-vision-db backup --output var/trading_vision.backup.sqlite3
+```
+
 ## Logs
 
 The UI and scanner both write concise console logs and a rotating local file at

@@ -83,13 +83,88 @@ def schema_version(connection: sqlite3.Connection) -> str:
     return f"{row['filename']} · {count} {migration_word}"
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Initialize the Trading Vision database")
+def backup_database(source_path: Path, destination_path: Path) -> Path:
+    """Copy an existing SQLite database to a destination path."""
+
+    if not source_path.exists():
+        raise FileNotFoundError(f"Database does not exist: {source_path}")
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(source_path) as source, sqlite3.connect(destination_path) as destination:
+        source.backup(destination)
+    return destination_path
+
+
+def table_counts(connection: sqlite3.Connection) -> list[tuple[str, int]]:
+    """Return row counts for user-created tables in stable name order."""
+
+    rows = connection.execute(
+        """
+        SELECT name
+        FROM sqlite_master
+        WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+        ORDER BY name
+        """
+    ).fetchall()
+    counts: list[tuple[str, int]] = []
+    for row in rows:
+        table_name = row["name"]
+        count = connection.execute(
+            f"SELECT COUNT(*) AS count FROM {_quote_identifier(table_name)}"
+        ).fetchone()["count"]
+        counts.append((table_name, int(count)))
+    return counts
+
+
+def database_file_size(database_path: Path) -> int:
+    """Return the combined SQLite database, WAL, and shared-memory file size."""
+
+    paths = (
+        database_path,
+        Path(f"{database_path}-wal"),
+        Path(f"{database_path}-shm"),
+    )
+    return sum(path.stat().st_size for path in paths if path.exists())
+
+
+def _quote_identifier(value: str) -> str:
+    return '"' + value.replace('"', '""') + '"'
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Manage the Trading Vision SQLite database")
+    parser.add_argument(
+        "command",
+        nargs="?",
+        choices=("init", "backup", "stats"),
+        default="init",
+        help="Database command to run",
+    )
     parser.add_argument("--path", type=Path, help="Optional database path")
-    arguments = parser.parse_args()
+    parser.add_argument("--output", type=Path, help="Backup destination path")
+    arguments = parser.parse_args(argv)
     path = arguments.path or load_settings().database_path
-    initialize_database(path)
-    print(f"Database ready: {path}")
+
+    if arguments.command == "init":
+        initialize_database(path)
+        print(f"Database ready: {path}")
+        return
+
+    if not path.exists():
+        raise FileNotFoundError(f"Database does not exist: {path}")
+
+    if arguments.command == "backup":
+        if arguments.output is None:
+            parser.error("backup requires --output")
+        backup_path = backup_database(path, arguments.output)
+        print(f"Database backup written: {backup_path}")
+        return
+
+    with connect(path) as connection:
+        print(f"Database: {path}")
+        print(f"Size: {database_file_size(path)} bytes")
+        print(f"Schema: {schema_version(connection)}")
+        for table_name, count in table_counts(connection):
+            print(f"{table_name}: {count}")
 
 
 if __name__ == "__main__":

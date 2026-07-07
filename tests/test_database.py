@@ -8,10 +8,16 @@ import pytest
 from trading_vision.data_quality import prepare_candles
 from trading_vision.database import (
     MIGRATIONS_DIRECTORY,
+    backup_database,
     connect,
     connection_scope,
+    database_file_size,
     initialize_database,
     schema_version,
+    table_counts,
+)
+from trading_vision.database import (
+    main as database_main,
 )
 from trading_vision.models import Symbol
 from trading_vision.repositories import (
@@ -184,3 +190,54 @@ def test_connection_scope_commits_and_closes(database_path) -> None:
 
     with pytest.raises(sqlite3.ProgrammingError, match="closed database"):
         connection.execute("SELECT 1")
+
+
+def test_database_backup_copies_committed_data(database_path, tmp_path: Path) -> None:
+    with connection_scope(database_path) as connection:
+        upsert_symbol(connection, Symbol("BACK", "BACK.IS", is_bist=True))
+
+    backup_path = tmp_path / "backups" / "trading_vision_backup.sqlite3"
+
+    written_path = backup_database(database_path, backup_path)
+
+    with connect(written_path) as connection:
+        assert find_symbol(connection, "BACK.IS") is not None
+        assert len(table_counts(connection)) > 0
+    assert written_path == backup_path
+
+
+def test_table_counts_and_database_size(database_path) -> None:
+    with connection_scope(database_path) as connection:
+        upsert_symbol(connection, Symbol("COUNT", "COUNT.IS", is_bist=True))
+
+    with connect(database_path) as connection:
+        counts = dict(table_counts(connection))
+
+    assert counts["symbols"] == 1
+    assert counts["schema_migrations"] == len(list(MIGRATIONS_DIRECTORY.glob("*.sql")))
+    assert database_file_size(database_path) > 0
+
+
+def test_database_cli_prints_stats(database_path, capsys) -> None:
+    with connection_scope(database_path) as connection:
+        upsert_symbol(connection, Symbol("STAT", "STAT.IS", is_bist=True))
+
+    database_main(["stats", "--path", str(database_path)])
+
+    output = capsys.readouterr().out
+    assert f"Database: {database_path}" in output
+    assert "Schema: 007_symbol_asset_type.sql" in output
+    assert "symbols: 1" in output
+
+
+def test_database_cli_writes_backup(database_path, tmp_path: Path, capsys) -> None:
+    with connection_scope(database_path) as connection:
+        upsert_symbol(connection, Symbol("CLIBACK", "CLIBACK.IS", is_bist=True))
+
+    backup_path = tmp_path / "cli-backup.sqlite3"
+
+    database_main(["backup", "--path", str(database_path), "--output", str(backup_path)])
+
+    assert f"Database backup written: {backup_path}" in capsys.readouterr().out
+    with connect(backup_path) as connection:
+        assert find_symbol(connection, "CLIBACK.IS") is not None
