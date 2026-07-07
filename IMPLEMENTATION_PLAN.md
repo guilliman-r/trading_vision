@@ -812,7 +812,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-0410 — P1 / S:** Require user review before catalog changes mark many symbols inactive.
 - [ ] **TV-0411 — P1 / S:** Record additions, removals, renames, and provider failures in a refresh report.
 - [x] **TV-0412 — P1 / S:** Schedule a monthly reminder or documented manual catalog refresh—not an opaque scrape at every startup.
-- [ ] **TV-0413 — P0 / M:** Add tests for `.IS` mapping, duplicate detection, invalid rows, and inactive symbols.
+- [x] **TV-0413 — P0 / M:** Add tests for `.IS` mapping, duplicate detection, invalid rows, and inactive symbols.
 
 **Exit criterion:** all intended BIST equities are searchable, and catalog provenance is visible.
 

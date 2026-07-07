@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.45.0 — 2026-07-07
+
+- Expand BIST catalog tests for `.IS` provider mapping, invalid-code skipping, duplicate collapse,
+  inactive imported symbols, and committed catalog uniqueness.
+- Mark `TV-0413` complete in the implementation checklist.
+
 ## 0.44.0 — 2026-07-07
 
 - Add fresh-start regression coverage for UI and worker startup database preparation.
