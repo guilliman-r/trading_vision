@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 import tomllib
 from dataclasses import dataclass, replace
@@ -24,6 +25,26 @@ SUPPORTED_PATTERN_TYPES = (
     "symmetrical_triangle",
 )
 LOOPBACK_HOSTNAMES = {"localhost", "127.0.0.1", "::1"}
+PUBLIC_SETTING_NAMES = (
+    "database_path",
+    "log_path",
+    "log_level",
+    "host",
+    "port",
+    "debug",
+    "timezone",
+    "default_symbol",
+    "default_interval",
+    "chart_candle_limit",
+    "scan_intervals",
+    "scanner_batch_size",
+    "scanner_lookback_bars",
+    "provider_delay_seconds",
+    "provider_cooldown_seconds",
+    "scanner_lock_path",
+    "minimum_alert_score",
+    "alert_pattern_types",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -174,3 +195,25 @@ def _is_loopback_host(host: str) -> bool:
         return ip_address(host).is_loopback
     except ValueError:
         return False
+
+
+def public_settings(settings: Settings) -> dict[str, str]:
+    """Return the explicit non-secret settings that are safe to print."""
+
+    return {name: _stringify_setting(getattr(settings, name)) for name in PUBLIC_SETTING_NAMES}
+
+
+def _stringify_setting(value: object) -> str:
+    if isinstance(value, tuple):
+        return ", ".join(str(item) for item in value)
+    return str(value)
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Print effective non-secret Trading Vision config")
+    parser.add_argument("--config", type=Path, help="Optional config.toml path")
+    arguments = parser.parse_args(argv)
+
+    settings = load_settings(arguments.config)
+    for key, value in public_settings(settings).items():
+        print(f"{key}={value}")

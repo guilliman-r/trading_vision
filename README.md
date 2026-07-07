@@ -205,6 +205,12 @@ Configuration is optional. Copy `config.example.toml` to `config.toml`, then edi
 TOML values. Environment variables `TV_DATABASE_PATH`, `TV_HOST`, and `TV_PORT` override the
 matching settings.
 
+To inspect the effective non-secret runtime configuration:
+
+```bash
+.venv/bin/trading-vision-config
+```
+
 ## Refresh the BIST catalog
 
 The committed catalog is generated from KAP's BIST Companies page:

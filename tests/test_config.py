@@ -2,7 +2,13 @@ from pathlib import Path
 
 import pytest
 
-from trading_vision.config import Settings, host_binding_warning, load_settings
+from trading_vision.config import (
+    Settings,
+    host_binding_warning,
+    load_settings,
+    main,
+    public_settings,
+)
 
 
 def test_default_settings_are_valid() -> None:
@@ -95,3 +101,32 @@ def test_non_loopback_host_warns_about_missing_authentication() -> None:
     assert warning is not None
     assert "no authentication" in warning
     assert "127.0.0.1" in warning
+
+
+def test_public_settings_are_an_explicit_non_secret_allowlist() -> None:
+    settings = Settings(host="127.0.0.1", scan_intervals=("1d", "1h"))
+
+    values = public_settings(settings)
+
+    assert values["host"] == "127.0.0.1"
+    assert values["scan_intervals"] == "1d, 1h"
+    assert "environment" not in values
+    assert "token" not in values
+
+
+def test_config_command_prints_effective_non_secret_settings(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text('[app]\nhost = "localhost"\nport = 9000\n')
+    monkeypatch.setenv("TV_FAKE_SECRET_TOKEN", "do-not-print")
+
+    main(["--config", str(config_path)])
+
+    output = capsys.readouterr().out
+    assert "host=localhost" in output
+    assert "port=9000" in output
+    assert "TV_FAKE_SECRET_TOKEN" not in output
+    assert "do-not-print" not in output

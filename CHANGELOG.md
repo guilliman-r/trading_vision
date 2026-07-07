@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.33.0 — 2026-07-07
+
+- Add `trading-vision-config` to print effective non-secret runtime settings.
+- Keep config output behind an explicit public setting allowlist.
+- Add regression tests to ensure unrelated environment secrets are not printed.
+- Mark `TV-0210` complete in the implementation checklist.
+
 ## 0.32.0 — 2026-07-07
 
 - Add a pull-request template with the project safety, local-first, migration, testing, and
