@@ -65,6 +65,24 @@ def initialize_database(database_path: Path) -> None:
             )
 
 
+def schema_version(connection: sqlite3.Connection) -> str:
+    """Return a concise human-readable migration state."""
+
+    row = connection.execute(
+        """
+        SELECT filename
+        FROM schema_migrations
+        ORDER BY filename DESC
+        LIMIT 1
+        """
+    ).fetchone()
+    count = connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0]
+    if row is None:
+        return "No migrations applied"
+    migration_word = "migration" if count == 1 else "migrations"
+    return f"{row['filename']} · {count} {migration_word}"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Initialize the Trading Vision database")
     parser.add_argument("--path", type=Path, help="Optional database path")

@@ -10,7 +10,9 @@ from importlib.metadata import PackageNotFoundError, version
 from io import StringIO
 from pathlib import Path
 
+from trading_vision import __version__
 from trading_vision.config import Settings
+from trading_vision.database import schema_version
 from trading_vision.scanner_repository import get_heartbeat, get_latest_scan_run
 from trading_vision.scanner_results import (
     PatternResultFilters,
@@ -62,6 +64,8 @@ class ScannerResultsService:
         run = get_latest_scan_run(self.connection)
         database_size = _database_size(self.settings.database_path)
         items = [
+            ("App version", f"Trading Vision {__version__}"),
+            ("Schema", schema_version(self.connection)),
             ("Scanner", heartbeat["status"].title() if heartbeat else "Not started"),
             ("Heartbeat", heartbeat["updated_at_utc"] if heartbeat else "—"),
             ("Next wake", heartbeat["next_wake_at_utc"] or "—" if heartbeat else "—"),

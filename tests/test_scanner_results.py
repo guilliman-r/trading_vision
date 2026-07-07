@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from tests.test_alerts import alert_scanner, fresh_breakout_fixture, stored_test_symbol
+from trading_vision import __version__
 from trading_vision.config import Settings
 from trading_vision.database import connect
 from trading_vision.scanner_repository import finish_scan_run, start_scan_run, update_heartbeat
@@ -83,6 +84,8 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
             .diagnostics
         )
     assert diagnostics["Scanner"] == "Sleeping"
+    assert diagnostics["App version"] == f"Trading Vision {__version__}"
+    assert "005_quality_warnings.sql" in diagnostics["Schema"]
     assert "partial" in diagnostics["Last run"]
     assert diagnostics["Last success/fail"] == "1 / 1"
     assert "test.sqlite3" in diagnostics["Database"]

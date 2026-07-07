@@ -48,6 +48,8 @@ visible in the browser.
 
 The diagnostic cards refresh with the result table every 30 seconds and include:
 
+- Trading Vision application version;
+- current SQLite schema migration version;
 - current scanner heartbeat and update timestamp;
 - next scheduled wake;
 - latest interval run, terminal status, and duration;

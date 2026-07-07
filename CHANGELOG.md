@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.20.0 — 2026-07-07
+
+- Add a schema-version helper that reports the latest applied SQLite migration and total count.
+- Show the Trading Vision application version in scanner diagnostics.
+- Show the database schema version in scanner diagnostics.
+- Add regression tests for migration-version reporting and visible diagnostics.
+- Mark `TV-1804` complete in the implementation checklist.
+
 ## 0.19.0 — 2026-07-07
 
 - Add repository helpers to list active symbols with optional BIST filtering.

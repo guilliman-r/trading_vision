@@ -10,6 +10,7 @@ from trading_vision.database import (
     connect,
     connection_scope,
     initialize_database,
+    schema_version,
 )
 from trading_vision.models import Symbol
 from trading_vision.repositories import (
@@ -29,6 +30,14 @@ def test_migrations_are_idempotent(database_path) -> None:
     with connect(database_path) as connection:
         migrations = connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0]
     assert migrations == len(list(MIGRATIONS_DIRECTORY.glob("*.sql")))
+
+
+def test_schema_version_reports_latest_applied_migration(database_path) -> None:
+    with connect(database_path) as connection:
+        version = schema_version(connection)
+
+    assert "005_quality_warnings.sql" in version
+    assert f"{len(list(MIGRATIONS_DIRECTORY.glob('*.sql')))} migrations" in version
 
 
 def test_symbol_can_be_inserted_and_found(database_path) -> None:
