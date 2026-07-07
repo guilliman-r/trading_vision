@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.19.0 — 2026-07-07
+
+- Add repository helpers to list active symbols with optional BIST filtering.
+- Add a safe symbol inactive marker that keeps historical candles and patterns intact.
+- Add date-bounded candle range queries for focused chart and future diagnostics work.
+- Add latest-candle lookup for status and health checks without reloading full chart windows.
+- Add fresh SQLite tests for active/inactive symbol behavior and candle range/latest queries.
+- Mark `TV-0304` and `TV-0306` complete in the implementation checklist.
+
 ## 0.18.0 — 2026-07-07
 
 - Add focused scanner result links with `range_from` and `range_to` chart context.

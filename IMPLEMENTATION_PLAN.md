@@ -782,9 +782,9 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0301 — P0 / S:** Add a database connection helper that enables foreign keys, WAL mode, row objects, and busy timeout.
 - [ ] **TV-0302 — P0 / M:** Write `001_initial.sql` for symbols, candles, patterns, transitions, scan runs, watchlists, alerts, and settings.
 - [x] **TV-0303 — P0 / S:** Implement a tiny migration runner with a `schema_migrations` table.
-- [ ] **TV-0304 — P0 / S:** Implement symbol upsert, get, search, list-active, and mark-inactive functions.
+- [x] **TV-0304 — P0 / S:** Implement symbol upsert, get, search, list-active, and mark-inactive functions.
 - [x] **TV-0305 — P0 / M:** Implement bulk candle upsert in a transaction.
-- [ ] **TV-0306 — P0 / S:** Implement candle range and latest-candle queries.
+- [x] **TV-0306 — P0 / S:** Implement candle range and latest-candle queries.
 - [x] **TV-0307 — P0 / M:** Implement pattern upsert and immutable transition append in one transaction.
 - [x] **TV-0308 — P0 / S:** Implement scan-run start/finish/fail operations.
 - [ ] **TV-0309 — P0 / S:** Implement watchlist create, reorder, add, and remove operations.

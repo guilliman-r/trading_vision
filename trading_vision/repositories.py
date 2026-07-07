@@ -6,6 +6,7 @@ import csv
 import sqlite3
 import unicodedata
 from collections.abc import Iterable
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -87,6 +88,48 @@ def search_symbols(
     matches = [symbol for symbol in symbols if _symbol_matches(symbol, normalized_query)]
     matches.sort(key=lambda symbol: _symbol_search_rank(symbol, normalized_query))
     return matches[:limit]
+
+
+def list_active_symbols(
+    connection: sqlite3.Connection,
+    is_bist: bool | None = None,
+    limit: int = 1_000,
+) -> list[Symbol]:
+    if limit <= 0:
+        return []
+    if is_bist is None:
+        rows = connection.execute(
+            """
+            SELECT * FROM symbols
+            WHERE is_active = 1
+            ORDER BY is_bist DESC, display_symbol
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    else:
+        rows = connection.execute(
+            """
+            SELECT * FROM symbols
+            WHERE is_active = 1 AND is_bist = ?
+            ORDER BY display_symbol
+            LIMIT ?
+            """,
+            (int(is_bist), limit),
+        ).fetchall()
+    return [_symbol_from_row(row) for row in rows]
+
+
+def mark_symbol_inactive(connection: sqlite3.Connection, provider_symbol: str) -> bool:
+    cursor = connection.execute(
+        """
+        UPDATE symbols
+        SET is_active = 0, updated_at_utc = CURRENT_TIMESTAMP
+        WHERE UPPER(provider_symbol) = UPPER(?)
+        """,
+        (provider_symbol.strip(),),
+    )
+    return cursor.rowcount > 0
 
 
 def import_symbol_catalog(connection: sqlite3.Connection, catalog_path: Path) -> int:
@@ -176,9 +219,59 @@ def get_candles(
         """,
         (symbol_id, interval, limit),
     ).fetchall()
+    return _candles_from_rows(reversed(rows))
+
+
+def get_candles_between(
+    connection: sqlite3.Connection,
+    symbol_id: int,
+    interval: str,
+    start: datetime,
+    end: datetime,
+) -> pd.DataFrame:
+    rows = connection.execute(
+        """
+        SELECT opened_at_utc, open, high, low, close, volume,
+               is_complete, is_adjusted, source, fetched_at_utc
+        FROM candles
+        WHERE symbol_id = ?
+          AND interval = ?
+          AND datetime(opened_at_utc) >= datetime(?)
+          AND datetime(opened_at_utc) <= datetime(?)
+        ORDER BY opened_at_utc
+        """,
+        (symbol_id, interval, start.isoformat(), end.isoformat()),
+    ).fetchall()
+    return _candles_from_rows(rows)
+
+
+def get_latest_candle(
+    connection: sqlite3.Connection,
+    symbol_id: int,
+    interval: str,
+) -> dict | None:
+    rows = connection.execute(
+        """
+        SELECT opened_at_utc, open, high, low, close, volume,
+               is_complete, is_adjusted, source, fetched_at_utc
+        FROM candles
+        WHERE symbol_id = ? AND interval = ?
+        ORDER BY opened_at_utc DESC
+        LIMIT 1
+        """,
+        (symbol_id, interval),
+    ).fetchall()
+    if not rows:
+        return None
+    frame = _candles_from_rows(rows)
+    return dict(frame.iloc[0])
+
+
+def _candles_from_rows(rows) -> pd.DataFrame:
+    rows = list(rows)
     if not rows:
         return pd.DataFrame()
-    frame = pd.DataFrame([dict(row) for row in reversed(rows)])
+    frame = pd.DataFrame([dict(row) for row in rows])
     frame["opened_at_utc"] = pd.to_datetime(frame["opened_at_utc"], utc=True)
     frame["fetched_at_utc"] = pd.to_datetime(frame["fetched_at_utc"], utc=True)
     frame["is_complete"] = frame["is_complete"].astype(bool)
