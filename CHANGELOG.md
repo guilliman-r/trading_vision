@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.36.0 — 2026-07-07
+
+- Add a pure Yahoo history-frame normalizer for single-symbol and multi-symbol column shapes.
+- Add frozen Yahoo provider-shape tests covering price-first and ticker-first multi-index data.
+- Mark `TV-0505` and `TV-0515` complete in the implementation checklist.
+
 ## 0.35.0 — 2026-07-07
 
 - Add explicit diagnostics regression coverage for the installed `yfinance` version.

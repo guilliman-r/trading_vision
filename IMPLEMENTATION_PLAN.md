@@ -822,7 +822,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0502 — P0 / S:** Define a result object that carries successful data and per-symbol errors together.
 - [x] **TV-0503 — P0 / M:** Implement Yahoo single-symbol history fetch with every important argument explicit.
 - [ ] **TV-0504 — P0 / M:** Implement batched multi-symbol downloads with a configurable batch size.
-- [ ] **TV-0505 — P0 / S:** Normalize Yahoo's single- and multi-ticker column shapes into one internal schema.
+- [x] **TV-0505 — P0 / S:** Normalize Yahoo's single- and multi-ticker column shapes into one internal schema.
 - [x] **TV-0506 — P0 / S:** Convert provider timestamps to UTC and retain exchange metadata separately.
 - [x] **TV-0507 — P0 / XS:** Choose adjusted-price behavior explicitly rather than accepting a changing library default.
   - Default: use adjusted OHLC for pattern continuity and record `is_adjusted=True`.
@@ -833,7 +833,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0512 — P0 / S:** Add a small in-process cooldown to avoid repeated identical requests from UI callbacks.
 - [ ] **TV-0513 — P0 / M:** Upsert only new/changed candles and report added/updated counts.
 - [x] **TV-0514 — P0 / S:** Add a generic Yahoo symbol through the UI without appending `.IS` unless it matches the BIST catalog.
-- [ ] **TV-0515 — P0 / S:** Add frozen provider-shape tests so most tests never contact Yahoo.
+- [x] **TV-0515 — P0 / S:** Add frozen provider-shape tests so most tests never contact Yahoo.
 - [ ] **TV-0516 — P1 / M:** Add a manually invoked live integration test for representative BIST and non-BIST symbols.
 - [x] **TV-0517 — P1 / S:** Capture the installed `yfinance` version in diagnostic output.
 - [ ] **TV-0518 — P1 / S:** Add a provider health result showing success rate, latency, and latest returned bar age.
