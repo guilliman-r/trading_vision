@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.32.0 — 2026-07-07
+
+- Add a pull-request template with the project safety, local-first, migration, testing, and
+  documentation checklist.
+- Mark `TV-0112` complete in the implementation checklist.
+
 ## 0.31.0 — 2026-07-07
 
 - Add a direct fresh-database smoke test covering every repository module.

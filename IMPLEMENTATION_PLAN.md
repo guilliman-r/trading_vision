@@ -756,7 +756,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0109 — P0 / XS:** Add `config.example.toml` with every setting commented in plain language.
 - [x] **TV-0110 — P0 / XS:** Add `.env.example` only for secrets such as notification tokens.
 - [x] **TV-0111 — P1 / S:** Add a CI workflow that installs, runs Ruff, and executes tests on one supported Python version.
-- [ ] **TV-0112 — P1 / XS:** Add a pull-request checklist based on the project principles.
+- [x] **TV-0112 — P1 / XS:** Add a pull-request checklist based on the project principles.
 - [x] **TV-0113 — P1 / XS:** Add `CHANGELOG.md` and use simple semantic versioning.
 - [x] **TV-0114 — P1 / XS:** Choose and add an appropriate project license.
 
