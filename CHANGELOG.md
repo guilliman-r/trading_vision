@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.37.0 — 2026-07-07
+
+- Add small provider contract result objects for symbol validation and lightweight metadata.
+- Keep safe default provider validation and metadata behavior for fixture and future providers.
+- Mark `TV-0501` complete in the implementation checklist.
+
 ## 0.36.0 — 2026-07-07
 
 - Add a pure Yahoo history-frame normalizer for single-symbol and multi-symbol column shapes.

@@ -10,6 +10,31 @@ from trading_vision.data_quality import DataQualityReport
 
 
 @dataclass(slots=True)
+class MetadataResult:
+    symbol: str
+    provider_name: str
+    name: str | None = None
+    exchange: str | None = None
+    currency: str | None = None
+    error: str | None = None
+
+    @property
+    def succeeded(self) -> bool:
+        return self.error is None
+
+
+@dataclass(slots=True)
+class SymbolValidationResult:
+    symbol: str
+    error: str | None = None
+    metadata: MetadataResult | None = None
+
+    @property
+    def succeeded(self) -> bool:
+        return self.error is None
+
+
+@dataclass(slots=True)
 class FetchResult:
     symbol: str
     candles: pd.DataFrame = field(default_factory=pd.DataFrame)
@@ -26,5 +51,25 @@ class MarketDataProvider:
 
     name = "unknown"
 
+    def validate_symbol(self, symbol: str) -> SymbolValidationResult:
+        normalized = normalize_provider_symbol(symbol)
+        if not normalized:
+            return SymbolValidationResult(symbol=symbol, error="Symbol is required")
+        return SymbolValidationResult(symbol=normalized)
+
+    def fetch_metadata(self, symbol: str) -> MetadataResult:
+        normalized = normalize_provider_symbol(symbol)
+        if not normalized:
+            return MetadataResult(
+                symbol=symbol,
+                provider_name=self.name,
+                error="Symbol is required",
+            )
+        return MetadataResult(symbol=normalized, provider_name=self.name)
+
     def fetch_history(self, symbol: str, interval: str) -> FetchResult:
         raise NotImplementedError
+
+
+def normalize_provider_symbol(symbol: str) -> str:
+    return symbol.strip().upper()

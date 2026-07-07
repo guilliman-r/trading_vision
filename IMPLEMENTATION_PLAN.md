@@ -818,7 +818,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 ### Phase 5 — Provider boundary and Yahoo data ingestion
 
-- [ ] **TV-0501 — P0 / S:** Define a small `MarketDataProvider` interface: validate symbol, fetch bars, and fetch lightweight metadata.
+- [x] **TV-0501 — P0 / S:** Define a small `MarketDataProvider` interface: validate symbol, fetch bars, and fetch lightweight metadata.
 - [x] **TV-0502 — P0 / S:** Define a result object that carries successful data and per-symbol errors together.
 - [x] **TV-0503 — P0 / M:** Implement Yahoo single-symbol history fetch with every important argument explicit.
 - [ ] **TV-0504 — P0 / M:** Implement batched multi-symbol downloads with a configurable batch size.
