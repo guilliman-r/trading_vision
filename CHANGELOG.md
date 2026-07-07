@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.44.0 — 2026-07-07
+
+- Add fresh-start regression coverage for UI and worker startup database preparation.
+- Verify startup creates directories, applies migrations, and imports the committed BIST catalog.
+- Mark `TV-1802` complete in the implementation checklist.
+
 ## 0.43.0 — 2026-07-07
 
 - Add an operations guide for first run, normal run, shutdown, update, backup, and restore.
