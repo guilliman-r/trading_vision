@@ -63,6 +63,19 @@ class ChartSnapshot:
 
 
 @dataclass(frozen=True, slots=True)
+class Drawing:
+    """One user-created Plotly shape saved for a symbol and interval."""
+
+    id: int
+    symbol_id: int
+    interval: str
+    drawing_type: str
+    shape: dict[str, Any]
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class Pivot:
     """A local high or low that became knowable after its confirmation window."""
 

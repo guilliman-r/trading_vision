@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.30.0 — 2026-07-07
+
+- Add an additive `drawings` table for saved chart annotations.
+- Add a `Drawing` value object and drawing repository save, list, update, delete, and delete-all
+  helpers.
+- Add tests for drawing persistence, validation, and symbol-delete cascade behavior.
+- Document drawing persistence as storage-only until the later UI drawing milestone.
+- Mark `TV-0311` complete in the implementation checklist.
+
 ## 0.29.0 — 2026-07-07
 
 - Add `trading-vision-db backup --output ...` using SQLite's backup API.

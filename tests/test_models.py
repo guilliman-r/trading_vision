@@ -5,7 +5,15 @@ from datetime import UTC, datetime
 
 import pytest
 
-from trading_vision.models import AlertEvent, Candle, PatternMatch, PatternPoint, Pivot, Symbol
+from trading_vision.models import (
+    AlertEvent,
+    Candle,
+    Drawing,
+    PatternMatch,
+    PatternPoint,
+    Pivot,
+    Symbol,
+)
 
 
 def test_candle_model_accepts_valid_aware_ohlcv() -> None:
@@ -118,8 +126,17 @@ def test_pivot_pattern_and_alert_models_construct_without_storage_or_ui_behavior
         created_at=now,
         acknowledged_at=None,
     )
+    drawing = Drawing(
+        id=1,
+        symbol_id=1,
+        interval="1d",
+        drawing_type="line",
+        shape={"type": "line"},
+        created_at=now,
+        updated_at=now,
+    )
 
-    for model in (pivot, point, pattern, alert):
+    for model in (pivot, point, pattern, alert, drawing):
         assert not hasattr(model, "save")
         assert not hasattr(model, "render")
         assert not hasattr(model, "connection")

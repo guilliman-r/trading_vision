@@ -85,7 +85,7 @@ def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) ->
         )
     assert diagnostics["Scanner"] == "Sleeping"
     assert diagnostics["App version"] == f"Trading Vision {__version__}"
-    assert "007_symbol_asset_type.sql" in diagnostics["Schema"]
+    assert "008_drawings.sql" in diagnostics["Schema"]
     assert "partial" in diagnostics["Last run"]
     assert diagnostics["Last success/fail"] == "1 / 1"
     assert "test.sqlite3" in diagnostics["Database"]

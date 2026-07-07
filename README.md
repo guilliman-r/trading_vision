@@ -134,6 +134,9 @@ counts, database path and size, package versions, provider run state, and recent
 Watchlist tables and repository operations are available for saved symbol groups. Full management
 controls are still a later UI task. See the [watchlist guide](docs/WATCHLISTS.md).
 
+Drawing persistence is also available at the repository layer. UI drawing tools are still tracked
+as a later chart task. See the [drawing persistence guide](docs/DRAWINGS.md).
+
 ## Database utilities
 
 Initialize the configured SQLite database:

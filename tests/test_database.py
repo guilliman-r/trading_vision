@@ -45,7 +45,7 @@ def test_schema_version_reports_latest_applied_migration(database_path) -> None:
     with connect(database_path) as connection:
         version = schema_version(connection)
 
-    assert "007_symbol_asset_type.sql" in version
+    assert "008_drawings.sql" in version
     assert f"{len(list(MIGRATIONS_DIRECTORY.glob('*.sql')))} migrations" in version
 
 
@@ -73,11 +73,15 @@ def test_database_upgrades_from_committed_schema_fixture(tmp_path: Path) -> None
         asset_type_column = connection.execute(
             "SELECT name FROM pragma_table_info('symbols') WHERE name = 'asset_type'"
         ).fetchone()
+        drawings = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'drawings'"
+        ).fetchone()
 
     assert migrations == sorted(path.name for path in MIGRATIONS_DIRECTORY.glob("*.sql"))
     assert watchlists is not None
     assert app_settings is not None
     assert asset_type_column is not None
+    assert drawings is not None
 
 
 def test_symbol_can_be_inserted_and_found(database_path) -> None:
@@ -226,7 +230,7 @@ def test_database_cli_prints_stats(database_path, capsys) -> None:
 
     output = capsys.readouterr().out
     assert f"Database: {database_path}" in output
-    assert "Schema: 007_symbol_asset_type.sql" in output
+    assert "Schema: 008_drawings.sql" in output
     assert "symbols: 1" in output
 
 
