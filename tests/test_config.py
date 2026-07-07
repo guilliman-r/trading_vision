@@ -17,6 +17,15 @@ def test_loads_relative_database_path_from_toml(tmp_path: Path) -> None:
     assert settings.database_path.is_absolute()
 
 
+def test_loads_and_validates_timezone(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text('[app]\ntimezone = "UTC"\n')
+
+    assert load_settings(config_path).timezone == "UTC"
+    with pytest.raises(ValueError, match="Unsupported timezone"):
+        Settings(timezone="Mars/Olympus").validate()
+
+
 def test_rejects_unknown_interval() -> None:
     with pytest.raises(ValueError, match="Unsupported interval"):
         Settings(default_interval="2h").validate()

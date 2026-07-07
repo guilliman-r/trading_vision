@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.0 — 2026-07-07
+
+- Add an explicit `timezone` setting with `Europe/Istanbul` as the default.
+- Validate configured timezones at startup using the standard-library `zoneinfo` database.
+- Document the timezone field in `config.example.toml`.
+- Add tests for valid and invalid timezone configuration.
+- Mark `TV-0204` complete in the implementation checklist.
+
 ## 0.21.0 — 2026-07-07
 
 - Keep the documented default server bind address on loopback-only `127.0.0.1`.

@@ -6,6 +6,7 @@
 host = "127.0.0.1"
 port = 8050
 debug = false
+timezone = "Europe/Istanbul"
 default_symbol = "THYAO.IS"
 default_interval = "1d"
 chart_candle_limit = 500

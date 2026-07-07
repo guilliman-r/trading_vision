@@ -7,6 +7,7 @@ import tomllib
 from dataclasses import dataclass, replace
 from ipaddress import ip_address
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SUPPORTED_INTERVALS = ("1d", "1h", "15m", "5m")
@@ -32,6 +33,7 @@ class Settings:
     host: str = "127.0.0.1"
     port: int = 8050
     debug: bool = False
+    timezone: str = "Europe/Istanbul"
     default_symbol: str = "THYAO.IS"
     default_interval: str = "1d"
     chart_candle_limit: int = 500
@@ -53,6 +55,10 @@ class Settings:
             raise ValueError(f"Unsupported interval {self.default_interval!r}; use {allowed}")
         if not 1 <= self.port <= 65_535:
             raise ValueError("Port must be between 1 and 65535")
+        try:
+            ZoneInfo(self.timezone)
+        except ZoneInfoNotFoundError as error:
+            raise ValueError(f"Unsupported timezone: {self.timezone}") from error
         if not 50 <= self.chart_candle_limit <= 5_000:
             raise ValueError("chart_candle_limit must be between 50 and 5000")
         invalid_scan_intervals = set(self.scan_intervals).difference(SUPPORTED_INTERVALS)
@@ -105,6 +111,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
             host=str(app.get("host", settings.host)),
             port=int(app.get("port", settings.port)),
             debug=bool(app.get("debug", settings.debug)),
+            timezone=str(app.get("timezone", settings.timezone)),
             default_symbol=str(app.get("default_symbol", settings.default_symbol)).upper(),
             default_interval=str(app.get("default_interval", settings.default_interval)),
             chart_candle_limit=int(app.get("chart_candle_limit", settings.chart_candle_limit)),
