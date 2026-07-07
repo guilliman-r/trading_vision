@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.24.0 — 2026-07-07
+
+- Add shared logging setup for console and rotating local file output.
+- Add configurable log path and log level settings.
+- Stamp UI and scanner log lines with a process label.
+- Include scanner `run_id` in scanner cycle log entries.
+- Wire logging into the UI and scanner command entry points.
+- Add tests for logging configuration, file output, process labels, and scanner run identifiers.
+- Mark `TV-0205` and `TV-0206` complete in the implementation checklist.
+
 ## 0.23.0 — 2026-07-07
 
 - Add a typed frozen `Candle` model matching the project OHLCV contract.

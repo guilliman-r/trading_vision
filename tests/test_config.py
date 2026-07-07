@@ -17,6 +17,19 @@ def test_loads_relative_database_path_from_toml(tmp_path: Path) -> None:
     assert settings.database_path.is_absolute()
 
 
+def test_loads_and_validates_logging_settings(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text('[logging]\npath = "var/example.log"\nlevel = "debug"\n')
+
+    settings = load_settings(config_path)
+
+    assert settings.log_path.name == "example.log"
+    assert settings.log_path.is_absolute()
+    assert settings.log_level == "DEBUG"
+    with pytest.raises(ValueError, match="log_level"):
+        Settings(log_level="verbose").validate()
+
+
 def test_loads_and_validates_timezone(tmp_path: Path) -> None:
     config_path = tmp_path / "config.toml"
     config_path.write_text('[app]\ntimezone = "UTC"\n')

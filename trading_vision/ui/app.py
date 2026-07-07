@@ -15,6 +15,7 @@ from trading_vision.alert_repository import (
 )
 from trading_vision.config import PROJECT_ROOT, Settings, host_binding_warning, load_settings
 from trading_vision.database import connection_scope, initialize_database
+from trading_vision.logging_setup import configure_logging
 from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.repositories import import_symbol_catalog, search_symbols, seed_symbols
@@ -129,6 +130,7 @@ def _unique_display_symbols(symbols: list[Symbol]) -> tuple[Symbol, ...]:
 
 def main() -> None:
     settings = load_settings()
+    configure_logging("ui", settings.log_path, settings.log_level)
     warning = host_binding_warning(settings)
     if warning:
         print(warning, file=sys.stderr)

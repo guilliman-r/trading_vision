@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from trading_vision import worker
 from trading_vision.database import connect
 from trading_vision.models import Symbol
@@ -15,7 +17,11 @@ def test_one_shot_worker_runs_end_to_end_with_fake_provider(
     with connect(database_path) as connection:
         seed_symbols(connection, [Symbol("GOOD", "GOOD.IS", is_bist=True)])
         connection.commit()
-    settings = scanner_settings(database_path, tmp_path / "scanner.lock")
+    log_path = tmp_path / "worker.log"
+    settings = replace(
+        scanner_settings(database_path, tmp_path / "scanner.lock"),
+        log_path=log_path,
+    )
     monkeypatch.setattr(worker, "load_settings", lambda: settings)
     monkeypatch.setattr(worker, "YahooFinanceProvider", PartialProvider)
     monkeypatch.setattr(worker, "_install_signal_handlers", lambda _stop: None)
@@ -28,3 +34,4 @@ def test_one_shot_worker_runs_end_to_end_with_fake_provider(
     assert run["status"] == "completed"
     assert run["symbols_succeeded"] == 1
     assert heartbeat["status"] == "stopped"
+    assert f"scan_run run_id={run['id']}" in log_path.read_text(encoding="utf-8")

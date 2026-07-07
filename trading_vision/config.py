@@ -30,6 +30,8 @@ class Settings:
     """Runtime settings shared by the UI and future scanner process."""
 
     database_path: Path = PROJECT_ROOT / "var" / "trading_vision.sqlite3"
+    log_path: Path = PROJECT_ROOT / "var" / "trading_vision.log"
+    log_level: str = "INFO"
     host: str = "127.0.0.1"
     port: int = 8050
     debug: bool = False
@@ -55,6 +57,8 @@ class Settings:
             raise ValueError(f"Unsupported interval {self.default_interval!r}; use {allowed}")
         if not 1 <= self.port <= 65_535:
             raise ValueError("Port must be between 1 and 65535")
+        if self.log_level.upper() not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
+            raise ValueError("log_level must be DEBUG, INFO, WARNING, ERROR, or CRITICAL")
         try:
             ZoneInfo(self.timezone)
         except ZoneInfoNotFoundError as error:
@@ -97,10 +101,15 @@ def load_settings(config_path: Path | None = None) -> Settings:
         scanner = document.get("scanner", {})
         provider = document.get("provider", {})
         alerts = document.get("alerts", {})
+        logging_settings = document.get("logging", {})
         raw_database_path = storage.get("database_path", str(settings.database_path))
         database_path = Path(raw_database_path)
         if not database_path.is_absolute():
             database_path = PROJECT_ROOT / database_path
+        raw_log_path = logging_settings.get("path", str(settings.log_path))
+        log_path = Path(raw_log_path)
+        if not log_path.is_absolute():
+            log_path = PROJECT_ROOT / log_path
         raw_lock_path = scanner.get("lock_path", str(settings.scanner_lock_path))
         scanner_lock_path = Path(raw_lock_path)
         if not scanner_lock_path.is_absolute():
@@ -108,6 +117,8 @@ def load_settings(config_path: Path | None = None) -> Settings:
         settings = replace(
             settings,
             database_path=database_path,
+            log_path=log_path,
+            log_level=str(logging_settings.get("level", settings.log_level)).upper(),
             host=str(app.get("host", settings.host)),
             port=int(app.get("port", settings.port)),
             debug=bool(app.get("debug", settings.debug)),

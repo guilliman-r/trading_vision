@@ -127,6 +127,13 @@ The same workspace shows scanner heartbeat, next wake time, latest run duration 
 counts, database path and size, package versions, provider run state, and recent errors. See the
 [scanner results guide](docs/SCANNER_RESULTS.md).
 
+## Logs
+
+The UI and scanner both write concise console logs and a rotating local file at
+`var/trading_vision.log` by default. Each line includes the process label (`ui` or `scanner`), and
+scanner cycle summaries include the persisted `run_id` for matching logs to diagnostics. Change the
+path or level in the `[logging]` section of `config.toml`.
+
 ## Pattern engine
 
 The first detector finds repeated horizontal resistance and support levels. It:

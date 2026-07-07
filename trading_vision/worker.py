@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from threading import Event
 
 from trading_vision.config import SUPPORTED_INTERVALS, load_settings
+from trading_vision.logging_setup import configure_logging
 from trading_vision.market_calendar import BistSessionCalendar
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.scanner_lock import ScannerAlreadyRunningError, ScannerLock
@@ -22,11 +23,11 @@ def main(arguments: list[str] | None = None) -> int:
     parser = _argument_parser()
     options = parser.parse_args(arguments)
     settings = load_settings()
+    configure_logging("scanner", settings.log_path, settings.log_level)
     intervals = tuple(options.intervals or settings.scan_intervals)
     symbols = tuple(options.symbols or ())
     stop = Event()
     _install_signal_handlers(stop)
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     try:
         with ScannerLock(settings.scanner_lock_path):
@@ -54,8 +55,9 @@ def _run_loop(service, intervals, symbols, options, stop: Event) -> None:
         )
         for run in summary.runs:
             LOGGER.info(
-                "scan_run interval=%s status=%s requested=%d succeeded=%d failed=%d "
+                "scan_run run_id=%d interval=%s status=%s requested=%d succeeded=%d failed=%d "
                 "candles_added=%d patterns_added=%d",
+                run.run_id,
                 run.interval,
                 run.status,
                 run.requested,
