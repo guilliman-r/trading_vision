@@ -10,4 +10,5 @@ def test_project_exposes_explicit_ui_and_scanner_commands() -> None:
 
     assert scripts["trading-vision-ui"] == "trading_vision.ui.app:main"
     assert scripts["trading-vision-worker"] == "trading_vision.worker:main"
+    assert scripts["trading-vision-health"] == "trading_vision.health:main"
     assert scripts["trading-vision"] == scripts["trading-vision-ui"]

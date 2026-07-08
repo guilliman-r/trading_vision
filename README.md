@@ -111,6 +111,16 @@ The left panel shows the last persisted scanner heartbeat when the page loads. R
 concise per-symbol failures are stored in SQLite. See the [scanner operator guide](docs/SCANNER.md)
 for scheduling rules, commands, configuration, and diagnostics.
 
+To check local operational health from a terminal:
+
+```bash
+.venv/bin/trading-vision-health
+```
+
+The command exits nonzero when the database is missing or corrupt, the scanner heartbeat is missing
+or stale, or the provider smoke request fails. Use `--skip-provider` for a purely local DB/scanner
+check when you do not want to make a Yahoo request.
+
 ## Alerts
 
 Newly confirmed enabled patterns above the configured score create one deduplicated in-app alert.

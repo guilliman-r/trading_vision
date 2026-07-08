@@ -46,6 +46,20 @@ For a safe scanner smoke test, run:
 .venv/bin/trading-vision-worker --once --force --dry-run --max-symbols 5 --intervals 1d
 ```
 
+To check whether the local database, scanner heartbeat, and provider are healthy:
+
+```bash
+.venv/bin/trading-vision-health
+```
+
+The command returns exit code `0` only when all checks pass. It exits nonzero if SQLite appears
+corrupt, the scanner heartbeat is missing/stale/stopped, or the provider smoke request fails.
+For a no-network local check, run:
+
+```bash
+.venv/bin/trading-vision-health --skip-provider
+```
+
 The UI is local-only by default at `127.0.0.1:8050`. Keep it that way unless you deliberately intend
 to expose an unauthenticated local app on a trusted network.
 

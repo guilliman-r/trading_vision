@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trading-vision"
-version = "0.47.0"
+version = "0.48.0"
 description = "Interactive financial charts with explainable pattern detection."
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
@@ -27,6 +27,7 @@ trading-vision = "trading_vision.ui.app:main"
 trading-vision-ui = "trading_vision.ui.app:main"
 trading-vision-config = "trading_vision.config:main"
 trading-vision-db = "trading_vision.database:main"
+trading-vision-health = "trading_vision.health:main"
 trading-vision-worker = "trading_vision.worker:main"
 
 [tool.setuptools.packages.find]

@@ -1067,7 +1067,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-1804 — P0 / S:** Display the application version and database schema version.
 - [ ] **TV-1805 — P1 / M:** Add a simple macOS launch-agent or equivalent user-service example if unattended local scanning is desired.
 - [ ] **TV-1806 — P1 / M:** Optionally add one Dockerfile and Compose file with UI/scanner services sharing a data volume.
-- [ ] **TV-1807 — P1 / S:** Add a health command that exits nonzero on stale scanner, corrupt database, or unavailable provider.
+- [x] **TV-1807 — P1 / S:** Add a health command that exits nonzero on stale scanner, corrupt database, or unavailable provider.
 - [ ] **TV-1808 — P1 / M:** Produce a release checklist and a versioned first release.
 
 **Exit criterion:** the user can operate and update the application from written instructions without developer improvisation.

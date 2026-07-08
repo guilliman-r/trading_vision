@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.48.0 — 2026-07-08
+
+- Add `trading-vision-health` for database, scanner-heartbeat, and provider health checks.
+- Document health checks in the README and operations guide, including the no-network
+  `--skip-provider` mode.
+- Mark `TV-1807` complete in the implementation checklist.
+
 ## 0.47.0 — 2026-07-08
 
 - Add a provider batch-fetch contract with a simple single-symbol fallback.
