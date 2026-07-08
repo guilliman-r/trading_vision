@@ -68,6 +68,9 @@ If you prefer containers instead of a local virtual environment, use the optiona
 [Docker and Compose guide](DOCKER.md). It keeps the UI on localhost and shares `./var` between the
 UI and scanner services.
 
+For monthly dependency review and pre-release security checks, follow the
+[maintenance cadence](MAINTENANCE.md).
+
 The UI is local-only by default at `127.0.0.1:8050`. Keep it that way unless you deliberately intend
 to expose an unauthenticated local app on a trusted network.
 

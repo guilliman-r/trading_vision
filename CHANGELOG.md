@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.52.0 — 2026-07-08
+
+- Add a maintenance cadence for monthly dependency review and pre-release security audits.
+- Link maintenance guidance from the README and operations guide.
+- Mark `TV-1714` complete in the implementation checklist.
+
 ## 0.51.0 — 2026-07-08
 
 - Add `scripts/check_data.py` for read-only candle coverage and stored-data quality summaries.

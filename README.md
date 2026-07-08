@@ -131,6 +131,9 @@ default.
 If you prefer containers, see the optional [Docker and Compose guide](docs/DOCKER.md) for UI and
 scanner services that share the same local `var/` directory.
 
+For monthly dependency review and pre-release audit steps, see the
+[maintenance cadence](docs/MAINTENANCE.md).
+
 ## Alerts
 
 Newly confirmed enabled patterns above the configured score create one deduplicated in-app alert.

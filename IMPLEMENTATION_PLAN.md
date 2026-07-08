@@ -1055,7 +1055,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [ ] **TV-1711 — P0 / S:** Cap batch size, candle lookback, export size, and retry count.
 - [ ] **TV-1712 — P1 / M:** Add startup database integrity check and documented restore procedure.
 - [ ] **TV-1713 — P1 / M:** Run a multi-day local soak test covering scanner restarts and provider failures.
-- [ ] **TV-1714 — P1 / S:** Add dependency-update and security-audit cadence.
+- [x] **TV-1714 — P1 / S:** Add dependency-update and security-audit cadence.
 
 **Exit criterion:** failures degrade visibly, local data can be restored, and no secret is stored in the database or repository.
 

@@ -22,3 +22,12 @@ def test_optional_container_files_are_present_and_local_only() -> None:
     compose = Path("compose.yaml").read_text(encoding="utf-8")
     assert "127.0.0.1:8050:8050" in compose
     assert "./var:/app/var" in compose
+
+
+def test_maintenance_cadence_is_documented() -> None:
+    maintenance = Path("docs/MAINTENANCE.md")
+
+    assert maintenance.is_file()
+    text = maintenance.read_text(encoding="utf-8")
+    assert "Monthly dependency review" in text
+    assert "Security audit before a release" in text
