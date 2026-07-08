@@ -901,6 +901,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   cards.
 - [x] **TV-0731 — P0 / XS:** Make side panels independently scrollable so long signal cards do not
   drag the chart out of view.
+- [x] **TV-0732 — P1 / S:** Persist the selected Light/Dark theme in browser-local storage.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

@@ -101,12 +101,23 @@ def register_callbacks(
             )
 
     @app.callback(
+        Output(ids.THEME_STORE, "data"),
+        Input(ids.THEME_BUTTON, "n_clicks"),
+        State(ids.THEME_STORE, "data"),
+        prevent_initial_call=True,
+    )
+    def toggle_theme(_clicks, current_theme):
+        if current_theme == "light":
+            return "dark"
+        return "light"
+
+    @app.callback(
         Output(ids.APP_ROOT, "className"),
         Output(ids.THEME_BUTTON, "children"),
-        Input(ids.THEME_BUTTON, "n_clicks"),
+        Input(ids.THEME_STORE, "data"),
     )
-    def toggle_theme(clicks):
-        if clicks and clicks % 2:
+    def apply_theme(theme):
+        if theme == "light":
             return "app-shell theme-light", "Dark mode"
         return "app-shell theme-dark", "Light mode"
 

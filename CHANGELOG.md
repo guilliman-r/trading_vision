@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.74.0 — 2026-07-08
+
+- Persist the Light/Dark theme choice in browser-local storage.
+- Split theme handling into simple store/update callbacks so refreshes keep the user's selected
+  mode without adding backend state.
+- Add callback regression coverage and mark `TV-0732` complete.
+
 ## 0.73.0 — 2026-07-08
 
 - Make the left watchlist and right signal/details panels independently scrollable.

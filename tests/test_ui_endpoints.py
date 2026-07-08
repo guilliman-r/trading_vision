@@ -110,6 +110,8 @@ def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None
     assert b"Trading Vision" in page.data
     assert layout.status_code == 200
     assert b'"app-root"' in layout.data
+    assert b'"theme-store"' in layout.data
+    assert b'"storage_type":"local"' in layout.data
     assert b'"scanner-results-table"' in layout.data
     assert b'"responsive":true' in layout.data
     assert b'"height":"680px"' in layout.data
@@ -397,7 +399,26 @@ def test_chart_callback_labels_still_forming_bist_candle(database_path) -> None:
     assert "forming candle" in payload["chart-meta"]["children"]
 
 
-def test_theme_button_callback_toggles_to_light(database_path) -> None:
+def test_theme_button_callback_persists_next_theme(database_path) -> None:
+    app = create_app(Settings(database_path=database_path), StaticProvider())
+    client = app.server.test_client()
+    output_key = next(key for key in app.callback_map if "theme-store.data" in key)
+    response = client.post(
+        "/_dash-update-component",
+        json={
+            "output": output_key,
+            "outputs": {"id": "theme-store", "property": "data"},
+            "inputs": [{"id": "theme-button", "property": "n_clicks", "value": 1}],
+            "state": [{"id": "theme-store", "property": "data", "value": "dark"}],
+            "changedPropIds": ["theme-button.n_clicks"],
+        },
+    )
+    payload = response.get_json()["response"]
+    assert response.status_code == 200
+    assert payload["theme-store"]["data"] == "light"
+
+
+def test_stored_theme_applies_to_shell_and_button(database_path) -> None:
     app = create_app(Settings(database_path=database_path), StaticProvider())
     client = app.server.test_client()
     output_key = next(key for key in app.callback_map if "app-root.className" in key)
@@ -409,9 +430,9 @@ def test_theme_button_callback_toggles_to_light(database_path) -> None:
                 {"id": "app-root", "property": "className"},
                 {"id": "theme-button", "property": "children"},
             ],
-            "inputs": [{"id": "theme-button", "property": "n_clicks", "value": 1}],
+            "inputs": [{"id": "theme-store", "property": "data", "value": "light"}],
             "state": [],
-            "changedPropIds": ["theme-button.n_clicks"],
+            "changedPropIds": ["theme-store.data"],
         },
     )
     payload = response.get_json()["response"]

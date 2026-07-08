@@ -30,6 +30,7 @@ def build_layout(
         className="app-shell theme-dark",
         children=[
             dcc.Location(id=ids.URL, refresh=False),
+            dcc.Store(id=ids.THEME_STORE, data="dark", storage_type="local"),
             dcc.Interval(id=ids.ALERT_POLL, interval=15_000, n_intervals=0),
             _top_bar(settings, symbols),
             html.Main(
