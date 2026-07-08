@@ -40,3 +40,7 @@ After refreshing, review `var/bist_catalog_refresh_report.md` before committing 
 lists additions, removed symbols that need inactive-review, and changed fields. Provider validation
 is a separate catalog task, so do not treat the scrape report as proof that Yahoo accepts every
 symbol.
+
+The refresh script stops before overwriting the CSV when more than 20 existing symbols would be
+removed. Review the report first, then rerun with `--allow-large-removal` only when the removal is
+expected.

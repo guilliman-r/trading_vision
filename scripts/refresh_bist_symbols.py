@@ -14,6 +14,7 @@ SOURCE_URL = "https://www.kap.org.tr/tr/bist-sirketler"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = PROJECT_ROOT / "data" / "catalogs" / "bist_symbols.csv"
 DEFAULT_REPORT = PROJECT_ROOT / "var" / "bist_catalog_refresh_report.md"
+DEFAULT_MAX_REMOVALS_WITHOUT_CONFIRM = 20
 ENTRY_PATTERN = re.compile(
     r'\\"kapMemberTitle\\":\\"(?P<name>.*?)\\".*?'
     r'\\"stockCode\\":\\"(?P<codes>.*?)\\"',
@@ -162,6 +163,17 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--input-html", type=Path, help="Use a previously downloaded KAP page")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument(
+        "--max-removals-without-confirm",
+        type=int,
+        default=DEFAULT_MAX_REMOVALS_WITHOUT_CONFIRM,
+        help="Stop before writing the CSV when more existing symbols would be removed",
+    )
+    parser.add_argument(
+        "--allow-large-removal",
+        action="store_true",
+        help="Write the CSV even when removals exceed the review threshold",
+    )
     arguments = parser.parse_args(argv)
     page = (
         arguments.input_html.read_text(encoding="utf-8")
@@ -170,8 +182,18 @@ def main(argv: list[str] | None = None) -> None:
     )
     before = read_catalog(arguments.output)
     rows = parse_companies(page)
-    write_catalog(rows, arguments.output)
     write_refresh_report(before, rows, arguments.report, arguments.output)
+    removed_count = len(catalog_diff(before, rows)["removed"])
+    if (
+        before
+        and removed_count > arguments.max_removals_without_confirm
+        and not arguments.allow_large_removal
+    ):
+        raise SystemExit(
+            f"Refresh would remove {removed_count} symbols. Review {arguments.report} and rerun "
+            "--allow-large-removal only if this is expected."
+        )
+    write_catalog(rows, arguments.output)
     print(f"Wrote {len(rows)} KAP codes to {arguments.output}")
     print(f"Wrote refresh report to {arguments.report}")
 

@@ -2,6 +2,8 @@ import csv
 from pathlib import Path
 from runpy import run_path
 
+import pytest
+
 from trading_vision.database import connect
 from trading_vision.repositories import (
     find_symbol,
@@ -123,6 +125,110 @@ def test_catalog_refresh_report_records_additions_removals_and_changes(tmp_path)
     assert "| NEW.IS | NEW | New Company |" in text
     assert "| OLD.IS | OLD | Old Company |" in text
     assert "| KEEP.IS | name | Before Name | After Name |" in text
+
+
+def test_catalog_refresh_stops_before_large_unconfirmed_removal(tmp_path) -> None:
+    module = run_path(str(PROJECT_ROOT / "scripts" / "refresh_bist_symbols.py"))
+    catalog = tmp_path / "catalog.csv"
+    report = tmp_path / "report.md"
+    old_rows = [
+        {
+            "display_symbol": "OLD",
+            "provider_symbol": "OLD.IS",
+            "name": "Old Company",
+            "exchange": "XIST",
+            "currency": "TRY",
+            "asset_type": "equity",
+            "is_bist": "true",
+            "is_active": "true",
+            "source": "fixture",
+            "source_date": "2026-07-01",
+        },
+        {
+            "display_symbol": "KEEP",
+            "provider_symbol": "KEEP.IS",
+            "name": "Keep Company",
+            "exchange": "XIST",
+            "currency": "TRY",
+            "asset_type": "equity",
+            "is_bist": "true",
+            "is_active": "true",
+            "source": "fixture",
+            "source_date": "2026-07-01",
+        },
+    ]
+    module["write_catalog"](old_rows, catalog)
+    page = (
+        r"\"kapMemberTitle\":\"Keep Company\","
+        r"\"stockCode\":\"KEEP\""
+    )
+    html_path = tmp_path / "kap.html"
+    html_path.write_text(page, encoding="utf-8")
+
+    with pytest.raises(SystemExit, match="remove 1 symbols"):
+        module["main"](
+            [
+                "--input-html",
+                str(html_path),
+                "--output",
+                str(catalog),
+                "--report",
+                str(report),
+                "--max-removals-without-confirm",
+                "0",
+            ]
+        )
+
+    with catalog.open(encoding="utf-8", newline="") as file:
+        rows = list(csv.DictReader(file))
+    assert [row["provider_symbol"] for row in rows] == ["OLD.IS", "KEEP.IS"]
+    assert "OLD.IS" in report.read_text(encoding="utf-8")
+
+
+def test_catalog_refresh_allows_confirmed_large_removal(tmp_path) -> None:
+    module = run_path(str(PROJECT_ROOT / "scripts" / "refresh_bist_symbols.py"))
+    catalog = tmp_path / "catalog.csv"
+    report = tmp_path / "report.md"
+    module["write_catalog"](
+        [
+            {
+                "display_symbol": "OLD",
+                "provider_symbol": "OLD.IS",
+                "name": "Old Company",
+                "exchange": "XIST",
+                "currency": "TRY",
+                "asset_type": "equity",
+                "is_bist": "true",
+                "is_active": "true",
+                "source": "fixture",
+                "source_date": "2026-07-01",
+            }
+        ],
+        catalog,
+    )
+    html_path = tmp_path / "kap.html"
+    html_path.write_text(
+        r"\"kapMemberTitle\":\"New Company\",\"stockCode\":\"NEWC\"",
+        encoding="utf-8",
+    )
+
+    module["main"](
+        [
+            "--input-html",
+            str(html_path),
+            "--output",
+            str(catalog),
+            "--report",
+            str(report),
+            "--max-removals-without-confirm",
+            "0",
+            "--allow-large-removal",
+        ]
+    )
+
+    with catalog.open(encoding="utf-8", newline="") as file:
+        rows = list(csv.DictReader(file))
+    assert [row["provider_symbol"] for row in rows] == ["NEWC.IS"]
 
 
 def test_committed_bist_catalog_has_unique_valid_provider_symbols() -> None:

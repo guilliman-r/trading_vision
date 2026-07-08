@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.59.0 — 2026-07-08
+
+- Add a BIST catalog refresh guard that stops before overwriting the CSV when too many existing
+  symbols would be removed without explicit confirmation.
+- Document the large-removal review threshold and override flag in the catalog policy.
+- Mark `TV-0410` complete in the implementation checklist.
+
 ## 0.58.0 — 2026-07-08
 
 - Extend the manual BIST catalog refresh script with a Markdown diff report for additions,
