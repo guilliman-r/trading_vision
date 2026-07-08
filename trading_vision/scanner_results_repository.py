@@ -7,6 +7,7 @@ import sqlite3
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
+from trading_vision.pattern_focus import pattern_focus_range
 from trading_vision.scanner_results import PatternResultFilters, PatternResultRow
 
 
@@ -132,7 +133,7 @@ def _chart_link(
     confirmed_at: datetime | None,
     last_seen_at: datetime,
 ) -> str:
-    range_from, range_to = _pattern_focus_range(interval, started_at, confirmed_at, last_seen_at)
+    range_from, range_to = pattern_focus_range(interval, started_at, confirmed_at, last_seen_at)
     query = urlencode(
         {
             "symbol": provider_symbol,
@@ -143,26 +144,3 @@ def _chart_link(
         }
     )
     return f"/?{query}"
-
-
-def _pattern_focus_range(
-    interval: str,
-    started_at: datetime,
-    confirmed_at: datetime | None,
-    last_seen_at: datetime,
-) -> tuple[datetime, datetime]:
-    padding = _range_padding(interval)
-    end = confirmed_at or last_seen_at
-    return started_at - padding, end + padding
-
-
-def _range_padding(interval: str) -> timedelta:
-    if interval == "1d":
-        return timedelta(days=5)
-    if interval == "1h":
-        return timedelta(hours=6)
-    if interval == "15m":
-        return timedelta(hours=2)
-    if interval == "5m":
-        return timedelta(hours=1)
-    return timedelta(days=5)

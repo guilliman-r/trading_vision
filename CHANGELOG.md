@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.66.0 — 2026-07-08
+
+- Make active pattern cards in the right details panel clickable.
+- Clicking a signal card now updates the chart URL with a focused pattern time range, causing the
+  chart to zoom into that signal window.
+- Add a visible `Zoom` affordance and shared focus-window tests, and mark `TV-0724` complete.
+
 ## 0.65.0 — 2026-07-08
 
 - Fix the chart loading layout by giving Dash/Plotly a real chart height instead of relying on

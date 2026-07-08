@@ -187,7 +187,13 @@ def test_successful_chart_result_keeps_patterns_out_of_default_plot() -> None:
 
     assert [trace.type for trace in figure.data] == ["candlestick", "bar"]
     assert status == "Live · 1 active pattern"
-    assert "Resistance Breakout" in repr(details)
+    rendered_details = repr(details)
+    assert "Resistance Breakout" in rendered_details
+    assert "Zoom" in rendered_details
+    assert "?symbol=TEST.IS" in rendered_details
+    assert "pattern=resistance_breakout" in rendered_details
+    assert "range_from=" in rendered_details
+    assert "range_to=" in rendered_details
 
 
 def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:

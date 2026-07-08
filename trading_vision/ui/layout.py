@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+from urllib.parse import urlencode
+
 from dash import dcc, html
 
 from trading_vision.config import SUPPORTED_INTERVALS, Settings
 from trading_vision.models import PatternMatch, Symbol
+from trading_vision.pattern_focus import pattern_focus_range
 from trading_vision.text_safety import safe_display_text
 from trading_vision.ui import ids
 from trading_vision.ui.chart_builder import CHART_CONFIG, CHART_HEIGHT, empty_chart
@@ -216,7 +220,7 @@ def detail_rows(
         _detail_row("Latest", latest),
         _detail_row("Close", close),
         _detail_row("Bar change", change),
-        _pattern_summary(patterns),
+        _pattern_summary(symbol, interval, patterns),
     ]
     return rows
 
@@ -228,12 +232,12 @@ def _detail_row(label: str, value: str) -> html.Div:
     )
 
 
-def _pattern_summary(patterns: tuple[PatternMatch, ...]) -> html.Div:
+def _pattern_summary(symbol: str, interval: str, patterns: tuple[PatternMatch, ...]) -> html.Div:
     if not patterns:
         return _pattern_empty("No forming or recently confirmed patterns in this window.")
     priority = {"forming": 0, "confirmed": 1}
     active = sorted(patterns, key=lambda pattern: (priority.get(pattern.state, 9), -pattern.score))
-    cards = [_pattern_card(pattern) for pattern in active]
+    cards = [_pattern_card(symbol, interval, pattern) for pattern in active]
     return html.Div(
         [
             html.Div(
@@ -246,14 +250,20 @@ def _pattern_summary(patterns: tuple[PatternMatch, ...]) -> html.Div:
     )
 
 
-def _pattern_card(pattern: PatternMatch) -> html.Div:
+def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link:
     title = pattern.pattern_type.replace("_", " ").title()
-    return html.Div(
+    return dcc.Link(
         [
             html.Div(
                 [
                     html.Strong(title),
-                    html.Span(pattern.state, className=f"pattern-state {pattern.state}"),
+                    html.Div(
+                        [
+                            html.Span(pattern.state, className=f"pattern-state {pattern.state}"),
+                            html.Span("Zoom", className="pattern-zoom-chip"),
+                        ],
+                        className="pattern-card-actions",
+                    ),
                 ],
                 className="pattern-card-heading",
             ),
@@ -274,8 +284,39 @@ def _pattern_card(pattern: PatternMatch) -> html.Div:
                 className="pattern-reasons",
             ),
         ],
-        className="pattern-card",
+        href=_pattern_card_href(symbol, interval, pattern),
+        title=f"Zoom chart to {title}",
+        className="pattern-card pattern-card-link",
     )
+
+
+def _pattern_card_href(symbol: str, interval: str, pattern: PatternMatch) -> str:
+    range_from, range_to = pattern_focus_range(
+        interval,
+        pattern.started_at,
+        pattern.confirmed_at,
+        _pattern_last_seen_at(pattern),
+    )
+    query = urlencode(
+        {
+            "symbol": symbol,
+            "interval": interval,
+            "pattern": pattern.pattern_type,
+            "range_from": range_from.isoformat(),
+            "range_to": range_to.isoformat(),
+        }
+    )
+    return f"/?{query}"
+
+
+def _pattern_last_seen_at(pattern: PatternMatch) -> datetime:
+    timestamps = [pattern.started_at]
+    timestamps.extend(point.occurred_at for point in pattern.points)
+    if pattern.ended_at is not None:
+        timestamps.append(pattern.ended_at)
+    if pattern.confirmed_at is not None:
+        timestamps.append(pattern.confirmed_at)
+    return max(timestamps)
 
 
 def _pattern_empty(message: str) -> html.Div:

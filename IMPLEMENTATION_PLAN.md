@@ -886,6 +886,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   price plot, moving active pattern context to details, and simplifying zoom controls.
 - [x] **TV-0723 — P0 / S:** Fix the Dash/Plotly sizing bug that made the chart appear cramped or
   blank, and verify the repaired page in Chrome.
+- [x] **TV-0724 — P0 / S:** Make active pattern cards clickable and zoom the chart to the
+  selected signal's time window.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 
