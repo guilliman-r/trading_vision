@@ -8,8 +8,11 @@ import pandas as pd
 
 from trading_vision.config import Settings
 from trading_vision.data_quality import prepare_candles, prepare_candles_with_report
+from trading_vision.models import PatternMatch, PatternPoint, Symbol
 from trading_vision.providers.base import FetchResult, MarketDataProvider
+from trading_vision.services.market_data import ChartLoadResult
 from trading_vision.ui.app import create_app
+from trading_vision.ui.callbacks import _successful_chart_result
 
 
 class StaticProvider(MarketDataProvider):
@@ -130,6 +133,56 @@ def test_load_button_callback_returns_chart_and_snapshot(database_path) -> None:
     assert payload["data-status"]["children"] == "Live · 0 active patterns"
     assert len(payload["price-chart"]["figure"]["data"]) == 2
     assert payload["symbol-input"]["value"] == "THYAO.IS"
+
+
+def test_successful_chart_result_keeps_patterns_out_of_default_plot() -> None:
+    times = pd.date_range("2026-01-01", periods=4, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [100.0, 101.0, 102.0, 103.0],
+            "high": [102.0, 103.0, 104.0, 105.0],
+            "low": [99.0, 100.0, 101.0, 102.0],
+            "close": [101.0, 102.0, 103.0, 104.0],
+            "volume": [1000.0, 1100.0, 1200.0, 1300.0],
+            "source": ["fixture"] * 4,
+            "is_complete": [True] * 4,
+        }
+    )
+    pattern = PatternMatch(
+        pattern_type="resistance_breakout",
+        direction="bullish",
+        state="forming",
+        started_at=times[1].to_pydatetime(),
+        ended_at=None,
+        confirmed_at=None,
+        score=82,
+        boundary_price=104.0,
+        target_price=110.0,
+        invalidation_price=100.0,
+        points=(
+            PatternPoint("touch_1", 1, times[1].to_pydatetime(), 104.0),
+            PatternPoint("touch_2", 2, times[2].to_pydatetime(), 104.0),
+        ),
+        reasons=("active but not painted on the main chart",),
+        parameters={},
+        detector_version="test-v1",
+    )
+    result = ChartLoadResult(
+        symbol=Symbol("TEST", "TEST.IS", currency="TRY", is_bist=False),
+        candles=candles,
+        patterns=(pattern,),
+    )
+
+    figure, _title, _meta, status, _class_name, details, _symbol = _successful_chart_result(
+        result,
+        "1d",
+        provider_delay_seconds=60,
+    )
+
+    assert [trace.type for trace in figure.data] == ["candlestick", "bar"]
+    assert status == "Live · 1 active pattern"
+    assert "Resistance Breakout" in repr(details)
 
 
 def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:

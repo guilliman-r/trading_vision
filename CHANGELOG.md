@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.64.0 — 2026-07-08
+
+- Keep the default chart clean by rendering pattern candidates in the details panel instead of
+  drawing pattern geometry over the candles.
+- Make chart interaction simpler by defaulting to drag-to-zoom, keeping scroll zoom, and removing
+  extra drawing buttons from the modebar.
+- Add regression coverage for the clean default chart and mark `TV-0722` complete.
+
 ## 0.63.0 — 2026-07-08
 
 - Limit user-facing chart, scanner, provider, and watchlist intervals to `1d` and `1h`.

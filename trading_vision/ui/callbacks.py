@@ -270,7 +270,7 @@ def _successful_chart_result(
             candles,
             result.symbol.provider_symbol,
             interval,
-            visible_patterns,
+            (),
             is_bist=result.symbol.is_bist,
             focus_range=focus_range,
         ),

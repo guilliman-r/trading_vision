@@ -70,8 +70,8 @@ def build_chart(
         font_color="#aab4c3",
         margin={"l": 14, "r": 58, "t": 12, "b": 28},
         showlegend=False,
-        hovermode="x unified",
-        dragmode="pan",
+        hovermode="x",
+        dragmode="zoom",
         uirevision=f"{symbol}:{interval}",
         xaxis_rangeslider_visible=False,
         modebar={"bgcolor": "rgba(11, 15, 23, 0.88)", "color": "#8d98a8"},
@@ -195,7 +195,18 @@ def empty_chart(message: str) -> go.Figure:
 
 CHART_CONFIG = {
     "displaylogo": False,
+    "displayModeBar": "hover",
     "scrollZoom": True,
     "responsive": True,
-    "modeBarButtonsToAdd": ["drawline", "drawrect", "drawcircle", "eraseshape"],
+    "doubleClick": "reset",
+    "modeBarButtonsToRemove": [
+        "select2d",
+        "lasso2d",
+        "drawline",
+        "drawopenpath",
+        "drawclosedpath",
+        "drawcircle",
+        "drawrect",
+        "eraseshape",
+    ],
 }
