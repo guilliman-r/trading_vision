@@ -127,6 +127,49 @@ def test_catalog_refresh_report_records_additions_removals_and_changes(tmp_path)
     assert "| KEEP.IS | name | Before Name | After Name |" in text
 
 
+def test_catalog_refresh_report_includes_provider_validation_failures(tmp_path) -> None:
+    module = run_path(str(PROJECT_ROOT / "scripts" / "refresh_bist_symbols.py"))
+    report = tmp_path / "report.md"
+
+    module["write_refresh_report"](
+        [],
+        [],
+        report,
+        tmp_path / "catalog.csv",
+        [
+            {
+                "provider_symbol": "BAD.IS",
+                "status": "failed",
+                "failure_kind": "invalid_ticker",
+                "error": "invalid ticker",
+            }
+        ],
+    )
+
+    text = report.read_text(encoding="utf-8")
+    assert "- Provider validation failures: 1" in text
+    assert "| BAD.IS | invalid_ticker | invalid ticker |" in text
+
+
+def test_catalog_refresh_reads_only_failed_provider_validation_rows(tmp_path) -> None:
+    module = run_path(str(PROJECT_ROOT / "scripts" / "refresh_bist_symbols.py"))
+    validation = tmp_path / "validation.csv"
+    validation.write_text(
+        "\n".join(
+            (
+                "provider_symbol,status,failure_kind,error,candles",
+                "GOOD.IS,ok,,,10",
+                "BAD.IS,failed,invalid_ticker,invalid ticker,0",
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    rows = module["read_provider_failures"](validation)
+
+    assert [row["provider_symbol"] for row in rows] == ["BAD.IS"]
+
+
 def test_catalog_refresh_stops_before_large_unconfirmed_removal(tmp_path) -> None:
     module = run_path(str(PROJECT_ROOT / "scripts" / "refresh_bist_symbols.py"))
     catalog = tmp_path / "catalog.csv"

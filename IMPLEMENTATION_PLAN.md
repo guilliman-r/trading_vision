@@ -810,7 +810,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0408 — P0 / S:** Build symbol search across exact ticker, provider ticker, company name, and aliases.
 - [x] **TV-0409 — P1 / M:** Implement a manual refresh script that downloads/reads the official source and generates a diff.
 - [x] **TV-0410 — P1 / S:** Require user review before catalog changes mark many symbols inactive.
-- [ ] **TV-0411 — P1 / S:** Record additions, removals, renames, and provider failures in a refresh report.
+- [x] **TV-0411 — P1 / S:** Record additions, removals, renames, and provider failures in a refresh report.
 - [x] **TV-0412 — P1 / S:** Schedule a monthly reminder or documented manual catalog refresh—not an opaque scrape at every startup.
 - [x] **TV-0413 — P0 / M:** Add tests for `.IS` mapping, duplicate detection, invalid rows, and inactive symbols.
 

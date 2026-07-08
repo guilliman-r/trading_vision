@@ -96,11 +96,13 @@ def write_refresh_report(
     after: list[dict[str, str]],
     report_path: Path,
     output_path: Path,
+    provider_failures: list[dict[str, str]] | None = None,
 ) -> None:
     diff = catalog_diff(before, after)
     added = diff["added"]
     removed = diff["removed"]
     changed = diff["changed"]
+    provider_failures = provider_failures or []
     lines = [
         "# BIST catalog refresh report",
         "",
@@ -112,6 +114,7 @@ def write_refresh_report(
         f"- Added: {len(added)}",
         f"- Removed / inactive-review needed: {len(removed)}",
         f"- Changed: {len(changed)}",
+        f"- Provider validation failures: {len(provider_failures)}",
         "",
         "Removed symbols are review items. Do not mark many symbols inactive without checking "
         "KAP/BIST.",
@@ -120,6 +123,7 @@ def write_refresh_report(
         _rows_section("Added", added),
         _rows_section("Removed / inactive review", removed),
         _changed_section(changed),
+        _provider_failures_section(provider_failures),
     ]
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -158,11 +162,38 @@ def _changed_section(changed) -> str:
     return "\n".join(lines)
 
 
+def read_provider_failures(path: Path | None) -> list[dict[str, str]]:
+    if path is None or not path.exists():
+        return []
+    with path.open(encoding="utf-8", newline="") as file:
+        return [row for row in csv.DictReader(file) if row.get("status") == "failed"]
+
+
+def _provider_failures_section(rows: list[dict[str, str]]) -> str:
+    lines = ["## Provider validation failures", ""]
+    if not rows:
+        lines.append("None supplied or none failed.")
+        return "\n".join(lines)
+    lines.append("| provider_symbol | failure_kind | error |")
+    lines.append("| --- | --- | --- |")
+    for row in rows:
+        lines.append(
+            f"| {row.get('provider_symbol', '')} | {row.get('failure_kind', '')} | "
+            f"{row.get('error', '')} |"
+        )
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-html", type=Path, help="Use a previously downloaded KAP page")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument(
+        "--provider-validation",
+        type=Path,
+        help="Optional CSV from scripts/validate_catalog_provider_symbols.py",
+    )
     parser.add_argument(
         "--max-removals-without-confirm",
         type=int,
@@ -182,7 +213,8 @@ def main(argv: list[str] | None = None) -> None:
     )
     before = read_catalog(arguments.output)
     rows = parse_companies(page)
-    write_refresh_report(before, rows, arguments.report, arguments.output)
+    provider_failures = read_provider_failures(arguments.provider_validation)
+    write_refresh_report(before, rows, arguments.report, arguments.output, provider_failures)
     removed_count = len(catalog_diff(before, rows)["removed"])
     if (
         before

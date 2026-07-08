@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.61.0 — 2026-07-08
+
+- Allow BIST catalog refresh reports to include provider-validation failures from the validation CSV.
+- Document how to combine provider validation output with the catalog refresh report.
+- Mark `TV-0411` complete in the implementation checklist.
+
 ## 0.60.0 — 2026-07-08
 
 - Add a manual BIST provider-symbol validation script with bounded batches and CSV failure output.

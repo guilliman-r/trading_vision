@@ -54,3 +54,10 @@ After a catalog refresh, validate provider symbols manually in small batches:
 For a full validation run, omit `--max-symbols`. The script writes
 `var/bist_provider_validation.csv` with one row per provider symbol, including failure kind and
 error text for symbols Yahoo rejects or cannot return.
+
+To include provider failures in the catalog refresh report, rerun the refresh with:
+
+```bash
+.venv/bin/python scripts/refresh_bist_symbols.py \
+  --provider-validation var/bist_provider_validation.csv
+```
