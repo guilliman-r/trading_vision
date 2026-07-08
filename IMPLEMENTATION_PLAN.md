@@ -894,6 +894,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   target and invalidation prices are available.
 - [x] **TV-0727 — P0 / S:** Draw only the selected signal overlay after a signal card zooms the
   chart, while keeping the default chart uncluttered.
+- [x] **TV-0728 — P0 / XS:** Show started and last-seen/confirmed timing on active signal cards.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

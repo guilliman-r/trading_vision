@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.70.0 — 2026-07-08
+
+- Add compact Istanbul-local timing metrics to active signal cards.
+- Show when each visible signal started and when it was last seen or confirmed.
+- Add regression coverage for signal-card recency labels and mark `TV-0728` complete.
+
 ## 0.69.0 — 2026-07-08
 
 - Draw the selected pattern overlay only after a signal card is clicked.

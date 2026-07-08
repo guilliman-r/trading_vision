@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
 
 from dash import dcc, html
 
@@ -16,6 +17,7 @@ from trading_vision.ui.chart_builder import CHART_CONFIG, CHART_HEIGHT, empty_ch
 from trading_vision.ui.scanner_views import build_scanner_workspace
 
 QUICK_SYMBOLS = ("THYAO", "GARAN", "ASELS", "TUPRS", "BIMAS", "EREGL")
+ISTANBUL = ZoneInfo("Europe/Istanbul")
 
 
 def build_layout(
@@ -285,6 +287,8 @@ def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link
 def _pattern_metrics(pattern: PatternMatch) -> list[html.Span]:
     metrics = [
         html.Span(f"Score {pattern.score:.0f}"),
+        html.Span(f"Started {_pattern_time_label(pattern.started_at)}"),
+        html.Span(_pattern_state_time_label(pattern)),
         html.Span(f"Level {pattern.boundary_price:,.2f}"),
         html.Span(
             f"Target {pattern.target_price:,.2f}"
@@ -298,6 +302,18 @@ def _pattern_metrics(pattern: PatternMatch) -> list[html.Span]:
     if risk_reward is not None:
         metrics.append(html.Span(f"R/R {risk_reward:.2f}"))
     return metrics
+
+
+def _pattern_state_time_label(pattern: PatternMatch) -> str:
+    if pattern.confirmed_at is not None:
+        return f"Confirmed {_pattern_time_label(pattern.confirmed_at)}"
+    return f"Last seen {_pattern_time_label(_pattern_last_seen_at(pattern))}"
+
+
+def _pattern_time_label(value: datetime) -> str:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return value.astimezone(ISTANBUL).strftime("%d %b · %H:%M")
 
 
 def _pattern_reward_risk(pattern: PatternMatch) -> float | None:
