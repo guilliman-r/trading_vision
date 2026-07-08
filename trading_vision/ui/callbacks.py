@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlencode
 
 from dash import ALL, Input, Output, State, ctx, dcc, html
 
@@ -227,6 +227,8 @@ def _successful_chart_result(
         gap_report.count,
         quarantined_rows,
     )
+    if focus_range is not None:
+        chart_meta = f"{chart_meta} · Focused signal"
     visible_patterns = select_visible_patterns(candles, result.patterns)
     pattern_word = "pattern" if len(visible_patterns) == 1 else "patterns"
     status_prefix = "Cached" if result.from_cache or provider_message else "Live"
@@ -249,6 +251,20 @@ def _successful_chart_result(
     )
     if provider_message:
         details.append(html.P(provider_message, className="inline-warning"))
+    if focus_range is not None:
+        details.append(
+            html.Div(
+                [
+                    html.Span("Focused on selected signal."),
+                    dcc.Link(
+                        "Clear focus",
+                        href=_clear_focus_href(result.symbol.provider_symbol, interval),
+                        className="focus-clear-link",
+                    ),
+                ],
+                className="inline-info focus-notice",
+            )
+        )
     if gap_report.count:
         candle_word = "candle" if gap_report.count == 1 else "candles"
         details.append(
@@ -281,6 +297,10 @@ def _successful_chart_result(
         details,
         result.symbol.provider_symbol,
     )
+
+
+def _clear_focus_href(symbol: str, interval: str) -> str:
+    return f"/?{urlencode({'symbol': symbol, 'interval': interval})}"
 
 
 def _focus_range_from_query(

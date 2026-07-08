@@ -167,9 +167,13 @@ button, input { font: inherit; }
 .pattern-metrics { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 .pattern-metrics span { padding: 4px 6px; border-radius: 5px; background: var(--panel); color: var(--muted); font-size: 9px; }
 .pattern-reasons { margin: 10px 0 0; padding-left: 16px; color: var(--muted); font-size: 10px; line-height: 1.55; }
-.inline-error, .inline-warning { margin: 14px 0 0; padding: 10px; border-radius: 8px; font-size: 11px; line-height: 1.45; }
+.inline-error, .inline-warning, .inline-info { margin: 14px 0 0; padding: 10px; border-radius: 8px; font-size: 11px; line-height: 1.45; }
 .inline-error { color: var(--red); background: rgba(240,90,103,.1); }
 .inline-warning { color: #eab65f; background: rgba(234,182,95,.1); }
+.inline-info { color: var(--blue); background: rgba(77,163,255,.1); }
+.focus-notice { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.focus-clear-link { color: var(--text); font-weight: 800; text-decoration: none; white-space: nowrap; }
+.focus-clear-link:hover { color: var(--blue); }
 .alert-center { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
 .alert-center-heading, .alert-card-heading, .alert-actions { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
 .alert-center-heading h2 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .09em; }

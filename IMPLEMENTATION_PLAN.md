@@ -888,6 +888,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   blank, and verify the repaired page in Chrome.
 - [x] **TV-0724 — P0 / S:** Make active pattern cards clickable and zoom the chart to the
   selected signal's time window.
+- [x] **TV-0725 — P0 / XS:** Show focused-signal state and provide a `Clear focus` link after
+  signal-card zoom.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

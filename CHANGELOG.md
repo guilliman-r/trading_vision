@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.67.0 — 2026-07-08
+
+- Show when the chart is focused on a selected signal.
+- Add a `Clear focus` link in the details panel so signal-card zoom can be undone without editing
+  the URL or reloading manually.
+- Add regression coverage for focused chart metadata and clear-focus links, and mark `TV-0725`
+  complete.
+
 ## 0.66.0 — 2026-07-08
 
 - Make active pattern cards in the right details panel clickable.

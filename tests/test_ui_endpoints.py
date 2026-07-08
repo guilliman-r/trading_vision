@@ -196,6 +196,42 @@ def test_successful_chart_result_keeps_patterns_out_of_default_plot() -> None:
     assert "range_to=" in rendered_details
 
 
+def test_focused_chart_result_explains_and_can_clear_focus() -> None:
+    times = pd.date_range("2026-01-01", periods=12, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [100.0] * 12,
+            "high": [105.0] * 12,
+            "low": [95.0] * 12,
+            "close": [102.0] * 12,
+            "volume": [1000.0] * 12,
+            "source": ["fixture"] * 12,
+            "is_complete": [True] * 12,
+        }
+    )
+    focus_range = (times[3].to_pydatetime(), times[7].to_pydatetime())
+    result = ChartLoadResult(
+        symbol=Symbol("TEST", "TEST.IS", currency="TRY", is_bist=False),
+        candles=candles,
+    )
+
+    figure, _title, meta, _status, _class_name, details, _symbol = _successful_chart_result(
+        result,
+        "1d",
+        provider_delay_seconds=60,
+        focus_range=focus_range,
+    )
+
+    assert figure.layout.xaxis.range[0] == focus_range[0]
+    assert figure.layout.xaxis.range[1] == focus_range[1]
+    assert "Focused signal" in meta
+    rendered_details = repr(details)
+    assert "Focused on selected signal" in rendered_details
+    assert "Clear focus" in rendered_details
+    assert "?symbol=TEST.IS&interval=1d" in rendered_details
+
+
 def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:
     app = create_app(Settings(database_path=database_path), StaticProvider())
     creating_thread = threading.get_ident()
