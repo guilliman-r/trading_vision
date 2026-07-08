@@ -162,6 +162,15 @@ def _chart_panel() -> html.Section:
                     style={"height": f"{CHART_HEIGHT}px", "width": "100%"},
                 ),
             ),
+            html.Div(
+                [
+                    html.Span([html.Strong("Drag"), " to zoom"]),
+                    html.Span([html.Strong("Scroll"), " to zoom finer"]),
+                    html.Span([html.Strong("Double-click"), " to reset"]),
+                    html.Span([html.Strong("Click a signal card"), " to focus it"]),
+                ],
+                className="chart-help",
+            ),
         ],
     )
 

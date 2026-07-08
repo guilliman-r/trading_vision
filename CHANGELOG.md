@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.75.0 — 2026-07-08
+
+- Add an always-visible chart interaction helper strip below the plot.
+- Show the key controls in plain language: drag to zoom, scroll to zoom finer, double-click to
+  reset, and click a signal card to focus it.
+- Add layout and stylesheet regression coverage and mark `TV-0733` complete.
+
 ## 0.74.0 — 2026-07-08
 
 - Persist the Light/Dark theme choice in browser-local storage.

@@ -902,6 +902,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0731 — P0 / XS:** Make side panels independently scrollable so long signal cards do not
   drag the chart out of view.
 - [x] **TV-0732 — P1 / S:** Persist the selected Light/Dark theme in browser-local storage.
+- [x] **TV-0733 — P0 / XS:** Add a plain chart interaction helper so zoom, reset, and signal-card
+  focus controls are visible without relying on Plotly icon discovery.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

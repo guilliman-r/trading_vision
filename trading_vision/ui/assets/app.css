@@ -138,6 +138,24 @@ button, input { font: inherit; }
 .chart-heading h1 { margin: 0; font-size: 17px; }
 .chart-heading p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
 .chart { height: 680px; width: 100%; }
+.chart-help {
+    margin: 0 16px 14px;
+    padding: 9px 11px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel-raised);
+    color: var(--muted);
+    font-size: 10px;
+}
+.chart-help span {
+    padding: 4px 7px;
+    border-radius: 99px;
+    background: var(--panel);
+}
+.chart-help strong { color: var(--text); }
 
 .status-badge { padding: 7px 10px; border-radius: 99px; font-size: 11px; font-weight: 750; }
 .status-badge.neutral { color: var(--muted); background: var(--panel-raised); }

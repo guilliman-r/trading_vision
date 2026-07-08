@@ -113,12 +113,15 @@ def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None
     assert b'"theme-store"' in layout.data
     assert b'"storage_type":"local"' in layout.data
     assert b'"scanner-results-table"' in layout.data
+    assert b"Drag" in layout.data
+    assert b"Click a signal card" in layout.data
     assert b'"responsive":true' in layout.data
     assert b'"height":"680px"' in layout.data
     assert dependencies.status_code == 200
     assert b"price-chart.figure" in dependencies.data
     assert stylesheet.status_code == 200
     assert b".workspace" in stylesheet.data
+    assert b".chart-help" in stylesheet.data
     assert b"max-height: calc(100vh - 68px)" in stylesheet.data
     assert b".chart { height: 680px" in stylesheet.data
     assert b".interval-select .Select-control" in stylesheet.data
