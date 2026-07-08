@@ -74,11 +74,37 @@ button, input { font: inherit; }
 .alert-indicator { height: 40px; padding: 0 12px; display: flex; gap: 8px; align-items: center; border: 1px solid var(--border); border-radius: 9px; color: var(--muted); font-size: 11px; }
 .alert-indicator strong { min-width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; background: rgba(240,90,103,.13); color: var(--red); }
 
+.interval-select,
+.interval-select .Select,
 .interval-select .Select-control,
-.interval-select .Select-menu-outer { background: var(--panel-raised); border-color: var(--border); color: var(--text); }
-.interval-select .Select-value-label { color: var(--text) !important; font-weight: 700; }
-.interval-select .VirtualizedSelectOption { background: var(--panel-raised); color: var(--text); }
-.interval-select .VirtualizedSelectFocusedOption { background: rgba(77,163,255,.16); }
+.interval-select select {
+    height: 40px !important;
+    border-color: var(--border) !important;
+    border-radius: 9px !important;
+    background: var(--panel-raised) !important;
+    color: var(--text) !important;
+}
+.interval-select .Select-control { border: 1px solid var(--border) !important; box-shadow: none !important; }
+.interval-select .Select-placeholder,
+.interval-select .Select-value,
+.interval-select .Select-value-label,
+.interval-select .Select-input,
+.interval-select .Select-input input {
+    color: var(--text) !important;
+    font-weight: 700;
+    line-height: 38px !important;
+}
+.interval-select .Select-arrow-zone { color: var(--muted) !important; }
+.interval-select .Select-arrow { border-top-color: var(--muted) !important; }
+.interval-select .Select-menu-outer,
+.interval-select .Select-menu,
+.interval-select .VirtualizedSelectOption {
+    border-color: var(--border) !important;
+    background: var(--panel-raised) !important;
+    color: var(--text) !important;
+}
+.interval-select .VirtualizedSelectFocusedOption,
+.interval-select .Select-option.is-focused { background: rgba(77,163,255,.16) !important; }
 
 .workspace {
     display: grid;
@@ -107,7 +133,7 @@ button, input { font: inherit; }
 .chart-heading { height: 64px; padding: 11px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
 .chart-heading h1 { margin: 0; font-size: 17px; }
 .chart-heading p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
-.chart { height: calc(100vh - 133px); min-height: 560px; }
+.chart { height: 680px; width: 100%; }
 
 .status-badge { padding: 7px 10px; border-radius: 99px; font-size: 11px; font-weight: 750; }
 .status-badge.neutral { color: var(--muted); background: var(--panel-raised); }

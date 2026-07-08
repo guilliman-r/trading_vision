@@ -13,6 +13,7 @@ from trading_vision.ui.pattern_overlays import add_pattern_overlays
 from trading_vision.ui.range_breaks import bist_range_breaks
 
 DEFAULT_VISIBLE_CANDLES = 180
+CHART_HEIGHT = 680
 
 
 def build_chart(
@@ -68,6 +69,8 @@ def build_chart(
         paper_bgcolor="#0b0f17",
         plot_bgcolor="#0b0f17",
         font_color="#aab4c3",
+        autosize=True,
+        height=CHART_HEIGHT,
         margin={"l": 14, "r": 58, "t": 12, "b": 28},
         showlegend=False,
         hovermode="x",
@@ -186,6 +189,8 @@ def empty_chart(message: str) -> go.Figure:
         template="plotly_dark",
         paper_bgcolor="#0b0f17",
         plot_bgcolor="#0b0f17",
+        autosize=True,
+        height=CHART_HEIGHT,
         margin={"l": 20, "r": 20, "t": 20, "b": 20},
         xaxis={"visible": False},
         yaxis={"visible": False},

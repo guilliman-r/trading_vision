@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.65.0 — 2026-07-08
+
+- Fix the chart loading layout by giving Dash/Plotly a real chart height instead of relying on
+  percentage sizing that left the visible plot cramped or blank.
+- Restyle the interval dropdown for dark mode so it no longer looks disabled or half-loaded.
+- Verify the repaired page in Chrome and mark `TV-0723` complete.
+
 ## 0.64.0 — 2026-07-08
 
 - Keep the default chart clean by rendering pattern candidates in the details panel instead of

@@ -111,10 +111,15 @@ def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None
     assert layout.status_code == 200
     assert b'"app-root"' in layout.data
     assert b'"scanner-results-table"' in layout.data
+    assert b'"responsive":true' in layout.data
+    assert b'"height":"680px"' in layout.data
     assert dependencies.status_code == 200
     assert b"price-chart.figure" in dependencies.data
     assert stylesheet.status_code == 200
     assert b".workspace" in stylesheet.data
+    assert b".chart { height: 680px" in stylesheet.data
+    assert b".interval-select .Select-control" in stylesheet.data
+    assert b"background: var(--panel-raised) !important" in stylesheet.data
 
 
 def test_load_button_callback_returns_chart_and_snapshot(database_path) -> None:

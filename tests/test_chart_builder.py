@@ -1,7 +1,7 @@
 import pandas as pd
 
 from trading_vision.models import PatternMatch, PatternPoint
-from trading_vision.ui.chart_builder import CHART_CONFIG, build_chart, empty_chart
+from trading_vision.ui.chart_builder import CHART_CONFIG, CHART_HEIGHT, build_chart, empty_chart
 
 
 def test_empty_chart_has_message() -> None:
@@ -23,6 +23,8 @@ def test_chart_contains_candles_and_volume() -> None:
     figure = build_chart(candles, "TEST", "1d")
     assert [trace.type for trace in figure.data] == ["candlestick", "bar"]
     assert figure.layout.uirevision == "TEST:1d"
+    assert figure.layout.autosize is True
+    assert figure.layout.height == CHART_HEIGHT
     assert figure.layout.dragmode == "zoom"
     assert figure.layout.hovermode == "x"
     assert "Open 11.00" in figure.data[0].hovertext[1]

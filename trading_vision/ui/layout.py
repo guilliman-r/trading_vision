@@ -8,7 +8,7 @@ from trading_vision.config import SUPPORTED_INTERVALS, Settings
 from trading_vision.models import PatternMatch, Symbol
 from trading_vision.text_safety import safe_display_text
 from trading_vision.ui import ids
-from trading_vision.ui.chart_builder import CHART_CONFIG, empty_chart
+from trading_vision.ui.chart_builder import CHART_CONFIG, CHART_HEIGHT, empty_chart
 from trading_vision.ui.scanner_views import build_scanner_workspace
 
 QUICK_SYMBOLS = ("THYAO", "GARAN", "ASELS", "TUPRS", "BIMAS", "EREGL")
@@ -150,7 +150,9 @@ def _chart_panel() -> html.Section:
                     id=ids.CHART,
                     figure=empty_chart("Loading market data…"),
                     config=CHART_CONFIG,
+                    responsive=True,
                     className="chart",
+                    style={"height": f"{CHART_HEIGHT}px", "width": "100%"},
                 ),
             ),
         ],
