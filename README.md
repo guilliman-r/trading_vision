@@ -121,6 +121,10 @@ The command exits nonzero when the database is missing or corrupt, the scanner h
 or stale, or the provider smoke request fails. Use `--skip-provider` for a purely local DB/scanner
 check when you do not want to make a Yahoo request.
 
+If you later want the scanner to start automatically after macOS login, use the optional
+[LaunchAgent example](docs/LAUNCH_AGENT.md). It is documentation-only; nothing is installed by
+default.
+
 ## Alerts
 
 Newly confirmed enabled patterns above the configured score create one deduplicated in-app alert.

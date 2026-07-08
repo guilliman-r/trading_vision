@@ -1065,7 +1065,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-1802 — P0 / S:** Add a startup check that creates directories, migrates the database, and imports the catalog safely.
 - [x] **TV-1803 — P0 / S:** Document first run, normal run, shutdown, update, backup, and restore.
 - [x] **TV-1804 — P0 / S:** Display the application version and database schema version.
-- [ ] **TV-1805 — P1 / M:** Add a simple macOS launch-agent or equivalent user-service example if unattended local scanning is desired.
+- [x] **TV-1805 — P1 / M:** Add a simple macOS launch-agent or equivalent user-service example if unattended local scanning is desired.
 - [ ] **TV-1806 — P1 / M:** Optionally add one Dockerfile and Compose file with UI/scanner services sharing a data volume.
 - [x] **TV-1807 — P1 / S:** Add a health command that exits nonzero on stale scanner, corrupt database, or unavailable provider.
 - [ ] **TV-1808 — P1 / M:** Produce a release checklist and a versioned first release.

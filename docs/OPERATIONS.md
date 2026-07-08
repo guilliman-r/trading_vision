@@ -60,6 +60,10 @@ For a no-network local check, run:
 .venv/bin/trading-vision-health --skip-provider
 ```
 
+If you want the scanner to run unattended after macOS login, follow the optional
+[LaunchAgent example](LAUNCH_AGENT.md). Do this only after manual scanner runs and health checks
+already work.
+
 The UI is local-only by default at `127.0.0.1:8050`. Keep it that way unless you deliberately intend
 to expose an unauthenticated local app on a trusted network.
 

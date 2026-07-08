@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.49.0 — 2026-07-08
+
+- Add an optional macOS LaunchAgent guide and copyable scanner plist example for unattended local
+  scanning.
+- Link the LaunchAgent guide from the README and operations guide.
+- Mark `TV-1805` complete in the implementation checklist.
+
 ## 0.48.0 — 2026-07-08
 
 - Add `trading-vision-health` for database, scanner-heartbeat, and provider health checks.
