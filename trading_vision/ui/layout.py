@@ -273,9 +273,18 @@ def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link
                 _pattern_metrics(pattern),
                 className="pattern-metrics",
             ),
-            html.Ul(
-                [html.Li(safe_display_text(reason, max_length=240)) for reason in pattern.reasons],
-                className="pattern-reasons",
+            html.Details(
+                [
+                    html.Summary("Why this signal"),
+                    html.Ul(
+                        [
+                            html.Li(safe_display_text(reason, max_length=240))
+                            for reason in pattern.reasons
+                        ],
+                        className="pattern-reasons",
+                    ),
+                ],
+                className="pattern-reasons-details",
             ),
         ],
         href=_pattern_card_href(symbol, interval, pattern),

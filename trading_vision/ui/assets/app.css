@@ -166,7 +166,10 @@ button, input { font: inherit; }
 .pattern-zoom-chip { padding: 4px 7px; border-radius: 99px; color: var(--text); background: rgba(77,163,255,.18); font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
 .pattern-metrics { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 .pattern-metrics span { padding: 4px 6px; border-radius: 5px; background: var(--panel); color: var(--muted); font-size: 9px; }
-.pattern-reasons { margin: 10px 0 0; padding-left: 16px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.pattern-reasons-details { margin-top: 10px; color: var(--muted); font-size: 10px; }
+.pattern-reasons-details summary { cursor: pointer; font-weight: 800; list-style-position: inside; }
+.pattern-reasons-details summary:hover { color: var(--text); }
+.pattern-reasons { margin: 8px 0 0; padding-left: 16px; color: var(--muted); font-size: 10px; line-height: 1.55; }
 .inline-error, .inline-warning, .inline-info { margin: 14px 0 0; padding: 10px; border-radius: 8px; font-size: 11px; line-height: 1.45; }
 .inline-error { color: var(--red); background: rgba(240,90,103,.1); }
 .inline-warning { color: #eab65f; background: rgba(234,182,95,.1); }

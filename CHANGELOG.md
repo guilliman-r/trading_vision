@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.71.0 — 2026-07-08
+
+- Collapse signal score reasons under a `Why this signal` disclosure inside each card.
+- Keep signal cards easier to scan while preserving the full detector explanation on demand.
+- Add regression coverage for the disclosure label and mark `TV-0729` complete.
+
 ## 0.70.0 — 2026-07-08
 
 - Add compact Istanbul-local timing metrics to active signal cards.

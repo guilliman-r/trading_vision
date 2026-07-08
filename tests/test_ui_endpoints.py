@@ -190,6 +190,7 @@ def test_successful_chart_result_keeps_patterns_out_of_default_plot() -> None:
     rendered_details = repr(details)
     assert "Resistance Breakout" in rendered_details
     assert "Zoom" in rendered_details
+    assert "Why this signal" in rendered_details
     assert "Started 02 Jan · 03:00" in rendered_details
     assert "Last seen 03 Jan · 03:00" in rendered_details
     assert "Invalidation 100.00" in rendered_details
