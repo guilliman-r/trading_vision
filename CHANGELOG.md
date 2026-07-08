@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.51.0 — 2026-07-08
+
+- Add `scripts/check_data.py` for read-only candle coverage and stored-data quality summaries.
+- Document the manual data checker in the README and data-quality guide.
+- Mark `TV-0612` complete in the implementation checklist.
+
 ## 0.50.0 — 2026-07-08
 
 - Add an optional Dockerfile and Compose file with UI and scanner services sharing `./var`.

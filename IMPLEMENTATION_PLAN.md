@@ -853,7 +853,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0609 — P0 / S:** Quarantine invalid rows and preserve an error summary instead of silently dropping them.
 - [ ] **TV-0610 — P1 / M:** Detect suspicious split-like jumps and compare them with corporate-action information.
 - [x] **TV-0611 — P0 / M:** Create fixture tests for DST boundaries, weekends, holidays, half days, duplicates, and malformed OHLC.
-- [ ] **TV-0612 — P1 / S:** Build `scripts/check_data.py` to print coverage and quality by symbol/interval.
+- [x] **TV-0612 — P1 / S:** Build `scripts/check_data.py` to print coverage and quality by symbol/interval.
 
 **Exit criterion:** scanners cannot unknowingly run on partial, malformed, or obviously stale data.
 

@@ -37,3 +37,23 @@ inflating the scanner failure count.
 The pure normalization entry point is `prepare_candles_with_report` in
 `trading_vision/data_quality.py`. The original `prepare_candles` helper remains as a compact wrapper
 for callers that only need the valid frame.
+
+## Stored data coverage check
+
+Run this manual read-only report from the project root when you want to inspect cached candle
+coverage:
+
+```bash
+.venv/bin/python scripts/check_data.py
+```
+
+Useful filters:
+
+```bash
+.venv/bin/python scripts/check_data.py --symbol THYAO.IS --interval 1d
+```
+
+The report groups by provider symbol and interval. It prints row count, complete/forming count,
+first and latest candle timestamps, latest fetch timestamp, missing-volume count, impossible OHLC
+count, nonpositive-price count, and a compact quality status. It does not fetch provider data or
+modify SQLite.

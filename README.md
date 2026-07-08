@@ -83,6 +83,9 @@ contains invalid rows, the chart shows the count and exact reason categories. Sc
 the same information as warnings without falsely marking a successful symbol as failed. See the
 [data-quality guide](docs/DATA_QUALITY.md).
 
+For a read-only coverage summary of stored candles, run
+`.venv/bin/python scripts/check_data.py`.
+
 ## Run the scanner
 
 Keep the UI running and start the worker in a second terminal:
