@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.60.0 — 2026-07-08
+
+- Add a manual BIST provider-symbol validation script with bounded batches and CSV failure output.
+- Document provider validation smoke and full-run commands in the README and catalog policy.
+- Mark `TV-0406` complete in the implementation checklist.
+
 ## 0.59.0 — 2026-07-08
 
 - Add a BIST catalog refresh guard that stops before overwriting the CSV when too many existing

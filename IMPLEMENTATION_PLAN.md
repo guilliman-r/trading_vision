@@ -805,7 +805,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   - Default: include ordinary listed equities; exclude non-equity instruments.
 - [x] **TV-0404 — P0 / S:** Normalize Turkish characters only in search aliases, never by damaging official company names.
 - [x] **TV-0405 — P0 / S:** Map BIST display symbols to Yahoo `.IS` provider symbols in the catalog builder.
-- [ ] **TV-0406 — P0 / M:** Validate catalog provider symbols in rate-limited batches and record failures.
+- [x] **TV-0406 — P0 / M:** Validate catalog provider symbols in rate-limited batches and record failures.
 - [x] **TV-0407 — P0 / S:** Import the snapshot into `symbols` on first run.
 - [x] **TV-0408 — P0 / S:** Build symbol search across exact ticker, provider ticker, company name, and aliases.
 - [x] **TV-0409 — P1 / M:** Implement a manual refresh script that downloads/reads the official source and generates a diff.

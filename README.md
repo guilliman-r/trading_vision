@@ -260,6 +260,12 @@ instruments, and non-equity member codes from the active scan universe. See the
 [BIST catalog policy](docs/BIST_CATALOG_POLICY.md). Provider validation and an equity-only review
 are tracked in the implementation plan.
 
+To validate provider availability after a refresh:
+
+```bash
+.venv/bin/python scripts/validate_catalog_provider_symbols.py --max-symbols 25
+```
+
 ## Test and format
 
 ```bash

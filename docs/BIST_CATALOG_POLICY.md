@@ -44,3 +44,13 @@ symbol.
 The refresh script stops before overwriting the CSV when more than 20 existing symbols would be
 removed. Review the report first, then rerun with `--allow-large-removal` only when the removal is
 expected.
+
+After a catalog refresh, validate provider symbols manually in small batches:
+
+```bash
+.venv/bin/python scripts/validate_catalog_provider_symbols.py --max-symbols 25
+```
+
+For a full validation run, omit `--max-symbols`. The script writes
+`var/bist_provider_validation.csv` with one row per provider symbol, including failure kind and
+error text for symbols Yahoo rejects or cannot return.
