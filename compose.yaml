@@ -1,0 +1,17 @@
+services:
+  ui:
+    build: .
+    command: trading-vision-ui
+    environment:
+      TV_HOST: 0.0.0.0
+      TV_PORT: 8050
+    ports:
+      - "127.0.0.1:8050:8050"
+    volumes:
+      - ./var:/app/var
+
+  scanner:
+    build: .
+    command: trading-vision-worker
+    volumes:
+      - ./var:/app/var

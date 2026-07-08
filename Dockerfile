@@ -1,0 +1,19 @@
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY pyproject.toml README.md ./
+COPY data ./data
+COPY migrations ./migrations
+COPY trading_vision ./trading_vision
+
+RUN python -m pip install --upgrade pip \
+    && python -m pip install .
+
+EXPOSE 8050
+
+CMD ["trading-vision-ui"]

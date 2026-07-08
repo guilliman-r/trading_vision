@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.50.0 — 2026-07-08
+
+- Add an optional Dockerfile and Compose file with UI and scanner services sharing `./var`.
+- Document container startup, shutdown, and local-only port binding in a Docker guide.
+- Mark `TV-1806` complete in the implementation checklist.
+
 ## 0.49.0 — 2026-07-08
 
 - Add an optional macOS LaunchAgent guide and copyable scanner plist example for unattended local

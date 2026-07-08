@@ -125,6 +125,9 @@ If you later want the scanner to start automatically after macOS login, use the 
 [LaunchAgent example](docs/LAUNCH_AGENT.md). It is documentation-only; nothing is installed by
 default.
 
+If you prefer containers, see the optional [Docker and Compose guide](docs/DOCKER.md) for UI and
+scanner services that share the same local `var/` directory.
+
 ## Alerts
 
 Newly confirmed enabled patterns above the configured score create one deduplicated in-app alert.

@@ -64,6 +64,10 @@ If you want the scanner to run unattended after macOS login, follow the optional
 [LaunchAgent example](LAUNCH_AGENT.md). Do this only after manual scanner runs and health checks
 already work.
 
+If you prefer containers instead of a local virtual environment, use the optional
+[Docker and Compose guide](DOCKER.md). It keeps the UI on localhost and shares `./var` between the
+UI and scanner services.
+
 The UI is local-only by default at `127.0.0.1:8050`. Keep it that way unless you deliberately intend
 to expose an unauthenticated local app on a trusted network.
 
