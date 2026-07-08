@@ -159,6 +159,10 @@ button, input { font: inherit; }
 .pattern-card-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .pattern-card-heading strong { font-size: 12px; }
 .pattern-card-actions { display: flex; align-items: center; gap: 5px; }
+.pattern-direction { padding: 4px 7px; border-radius: 99px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.pattern-direction.bullish { color: var(--green); background: rgba(25,195,125,.12); }
+.pattern-direction.bearish { color: var(--red); background: rgba(240,90,103,.12); }
+.pattern-direction.neutral { color: var(--blue); background: rgba(77,163,255,.12); }
 .pattern-state { padding: 4px 7px; border-radius: 99px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
 .pattern-state.forming { color: var(--blue); background: rgba(77,163,255,.12); }
 .pattern-state.confirmed { color: var(--green); background: rgba(25,195,125,.12); }

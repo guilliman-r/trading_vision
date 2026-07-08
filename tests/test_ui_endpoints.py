@@ -189,6 +189,7 @@ def test_successful_chart_result_keeps_patterns_out_of_default_plot() -> None:
     assert status == "Live · 1 active pattern"
     rendered_details = repr(details)
     assert "Resistance Breakout" in rendered_details
+    assert "bullish" in rendered_details
     assert "Zoom" in rendered_details
     assert "Why this signal" in rendered_details
     assert "Started 02 Jan · 03:00" in rendered_details

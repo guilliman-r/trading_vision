@@ -897,6 +897,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0728 — P0 / XS:** Show started and last-seen/confirmed timing on active signal cards.
 - [x] **TV-0729 — P0 / XS:** Collapse signal-card score reasons behind a `Why this signal`
   disclosure to reduce right-panel clutter.
+- [x] **TV-0730 — P0 / XS:** Add visible bullish/bearish/neutral direction pills to active signal
+  cards.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

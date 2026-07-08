@@ -261,6 +261,10 @@ def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link
                     html.Strong(title),
                     html.Div(
                         [
+                            html.Span(
+                                pattern.direction,
+                                className=f"pattern-direction {pattern.direction}",
+                            ),
                             html.Span(pattern.state, className=f"pattern-state {pattern.state}"),
                             html.Span("Zoom", className="pattern-zoom-chip"),
                         ],

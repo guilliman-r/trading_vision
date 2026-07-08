@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.72.0 — 2026-07-08
+
+- Add explicit direction pills to active signal cards.
+- Color bullish, bearish, and neutral signals differently in the card header for faster scanning.
+- Add regression coverage for the direction label and mark `TV-0730` complete.
+
 ## 0.71.0 — 2026-07-08
 
 - Collapse signal score reasons under a `Why this signal` disclosure inside each card.
