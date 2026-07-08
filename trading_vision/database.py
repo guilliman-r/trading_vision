@@ -65,6 +65,22 @@ def initialize_database(database_path: Path) -> None:
             )
 
 
+def check_database_integrity(database_path: Path) -> None:
+    """Raise sqlite3.DatabaseError if SQLite reports a corrupt database."""
+
+    with connection_scope(database_path) as connection:
+        result = database_integrity_result(connection)
+    if result != "ok":
+        raise sqlite3.DatabaseError(f"SQLite quick_check failed: {result}")
+
+
+def database_integrity_result(connection: sqlite3.Connection) -> str:
+    """Return SQLite PRAGMA quick_check output."""
+
+    row = connection.execute("PRAGMA quick_check").fetchone()
+    return str(row[0]) if row else "no quick_check result"
+
+
 def schema_version(connection: sqlite3.Connection) -> str:
     """Return a concise human-readable migration state."""
 

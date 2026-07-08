@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.53.0 — 2026-07-08
+
+- Add a SQLite `quick_check` integrity helper and run it during UI and scanner startup.
+- Extend restore guidance with post-restore health/stat checks and startup integrity behavior.
+- Mark `TV-1712` complete in the implementation checklist.
+
 ## 0.52.0 — 2026-07-08
 
 - Add a maintenance cadence for monthly dependency review and pre-release security audits.

@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 from trading_vision.config import Settings, load_settings
-from trading_vision.database import connect, schema_version
+from trading_vision.database import connect, database_integrity_result, schema_version
 from trading_vision.providers.base import MarketDataProvider
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.scanner_repository import get_heartbeat
@@ -66,7 +66,7 @@ def _check_database(database_path: Path) -> HealthCheck:
         return HealthCheck("database", "fail", f"Database file does not exist: {database_path}")
     try:
         with connect(database_path) as connection:
-            quick_check = connection.execute("PRAGMA quick_check").fetchone()[0]
+            quick_check = database_integrity_result(connection)
             if quick_check != "ok":
                 return HealthCheck("database", "fail", f"SQLite quick_check failed: {quick_check}")
             missing = REQUIRED_TABLES.difference(_table_names(connection))

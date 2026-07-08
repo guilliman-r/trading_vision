@@ -141,14 +141,22 @@ default `var/trading_vision.sqlite3`.
    cp var/trading_vision.backup.sqlite3 var/trading_vision.sqlite3
    ```
 
-4. Start the UI:
+4. Check the restored database before starting the scanner:
+
+   ```bash
+   .venv/bin/trading-vision-health --skip-provider
+   .venv/bin/trading-vision-db stats
+   ```
+
+5. Start the UI:
 
    ```bash
    .venv/bin/trading-vision-ui
    ```
 
-5. Confirm the chart opens and the scanner diagnostics load.
-6. Start the scanner only after the restored UI looks healthy.
+6. Confirm the chart opens and the scanner diagnostics load.
+7. Start the scanner only after the restored UI looks healthy.
 
 If the restored file came from an older version, startup migrations will apply forward-only schema
-changes automatically.
+changes automatically. UI and scanner startup also run SQLite `quick_check`; if that fails, restore
+from a different backup before continuing.

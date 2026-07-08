@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 
 from trading_vision.candle_completion import mark_bist_candle_completion
 from trading_vision.config import PROJECT_ROOT, Settings
-from trading_vision.database import connection_scope, initialize_database
+from trading_vision.database import check_database_integrity, connection_scope, initialize_database
 from trading_vision.market_calendar import BistSessionCalendar
 from trading_vision.providers.base import FetchResult, MarketDataProvider
 from trading_vision.repositories import (
@@ -49,6 +49,7 @@ class ScannerService:
                 connection,
                 PROJECT_ROOT / "data" / "catalogs" / "bist_symbols.csv",
             )
+        check_database_integrity(settings.database_path)
 
     def run_once(
         self,

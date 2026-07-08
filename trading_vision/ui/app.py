@@ -14,7 +14,7 @@ from trading_vision.alert_repository import (
     unread_alert_count,
 )
 from trading_vision.config import PROJECT_ROOT, Settings, host_binding_warning, load_settings
-from trading_vision.database import connection_scope, initialize_database
+from trading_vision.database import check_database_integrity, connection_scope, initialize_database
 from trading_vision.logging_setup import configure_logging
 from trading_vision.models import Symbol
 from trading_vision.providers.yahoo import YahooFinanceProvider
@@ -47,6 +47,7 @@ def create_app(settings: Settings | None = None, provider=None) -> Dash:
         seed_symbols(connection, FALLBACK_SYMBOLS)
         scanner_status = scanner_status_text(get_heartbeat(connection))
         symbols = _unique_display_symbols(search_symbols(connection, limit=10_000))
+    check_database_integrity(settings.database_path)
 
     data_provider = provider or YahooFinanceProvider()
     chart_load_cooldown = ChartLoadCooldown(settings.provider_cooldown_seconds)

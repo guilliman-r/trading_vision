@@ -9,9 +9,11 @@ from trading_vision.data_quality import prepare_candles
 from trading_vision.database import (
     MIGRATIONS_DIRECTORY,
     backup_database,
+    check_database_integrity,
     connect,
     connection_scope,
     database_file_size,
+    database_integrity_result,
     initialize_database,
     schema_version,
     table_counts,
@@ -48,6 +50,21 @@ def test_schema_version_reports_latest_applied_migration(database_path) -> None:
 
     assert "008_drawings.sql" in version
     assert f"{len(list(MIGRATIONS_DIRECTORY.glob('*.sql')))} migrations" in version
+
+
+def test_database_integrity_check_passes_for_valid_database(database_path) -> None:
+    with connect(database_path) as connection:
+        assert database_integrity_result(connection) == "ok"
+
+    check_database_integrity(database_path)
+
+
+def test_database_integrity_check_fails_for_corrupt_database(tmp_path: Path) -> None:
+    database_path = tmp_path / "corrupt.sqlite3"
+    database_path.write_text("not sqlite", encoding="utf-8")
+
+    with pytest.raises(sqlite3.DatabaseError):
+        check_database_integrity(database_path)
 
 
 def test_database_upgrades_from_committed_schema_fixture(tmp_path: Path) -> None:
