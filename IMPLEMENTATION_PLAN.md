@@ -890,6 +890,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   selected signal's time window.
 - [x] **TV-0725 — P0 / XS:** Show focused-signal state and provide a `Clear focus` link after
   signal-card zoom.
+- [x] **TV-0726 — P0 / XS:** Add invalidation and reward/risk metrics to active signal cards when
+  target and invalidation prices are available.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 

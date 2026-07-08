@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.68.0 — 2026-07-08
+
+- Add invalidation price to active signal cards when available.
+- Show a simple reward/risk ratio for bullish and bearish signal cards when target and invalidation
+  prices make the calculation meaningful.
+- Add regression coverage for signal-card trade-structure metrics and mark `TV-0726` complete.
+
 ## 0.67.0 — 2026-07-08
 
 - Show when the chart is focused on a selected signal.

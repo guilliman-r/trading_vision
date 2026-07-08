@@ -268,15 +268,7 @@ def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link
                 className="pattern-card-heading",
             ),
             html.Div(
-                [
-                    html.Span(f"Score {pattern.score:.0f}"),
-                    html.Span(f"Level {pattern.boundary_price:,.2f}"),
-                    html.Span(
-                        f"Target {pattern.target_price:,.2f}"
-                        if pattern.target_price is not None
-                        else "No target"
-                    ),
-                ],
+                _pattern_metrics(pattern),
                 className="pattern-metrics",
             ),
             html.Ul(
@@ -288,6 +280,40 @@ def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link
         title=f"Zoom chart to {title}",
         className="pattern-card pattern-card-link",
     )
+
+
+def _pattern_metrics(pattern: PatternMatch) -> list[html.Span]:
+    metrics = [
+        html.Span(f"Score {pattern.score:.0f}"),
+        html.Span(f"Level {pattern.boundary_price:,.2f}"),
+        html.Span(
+            f"Target {pattern.target_price:,.2f}"
+            if pattern.target_price is not None
+            else "No target"
+        ),
+    ]
+    if pattern.invalidation_price is not None:
+        metrics.append(html.Span(f"Invalidation {pattern.invalidation_price:,.2f}"))
+    risk_reward = _pattern_reward_risk(pattern)
+    if risk_reward is not None:
+        metrics.append(html.Span(f"R/R {risk_reward:.2f}"))
+    return metrics
+
+
+def _pattern_reward_risk(pattern: PatternMatch) -> float | None:
+    if pattern.target_price is None or pattern.invalidation_price is None:
+        return None
+    if pattern.direction == "bullish":
+        reward = pattern.target_price - pattern.boundary_price
+        risk = pattern.boundary_price - pattern.invalidation_price
+    elif pattern.direction == "bearish":
+        reward = pattern.boundary_price - pattern.target_price
+        risk = pattern.invalidation_price - pattern.boundary_price
+    else:
+        return None
+    if reward <= 0 or risk <= 0:
+        return None
+    return reward / risk
 
 
 def _pattern_card_href(symbol: str, interval: str, pattern: PatternMatch) -> str:
