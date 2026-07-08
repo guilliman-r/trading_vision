@@ -234,6 +234,59 @@ def test_focused_chart_result_explains_and_can_clear_focus() -> None:
     assert "?symbol=TEST.IS&interval=1d" in rendered_details
 
 
+def test_focused_chart_result_draws_only_selected_signal_overlay() -> None:
+    times = pd.date_range("2026-01-01", periods=12, freq="D", tz="UTC")
+    candles = pd.DataFrame(
+        {
+            "opened_at_utc": times,
+            "open": [100.0] * 12,
+            "high": [105.0] * 12,
+            "low": [95.0] * 12,
+            "close": [102.0] * 12,
+            "volume": [1000.0] * 12,
+            "source": ["fixture"] * 12,
+            "is_complete": [True] * 12,
+        }
+    )
+    pattern = PatternMatch(
+        pattern_type="resistance_breakout",
+        direction="bullish",
+        state="forming",
+        started_at=times[3].to_pydatetime(),
+        ended_at=None,
+        confirmed_at=None,
+        score=82,
+        boundary_price=104.0,
+        target_price=110.0,
+        invalidation_price=100.0,
+        points=(
+            PatternPoint("touch_1", 3, times[3].to_pydatetime(), 104.0),
+            PatternPoint("touch_2", 6, times[6].to_pydatetime(), 104.0),
+        ),
+        reasons=("focused pattern should be drawn",),
+        parameters={},
+        detector_version="test-v1",
+    )
+    result = ChartLoadResult(
+        symbol=Symbol("TEST", "TEST.IS", currency="TRY", is_bist=False),
+        candles=candles,
+        patterns=(pattern,),
+    )
+
+    figure, *_ = _successful_chart_result(
+        result,
+        "1d",
+        provider_delay_seconds=60,
+        focus_range=(times[2].to_pydatetime(), times[8].to_pydatetime()),
+        focused_pattern="resistance_breakout",
+    )
+
+    names = [trace.name for trace in figure.data]
+    assert names[:2] == ["TEST.IS", "resistance_breakout · forming"]
+    assert "Pattern structure" in names
+    assert names[-1] == "Volume"
+
+
 def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:
     app = create_app(Settings(database_path=database_path), StaticProvider())
     creating_thread = threading.get_ident()

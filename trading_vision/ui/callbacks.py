@@ -11,6 +11,7 @@ from dash import ALL, Input, Output, State, ctx, dcc, html
 from trading_vision.candle_gaps import CandleGapReport, find_bist_candle_gaps
 from trading_vision.config import SUPPORTED_INTERVALS
 from trading_vision.freshness import evaluate_data_freshness
+from trading_vision.models import PatternMatch
 from trading_vision.scanner_results import PatternResultFilters, ScannerResultsSnapshot
 from trading_vision.services.market_data import ChartLoadResult
 from trading_vision.text_safety import safe_display_text
@@ -66,6 +67,7 @@ def register_callbacks(
             if requested_interval in SUPPORTED_INTERVALS:
                 interval = requested_interval
         focus_range = _focus_range_from_query(query, requested)
+        focused_pattern = query.get("pattern", [""])[0]
         try:
             result = load_chart(requested, interval, triggered == ids.REFRESH_BUTTON)
             if result.candles.empty:
@@ -79,7 +81,13 @@ def register_callbacks(
                     [html.P(message, className="inline-error")],
                     result.symbol.provider_symbol,
                 )
-            return _successful_chart_result(result, interval, provider_delay_seconds, focus_range)
+            return _successful_chart_result(
+                result,
+                interval,
+                provider_delay_seconds,
+                focus_range,
+                focused_pattern,
+            )
         except Exception as error:
             message = str(error) or "Unable to load this symbol"
             return (
@@ -205,6 +213,7 @@ def _successful_chart_result(
     interval: str,
     provider_delay_seconds: int,
     focus_range: tuple[datetime, datetime] | None = None,
+    focused_pattern: str = "",
 ):
     candles = result.candles
     latest = candles.iloc[-1]
@@ -230,6 +239,11 @@ def _successful_chart_result(
     if focus_range is not None:
         chart_meta = f"{chart_meta} · Focused signal"
     visible_patterns = select_visible_patterns(candles, result.patterns)
+    focused_overlays = (
+        _focused_pattern_overlay(visible_patterns, focused_pattern)
+        if focus_range is not None
+        else ()
+    )
     pattern_word = "pattern" if len(visible_patterns) == 1 else "patterns"
     status_prefix = "Cached" if result.from_cache or provider_message else "Live"
     status_text = f"{status_prefix} · {len(visible_patterns)} active {pattern_word}"
@@ -286,7 +300,7 @@ def _successful_chart_result(
             candles,
             result.symbol.provider_symbol,
             interval,
-            (),
+            focused_overlays,
             is_bist=result.symbol.is_bist,
             focus_range=focus_range,
         ),
@@ -297,6 +311,18 @@ def _successful_chart_result(
         details,
         result.symbol.provider_symbol,
     )
+
+
+def _focused_pattern_overlay(
+    patterns: tuple[PatternMatch, ...],
+    focused_pattern: str,
+) -> tuple[PatternMatch, ...]:
+    if not focused_pattern:
+        return ()
+    for pattern in patterns:
+        if pattern.pattern_type == focused_pattern:
+            return (pattern,)
+    return ()
 
 
 def _clear_focus_href(symbol: str, interval: str) -> str:

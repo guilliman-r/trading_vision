@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.69.0 — 2026-07-08
+
+- Draw the selected pattern overlay only after a signal card is clicked.
+- Keep the default chart clean while giving focused signal views enough visual context to explain
+  the selected card.
+- Add regression coverage for focused signal overlays and mark `TV-0727` complete.
+
 ## 0.68.0 — 2026-07-08
 
 - Add invalidation price to active signal cards when available.
