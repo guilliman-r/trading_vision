@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.73.0 — 2026-07-08
+
+- Make the left watchlist and right signal/details panels independently scrollable.
+- Keep the main chart steadier when signal cards or alert details grow taller than the viewport.
+- Add stylesheet regression coverage and mark `TV-0731` complete.
+
 ## 0.72.0 — 2026-07-08
 
 - Add explicit direction pills to active signal cards.

@@ -117,6 +117,7 @@ def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None
     assert b"price-chart.figure" in dependencies.data
     assert stylesheet.status_code == 200
     assert b".workspace" in stylesheet.data
+    assert b"max-height: calc(100vh - 68px)" in stylesheet.data
     assert b".chart { height: 680px" in stylesheet.data
     assert b".interval-select .Select-control" in stylesheet.data
     assert b"background: var(--panel-raised) !important" in stylesheet.data

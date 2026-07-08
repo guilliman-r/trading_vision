@@ -899,6 +899,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
   disclosure to reduce right-panel clutter.
 - [x] **TV-0730 — P0 / XS:** Add visible bullish/bearish/neutral direction pills to active signal
   cards.
+- [x] **TV-0731 — P0 / XS:** Make side panels independently scrollable so long signal cards do not
+  drag the chart out of view.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 
