@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.55.0 — 2026-07-08
+
+- Add a validated `scanner.export_limit` setting capped at 2,000 rows and use it for CSV exports.
+- Cap Yahoo provider retry attempts at five and document scanner/export caps.
+- Mark `TV-1711` complete in the implementation checklist.
+
 ## 0.54.0 — 2026-07-08
 
 - Add shared log redaction for common token, password, API-key, Authorization, and Bearer fragments.

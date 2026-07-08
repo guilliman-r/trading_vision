@@ -16,8 +16,9 @@ Every filter is applied in the repository query with bound SQL values:
 - last 7, 30, or 90 days, or all history.
 
 Results are ordered by confirmation/current observation time and score. The UI returns at most 500
-rows to keep rendering bounded. CSV export uses the identical filter object and allows up to 2,000
-rows. Filters never interpolate user-entered values into SQL.
+rows to keep rendering bounded. CSV export uses the identical filter object and is capped by
+`scanner.export_limit`, which cannot exceed 2,000 rows. Filters never interpolate user-entered
+values into SQL.
 
 ## Result rows
 

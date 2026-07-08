@@ -24,6 +24,7 @@ SUPPORTED_PATTERN_TYPES = (
     "descending_triangle",
     "symmetrical_triangle",
 )
+MAX_SCANNER_EXPORT_LIMIT = 2_000
 LOOPBACK_HOSTNAMES = {"localhost", "127.0.0.1", "::1"}
 PUBLIC_SETTING_NAMES = (
     "database_path",
@@ -38,6 +39,7 @@ PUBLIC_SETTING_NAMES = (
     "chart_candle_limit",
     "scan_intervals",
     "scanner_batch_size",
+    "scanner_export_limit",
     "scanner_lookback_bars",
     "provider_delay_seconds",
     "provider_cooldown_seconds",
@@ -63,6 +65,7 @@ class Settings:
     chart_candle_limit: int = 500
     scan_intervals: tuple[str, ...] = ("1d",)
     scanner_batch_size: int = 25
+    scanner_export_limit: int = 2_000
     scanner_lookback_bars: int = 500
     provider_delay_seconds: int = 60
     provider_cooldown_seconds: int = 30
@@ -96,6 +99,10 @@ class Settings:
             raise ValueError("At least one scan interval is required")
         if not 1 <= self.scanner_batch_size <= 100:
             raise ValueError("scanner_batch_size must be between 1 and 100")
+        if not 1 <= self.scanner_export_limit <= MAX_SCANNER_EXPORT_LIMIT:
+            raise ValueError(
+                f"scanner_export_limit must be between 1 and {MAX_SCANNER_EXPORT_LIMIT}"
+            )
         if not 350 <= self.scanner_lookback_bars <= 5_000:
             raise ValueError("scanner_lookback_bars must be between 350 and 5000")
         if not 0 <= self.provider_delay_seconds <= 3_600:
@@ -151,6 +158,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
             chart_candle_limit=int(app.get("chart_candle_limit", settings.chart_candle_limit)),
             scan_intervals=tuple(scanner.get("intervals", settings.scan_intervals)),
             scanner_batch_size=int(scanner.get("batch_size", settings.scanner_batch_size)),
+            scanner_export_limit=int(scanner.get("export_limit", settings.scanner_export_limit)),
             scanner_lookback_bars=int(scanner.get("lookback_bars", settings.scanner_lookback_bars)),
             provider_delay_seconds=int(
                 scanner.get("provider_delay_seconds", settings.provider_delay_seconds)

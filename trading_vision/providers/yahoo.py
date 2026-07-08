@@ -21,6 +21,7 @@ PERIOD_BY_INTERVAL = {
 }
 
 REQUIRED_PRICE_COLUMNS = {"open", "high", "low", "close", "volume"}
+MAX_RETRY_ATTEMPTS = 5
 LOGGER = logging.getLogger(__name__)
 
 
@@ -37,6 +38,8 @@ class YahooFinanceProvider(MarketDataProvider):
     ) -> None:
         if max_attempts < 1:
             raise ValueError("max_attempts must be at least 1")
+        if max_attempts > MAX_RETRY_ATTEMPTS:
+            raise ValueError(f"max_attempts must be at most {MAX_RETRY_ATTEMPTS}")
         self.max_attempts = max_attempts
         self.base_retry_delay_seconds = base_retry_delay_seconds
         self.max_retry_delay_seconds = max_retry_delay_seconds

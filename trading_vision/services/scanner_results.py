@@ -62,7 +62,11 @@ class ScannerResultsService:
                 "app_link",
             )
         )
-        for row in search_pattern_results(self.connection, filters, limit=2_000):
+        for row in search_pattern_results(
+            self.connection,
+            filters,
+            limit=self.settings.scanner_export_limit,
+        ):
             writer.writerow(_csv_row(row))
         return output.getvalue()
 

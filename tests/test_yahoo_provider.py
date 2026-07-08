@@ -289,6 +289,11 @@ def test_fetch_history_stops_after_max_retry_attempts(monkeypatch) -> None:
     assert waits == [1.0]
 
 
+def test_fetch_history_rejects_unbounded_retry_attempts() -> None:
+    with pytest.raises(ValueError, match="at most 5"):
+        YahooFinanceProvider(max_attempts=6)
+
+
 def test_yahoo_failure_classifier_recognizes_invalid_and_partial_batch_errors() -> None:
     assert classify_yahoo_failure(RuntimeError("No timezone found, symbol may be delisted")) == (
         "invalid_ticker"

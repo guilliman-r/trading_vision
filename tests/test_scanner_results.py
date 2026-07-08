@@ -12,6 +12,7 @@ from trading_vision.repositories import upsert_candles
 from trading_vision.scanner_repository import finish_scan_run, start_scan_run, update_heartbeat
 from trading_vision.scanner_results import PatternResultFilters
 from trading_vision.scanner_results_repository import search_pattern_results
+from trading_vision.services import scanner_results as scanner_results_module
 from trading_vision.services.scanner_results import ScannerResultsService
 
 
@@ -61,6 +62,29 @@ def test_score_filter_and_csv_export_use_same_query(database_path) -> None:
     assert len(snapshot.rows) >= 1
     assert "TEST.IS,1d,resistance_breakout" in exported
     assert "app_link" in exported.splitlines()[0]
+
+
+def test_csv_export_uses_configured_export_limit(database_path, monkeypatch) -> None:
+    captured = {}
+
+    def fake_search_pattern_results(connection, filters, limit=500):
+        captured["limit"] = limit
+        return []
+
+    monkeypatch.setattr(
+        scanner_results_module,
+        "search_pattern_results",
+        fake_search_pattern_results,
+    )
+    with connect(database_path) as connection:
+        service = ScannerResultsService(
+            connection,
+            Settings(database_path=database_path, scanner_export_limit=7),
+        )
+        exported = service.export_csv(PatternResultFilters())
+
+    assert captured["limit"] == 7
+    assert exported.splitlines()[0].startswith("symbol,interval,pattern_type")
 
 
 def test_diagnostics_include_run_heartbeat_database_and_errors(database_path) -> None:

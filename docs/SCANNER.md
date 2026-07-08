@@ -78,13 +78,15 @@ as normal weekdays; do not run a new calendar year unattended before adding its 
 [scanner]
 intervals = ["1d"]
 batch_size = 25
+export_limit = 2000
 lookback_bars = 500
 provider_delay_seconds = 60
 lock_path = "var/scanner.lock"
 ```
 
-Batching is deliberately sequential. The current provider contract handles one symbol at a time;
-batch boundaries organize work and future provider adapters without hiding parallel requests.
+Batch size is capped between 1 and 100. The Yahoo adapter uses batch downloads inside those
+boundaries; provider failures are still recorded per symbol. Scanner lookback is capped between 350
+and 5,000 candles. CSV export is capped by `export_limit`, with an absolute maximum of 2,000 rows.
 
 ## Diagnostics
 
