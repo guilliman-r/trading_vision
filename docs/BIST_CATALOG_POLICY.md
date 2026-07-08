@@ -36,5 +36,7 @@ Current manual command:
 .venv/bin/python scripts/refresh_bist_symbols.py
 ```
 
-After refreshing, review the generated diff before committing it. Future catalog work will add a
-structured report for additions, removals, renames, and provider validation failures.
+After refreshing, review `var/bist_catalog_refresh_report.md` before committing the CSV. The report
+lists additions, removed symbols that need inactive-review, and changed fields. Provider validation
+is a separate catalog task, so do not treat the scrape report as proof that Yahoo accepts every
+symbol.

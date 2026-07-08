@@ -70,6 +70,61 @@ def test_catalog_import_preserves_inactive_symbols_without_scanning_them(
     assert active_symbols == []
 
 
+def test_catalog_refresh_report_records_additions_removals_and_changes(tmp_path) -> None:
+    module = run_path(str(PROJECT_ROOT / "scripts" / "refresh_bist_symbols.py"))
+    before = [
+        {
+            "display_symbol": "OLD",
+            "provider_symbol": "OLD.IS",
+            "name": "Old Company",
+            "exchange": "XIST",
+            "currency": "TRY",
+            "asset_type": "equity",
+            "is_bist": "true",
+            "is_active": "true",
+            "source": "fixture",
+            "source_date": "2026-07-01",
+        },
+        {
+            "display_symbol": "KEEP",
+            "provider_symbol": "KEEP.IS",
+            "name": "Before Name",
+            "exchange": "XIST",
+            "currency": "TRY",
+            "asset_type": "equity",
+            "is_bist": "true",
+            "is_active": "true",
+            "source": "fixture",
+            "source_date": "2026-07-01",
+        },
+    ]
+    after = [
+        {
+            **before[1],
+            "name": "After Name",
+            "source_date": "2026-07-08",
+        },
+        {
+            **before[0],
+            "display_symbol": "NEW",
+            "provider_symbol": "NEW.IS",
+            "name": "New Company",
+            "source_date": "2026-07-08",
+        },
+    ]
+    report = tmp_path / "report.md"
+
+    module["write_refresh_report"](before, after, report, tmp_path / "catalog.csv")
+
+    text = report.read_text(encoding="utf-8")
+    assert "- Added: 1" in text
+    assert "- Removed / inactive-review needed: 1" in text
+    assert "- Changed: 1" in text
+    assert "| NEW.IS | NEW | New Company |" in text
+    assert "| OLD.IS | OLD | Old Company |" in text
+    assert "| KEEP.IS | name | Before Name | After Name |" in text
+
+
 def test_committed_bist_catalog_has_unique_valid_provider_symbols() -> None:
     with CATALOG_PATH.open(encoding="utf-8", newline="") as file:
         rows = list(csv.DictReader(file))

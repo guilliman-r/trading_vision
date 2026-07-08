@@ -11,7 +11,9 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 SOURCE_URL = "https://www.kap.org.tr/tr/bist-sirketler"
-DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "data" / "catalogs" / "bist_symbols.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_OUTPUT = PROJECT_ROOT / "data" / "catalogs" / "bist_symbols.csv"
+DEFAULT_REPORT = PROJECT_ROOT / "var" / "bist_catalog_refresh_report.md"
 ENTRY_PATTERN = re.compile(
     r'\\"kapMemberTitle\\":\\"(?P<name>.*?)\\".*?'
     r'\\"stockCode\\":\\"(?P<codes>.*?)\\"',
@@ -58,24 +60,120 @@ def write_catalog(rows: list[dict[str, str]], output: Path) -> None:
         writer.writerows(rows)
 
 
+def read_catalog(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8", newline="") as file:
+        return list(csv.DictReader(file))
+
+
+def catalog_diff(
+    before: list[dict[str, str]],
+    after: list[dict[str, str]],
+) -> dict[str, object]:
+    before_by_symbol = {row["provider_symbol"]: row for row in before}
+    after_by_symbol = {row["provider_symbol"]: row for row in after}
+    before_symbols = set(before_by_symbol)
+    after_symbols = set(after_by_symbol)
+    added = [after_by_symbol[symbol] for symbol in sorted(after_symbols - before_symbols)]
+    removed = [before_by_symbol[symbol] for symbol in sorted(before_symbols - after_symbols)]
+    changed = []
+    for symbol in sorted(before_symbols & after_symbols):
+        field_changes = {
+            key: (before_by_symbol[symbol].get(key, ""), after_by_symbol[symbol].get(key, ""))
+            for key in sorted(after_by_symbol[symbol])
+            if before_by_symbol[symbol].get(key, "") != after_by_symbol[symbol].get(key, "")
+            and key != "source_date"
+        }
+        if field_changes:
+            changed.append((symbol, field_changes))
+    return {"added": added, "removed": removed, "changed": changed}
+
+
+def write_refresh_report(
+    before: list[dict[str, str]],
+    after: list[dict[str, str]],
+    report_path: Path,
+    output_path: Path,
+) -> None:
+    diff = catalog_diff(before, after)
+    added = diff["added"]
+    removed = diff["removed"]
+    changed = diff["changed"]
+    lines = [
+        "# BIST catalog refresh report",
+        "",
+        f"- Source: {SOURCE_URL}",
+        f"- Output CSV: {output_path}",
+        f"- Generated: {date.today().isoformat()}",
+        f"- Previous rows: {len(before)}",
+        f"- New rows: {len(after)}",
+        f"- Added: {len(added)}",
+        f"- Removed / inactive-review needed: {len(removed)}",
+        f"- Changed: {len(changed)}",
+        "",
+        "Removed symbols are review items. Do not mark many symbols inactive without checking "
+        "KAP/BIST.",
+        "Provider validation is separate from this catalog scrape.",
+        "",
+        _rows_section("Added", added),
+        _rows_section("Removed / inactive review", removed),
+        _changed_section(changed),
+    ]
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def _clean_escaped_text(value: str) -> str:
     value = value.replace(r"\u0026", "&").replace(r"\"", '"')
     return html.unescape(value).strip()
 
 
-def main() -> None:
+def _rows_section(title: str, rows: list[dict[str, str]]) -> str:
+    lines = [f"## {title}", ""]
+    if not rows:
+        lines.append("None.")
+        return "\n".join(lines)
+    lines.append("| provider_symbol | display_symbol | name |")
+    lines.append("| --- | --- | --- |")
+    for row in rows:
+        lines.append(
+            f"| {row.get('provider_symbol', '')} | {row.get('display_symbol', '')} | "
+            f"{row.get('name', '')} |"
+        )
+    return "\n".join(lines)
+
+
+def _changed_section(changed) -> str:
+    lines = ["## Changed", ""]
+    if not changed:
+        lines.append("None.")
+        return "\n".join(lines)
+    lines.append("| provider_symbol | field | before | after |")
+    lines.append("| --- | --- | --- | --- |")
+    for symbol, field_changes in changed:
+        for field, (before, after) in field_changes.items():
+            lines.append(f"| {symbol} | {field} | {before} | {after} |")
+    return "\n".join(lines)
+
+
+def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-html", type=Path, help="Use a previously downloaded KAP page")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    arguments = parser.parse_args()
+    parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    arguments = parser.parse_args(argv)
     page = (
         arguments.input_html.read_text(encoding="utf-8")
         if arguments.input_html
         else download_page()
     )
+    before = read_catalog(arguments.output)
     rows = parse_companies(page)
     write_catalog(rows, arguments.output)
+    write_refresh_report(before, rows, arguments.report, arguments.output)
     print(f"Wrote {len(rows)} KAP codes to {arguments.output}")
+    print(f"Wrote refresh report to {arguments.report}")
 
 
 if __name__ == "__main__":

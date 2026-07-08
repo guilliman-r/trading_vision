@@ -252,6 +252,7 @@ The committed catalog is generated from KAP's BIST Companies page:
 .venv/bin/python scripts/refresh_bist_symbols.py
 ```
 
+Review the CSV diff and `var/bist_catalog_refresh_report.md` before committing catalog changes.
 The source list includes KAP member codes as well as listed equity codes. The application keeps
 the raw catalog provenance and handles unavailable Yahoo symbols as visible provider errors.
 Version 1 targets ordinary listed equities and excludes ETFs, warrants, rights, funds, debt

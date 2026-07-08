@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.58.0 — 2026-07-08
+
+- Extend the manual BIST catalog refresh script with a Markdown diff report for additions,
+  removals that need inactive review, and changed fields.
+- Document the generated catalog refresh report in the README and BIST catalog policy.
+- Mark `TV-0409` complete in the implementation checklist.
+
 ## 0.57.0 — 2026-07-08
 
 - Add safe display-text normalization for provider/catalog metadata in UI details, scanner tables,
