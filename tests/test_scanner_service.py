@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import UTC, datetime
 
 import pandas as pd
@@ -31,6 +32,21 @@ class PartialProvider(MarketDataProvider):
         candles["source"] = self.name
         candles["fetched_at_utc"] = pd.Timestamp("2026-07-06T17:00:00Z")
         return FetchResult(symbol=symbol, candles=candles)
+
+
+class BatchProvider(PartialProvider):
+    def __init__(self) -> None:
+        super().__init__()
+        self.batches: list[tuple[tuple[str, ...], str, int]] = []
+
+    def fetch_history_batch(
+        self,
+        symbols: tuple[str, ...],
+        interval: str,
+        batch_size: int,
+    ) -> dict[str, FetchResult]:
+        self.batches.append((symbols, interval, batch_size))
+        return {symbol: self.fetch_history(symbol, interval) for symbol in symbols}
 
 
 class CurrentDailyProvider(MarketDataProvider):
@@ -115,6 +131,39 @@ def test_scanner_isolates_symbol_failure_and_persists_diagnostics(database_path,
     assert "BAD.IS" in json.loads(stored_run["error_summary"])[0]
     assert heartbeat["status"] == "idle"
     assert candles == len(resistance_fixture())
+
+
+def test_scanner_uses_provider_batch_fetch_for_configured_chunks(database_path, tmp_path) -> None:
+    with connect(database_path) as connection:
+        seed_symbols(
+            connection,
+            [
+                Symbol("GOOD", "GOOD.IS", is_bist=True),
+                Symbol("BAD", "BAD.IS", is_bist=True),
+                Symbol("EXTRA", "EXTRA.IS", is_bist=True),
+            ],
+        )
+        connection.commit()
+    provider = BatchProvider()
+    settings = replace(
+        scanner_settings(database_path, tmp_path / "scanner.lock"),
+        scanner_batch_size=2,
+    )
+    service = ScannerService(
+        settings,
+        provider,
+        now=lambda: datetime(2026, 7, 6, 17, 30, tzinfo=UTC),
+    )
+
+    summary = service.run_once(("GOOD", "BAD", "EXTRA"), force=True)
+
+    assert summary.runs[0].succeeded == 2
+    assert summary.runs[0].failed == 1
+    assert provider.batches == [
+        (("GOOD.IS", "BAD.IS"), "1d", 2),
+        (("EXTRA.IS",), "1d", 2),
+    ]
+    assert provider.requested == ["GOOD.IS", "BAD.IS", "EXTRA.IS"]
 
 
 def test_dry_run_caches_candles_without_persisting_patterns(database_path, tmp_path) -> None:

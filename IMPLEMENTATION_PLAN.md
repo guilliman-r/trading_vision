@@ -821,7 +821,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0501 — P0 / S:** Define a small `MarketDataProvider` interface: validate symbol, fetch bars, and fetch lightweight metadata.
 - [x] **TV-0502 — P0 / S:** Define a result object that carries successful data and per-symbol errors together.
 - [x] **TV-0503 — P0 / M:** Implement Yahoo single-symbol history fetch with every important argument explicit.
-- [ ] **TV-0504 — P0 / M:** Implement batched multi-symbol downloads with a configurable batch size.
+- [x] **TV-0504 — P0 / M:** Implement batched multi-symbol downloads with a configurable batch size.
 - [x] **TV-0505 — P0 / S:** Normalize Yahoo's single- and multi-ticker column shapes into one internal schema.
 - [x] **TV-0506 — P0 / S:** Convert provider timestamps to UTC and retain exchange metadata separately.
 - [x] **TV-0507 — P0 / XS:** Choose adjusted-price behavior explicitly rather than accepting a changing library default.

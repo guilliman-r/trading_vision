@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.47.0 — 2026-07-08
+
+- Add a provider batch-fetch contract with a simple single-symbol fallback.
+- Implement Yahoo Finance batched downloads with configurable chunk size and per-symbol results.
+- Route scanner batches through the provider batch API while preserving per-symbol failure isolation.
+- Mark `TV-0504` complete in the implementation checklist.
+
 ## 0.46.0 — 2026-07-07
 
 - Add explicit provider failure kinds for invalid tickers, empty history, rate limits, timeouts,

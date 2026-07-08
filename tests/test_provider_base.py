@@ -46,3 +46,10 @@ def test_fetch_result_success_requires_candles_and_no_error() -> None:
         candles=pd.DataFrame({"close": [10.0]}),
         error="failed",
     ).succeeded
+
+
+def test_batch_fetch_default_falls_back_to_single_symbol_fetches() -> None:
+    results = FixtureProvider().fetch_history_batch(("AAPL", "MSFT"), "1d", batch_size=25)
+
+    assert set(results) == {"AAPL", "MSFT"}
+    assert all(result.succeeded for result in results.values())

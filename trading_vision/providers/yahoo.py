@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import random
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from time import perf_counter, sleep
 
 import pandas as pd
@@ -93,6 +93,92 @@ class YahooFinanceProvider(MarketDataProvider):
                 failure_kind=failure_kind,
             )
 
+    def fetch_history_batch(
+        self,
+        symbols: Sequence[str],
+        interval: str,
+        batch_size: int,
+    ) -> dict[str, FetchResult]:
+        if not symbols:
+            return {}
+        if interval not in PERIOD_BY_INTERVAL:
+            return {
+                symbol: FetchResult(
+                    symbol=symbol,
+                    error=f"Unsupported interval: {interval}",
+                    failure_kind="unsupported_interval",
+                )
+                for symbol in symbols
+            }
+
+        results: dict[str, FetchResult] = {}
+        valid_symbols: list[str] = []
+        for symbol in symbols:
+            if symbol.strip():
+                valid_symbols.append(symbol)
+            else:
+                results[symbol] = FetchResult(
+                    symbol=symbol,
+                    error="Yahoo Finance invalid ticker: symbol is required",
+                    failure_kind="invalid_ticker",
+                )
+
+        for chunk in _chunks(valid_symbols, max(1, batch_size)):
+            started = perf_counter()
+            try:
+                raw = self._download_history_batch(chunk, interval)
+            except Exception as error:  # yfinance emits several transport exception types
+                failure_kind = classify_yahoo_failure(error)
+                for symbol in chunk:
+                    _log_history_failure(symbol, interval, started, failure_kind)
+                    results[symbol] = FetchResult(
+                        symbol=symbol,
+                        error=f"{_failure_title(failure_kind)}: {error}",
+                        failure_kind=failure_kind,
+                    )
+                continue
+
+            if raw.empty:
+                failure_kind = "empty_history"
+                for symbol in chunk:
+                    _log_history_failure(symbol, interval, started, failure_kind)
+                    results[symbol] = FetchResult(
+                        symbol=symbol,
+                        error="Yahoo Finance returned no candles",
+                        failure_kind=failure_kind,
+                    )
+                continue
+
+            for symbol in chunk:
+                try:
+                    normalized = normalize_yahoo_history_frame(raw, symbol)
+                    prepared = prepare_candles_with_report(normalized, interval, self.name)
+                    _log_history_success(symbol, interval, started, prepared.candles)
+                    results[symbol] = FetchResult(
+                        symbol=symbol,
+                        candles=prepared.candles,
+                        quality_report=prepared.quality_report,
+                    )
+                except DataQualityError as error:
+                    failure_kind = "data_quality"
+                    _log_history_failure(symbol, interval, started, failure_kind)
+                    results[symbol] = FetchResult(
+                        symbol=symbol,
+                        error=f"Yahoo Finance data-quality error: {error}",
+                        quality_report=error.quality_report,
+                        failure_kind=failure_kind,
+                    )
+                except Exception as error:
+                    failure_kind = classify_yahoo_failure(error)
+                    _log_history_failure(symbol, interval, started, failure_kind)
+                    results[symbol] = FetchResult(
+                        symbol=symbol,
+                        error=f"{_failure_title(failure_kind)}: {error}",
+                        failure_kind=failure_kind,
+                    )
+
+        return {symbol: results[symbol] for symbol in symbols}
+
     def _download_history(self, symbol: str, interval: str) -> pd.DataFrame:
         for attempt in range(1, self.max_attempts + 1):
             try:
@@ -116,6 +202,34 @@ class YahooFinanceProvider(MarketDataProvider):
                 )
                 self.sleeper(delay)
         raise RuntimeError("Provider retry loop ended unexpectedly")
+
+    def _download_history_batch(self, symbols: Sequence[str], interval: str) -> pd.DataFrame:
+        for attempt in range(1, self.max_attempts + 1):
+            try:
+                return yf.download(
+                    tickers=list(symbols),
+                    period=PERIOD_BY_INTERVAL[interval],
+                    interval=interval,
+                    auto_adjust=True,
+                    actions=False,
+                    progress=False,
+                    group_by="ticker",
+                    threads=True,
+                )
+            except Exception:
+                if attempt == self.max_attempts:
+                    raise
+                delay = self._retry_delay_seconds(attempt)
+                LOGGER.warning(
+                    "provider_history_batch_retry symbols=%s interval=%s attempt=%s "
+                    "next_delay_seconds=%.2f",
+                    ",".join(symbols),
+                    interval,
+                    attempt,
+                    delay,
+                )
+                self.sleeper(delay)
+        raise RuntimeError("Provider batch retry loop ended unexpectedly")
 
     def _retry_delay_seconds(self, attempt: int) -> float:
         base_delay = self.base_retry_delay_seconds * (2 ** (attempt - 1))
@@ -214,6 +328,8 @@ def classify_yahoo_failure(error: Exception) -> str:
         return "rate_limited"
     if isinstance(error, TimeoutError) or "timeout" in message or "timed out" in message:
         return "timeout"
+    if "did not contain symbol" in message:
+        return "partial_batch_failure"
     if "invalid ticker" in message or "no timezone found" in message or "delisted" in message:
         return "invalid_ticker"
     return "provider_error"
@@ -233,6 +349,11 @@ def _failure_title(failure_kind: str) -> str:
 def _opened_range(candles: pd.DataFrame) -> tuple[str, str]:
     opened = pd.to_datetime(candles["opened_at_utc"], utc=True)
     return opened.min().isoformat(), opened.max().isoformat()
+
+
+def _chunks(symbols: Sequence[str], size: int):
+    for start in range(0, len(symbols), size):
+        yield list(symbols[start : start + size])
 
 
 def _elapsed_ms(started: float) -> float:

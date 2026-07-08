@@ -165,6 +165,63 @@ def test_fetch_history_classifies_rate_limits(monkeypatch) -> None:
     assert result.error == "Yahoo Finance rate limit: Too Many Requests: rate limit 429"
 
 
+def test_fetch_history_batch_uses_yfinance_download_chunks(monkeypatch) -> None:
+    calls = []
+
+    def fake_download(**kwargs) -> pd.DataFrame:
+        symbols = kwargs["tickers"]
+        calls.append((tuple(symbols), kwargs))
+        columns = pd.MultiIndex.from_product(
+            [symbols, ["Open", "High", "Low", "Close", "Volume"]],
+            names=["Ticker", "Price"],
+        )
+        values = []
+        for index, _symbol in enumerate(symbols, start=1):
+            values.extend([10.0 + index, 12.0 + index, 9.0 + index, 11.0 + index, 100.0])
+        return pd.DataFrame([values], columns=columns, index=pd.to_datetime(["2026-07-01"]))
+
+    monkeypatch.setattr(yahoo.yf, "download", fake_download)
+    provider = YahooFinanceProvider()
+
+    results = provider.fetch_history_batch(
+        ["THYAO.IS", "GARAN.IS", "ASELS.IS"],
+        "1d",
+        batch_size=2,
+    )
+
+    assert list(results) == ["THYAO.IS", "GARAN.IS", "ASELS.IS"]
+    assert all(result.succeeded for result in results.values())
+    assert [call[0] for call in calls] == [("THYAO.IS", "GARAN.IS"), ("ASELS.IS",)]
+    first_call = calls[0][1]
+    assert first_call["period"] == "2y"
+    assert first_call["interval"] == "1d"
+    assert first_call["auto_adjust"] is True
+    assert first_call["actions"] is False
+    assert first_call["progress"] is False
+    assert first_call["group_by"] == "ticker"
+
+
+def test_fetch_history_batch_marks_missing_symbols_as_partial_failures(monkeypatch) -> None:
+    def fake_download(**kwargs) -> pd.DataFrame:
+        columns = pd.MultiIndex.from_product(
+            [["THYAO.IS"], ["Open", "High", "Low", "Close", "Volume"]],
+            names=["Ticker", "Price"],
+        )
+        return pd.DataFrame(
+            [[10.0, 12.0, 9.0, 11.0, 100.0]],
+            columns=columns,
+            index=pd.to_datetime(["2026-07-01"]),
+        )
+
+    monkeypatch.setattr(yahoo.yf, "download", fake_download)
+
+    results = YahooFinanceProvider().fetch_history_batch(["THYAO.IS", "GARAN.IS"], "1d", 10)
+
+    assert results["THYAO.IS"].succeeded
+    assert not results["GARAN.IS"].succeeded
+    assert results["GARAN.IS"].failure_kind == "partial_batch_failure"
+
+
 def test_fetch_history_retries_provider_errors_with_bounded_backoff(monkeypatch) -> None:
     attempts = []
 
@@ -237,5 +294,8 @@ def test_yahoo_failure_classifier_recognizes_invalid_and_partial_batch_errors() 
         "invalid_ticker"
     )
     assert classify_yahoo_failure(RuntimeError("partial batch failure: GARAN.IS failed")) == (
+        "partial_batch_failure"
+    )
+    assert classify_yahoo_failure(RuntimeError("Yahoo data did not contain symbol: GARAN.IS")) == (
         "partial_batch_failure"
     )

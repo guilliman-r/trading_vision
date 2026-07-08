@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 import pandas as pd
@@ -70,6 +71,14 @@ class MarketDataProvider:
 
     def fetch_history(self, symbol: str, interval: str) -> FetchResult:
         raise NotImplementedError
+
+    def fetch_history_batch(
+        self,
+        symbols: Sequence[str],
+        interval: str,
+        batch_size: int,
+    ) -> dict[str, FetchResult]:
+        return {symbol: self.fetch_history(symbol, interval) for symbol in symbols}
 
 
 def normalize_provider_symbol(symbol: str) -> str:

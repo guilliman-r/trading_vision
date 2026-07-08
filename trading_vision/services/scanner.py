@@ -10,7 +10,7 @@ from trading_vision.candle_completion import mark_bist_candle_completion
 from trading_vision.config import PROJECT_ROOT, Settings
 from trading_vision.database import connection_scope, initialize_database
 from trading_vision.market_calendar import BistSessionCalendar
-from trading_vision.providers.base import MarketDataProvider
+from trading_vision.providers.base import FetchResult, MarketDataProvider
 from trading_vision.repositories import (
     find_symbol,
     get_candles,
@@ -149,9 +149,17 @@ class ScannerService:
         candles_added = 0
         patterns_added = 0
         for batch in _batches(jobs, self.settings.scanner_batch_size):
+            fetched_by_symbol = self._fetch_batch(batch, interval)
             for job in batch:
                 try:
-                    result = self._run_job(job, dry_run)
+                    fetched = fetched_by_symbol.get(job.symbol.provider_symbol)
+                    if fetched is None:
+                        fetched = FetchResult(
+                            symbol=job.symbol.provider_symbol,
+                            error="Provider batch result was missing this symbol",
+                            failure_kind="partial_batch_failure",
+                        )
+                    result = self._run_job(job, dry_run, fetched)
                     succeeded += 1
                     candles_added += result.candles_added
                     patterns_added += result.patterns_added
@@ -186,8 +194,25 @@ class ScannerService:
             warnings=tuple(warnings),
         )
 
-    def _run_job(self, job: ScanJob, dry_run: bool) -> JobResult:
-        fetched = self.provider.fetch_history(job.symbol.provider_symbol, job.interval)
+    def _fetch_batch(self, batch: list[ScanJob], interval: str) -> dict[str, FetchResult]:
+        symbols = tuple(job.symbol.provider_symbol for job in batch)
+        try:
+            return self.provider.fetch_history_batch(
+                symbols,
+                interval,
+                batch_size=self.settings.scanner_batch_size,
+            )
+        except Exception as error:  # one batch must not abort the scanner cycle
+            return {
+                symbol: FetchResult(
+                    symbol=symbol,
+                    error=f"Provider batch failure: {error}",
+                    failure_kind="partial_batch_failure",
+                )
+                for symbol in symbols
+            }
+
+    def _run_job(self, job: ScanJob, dry_run: bool, fetched: FetchResult) -> JobResult:
         if not fetched.succeeded:
             raise RuntimeError(fetched.error or "Provider returned no candles")
         _require_storage_columns(fetched.candles)
