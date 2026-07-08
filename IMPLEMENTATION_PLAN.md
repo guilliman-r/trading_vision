@@ -78,7 +78,7 @@ For this project, it means:
 5. create at most one alert for each meaningful state transition;
 6. show when the source data or scanner is stale.
 
-For a 15-minute interval, a normal target is to surface a confirmed pattern within 1–2 minutes of Yahoo making the completed candle available. This is a product target to measure, not a guaranteed feed latency.
+For a 1-hour interval, a normal target is to surface a confirmed pattern within a few minutes of Yahoo making the completed candle available. This is a product target to measure, not a guaranteed feed latency.
 
 ### 3.3 Pattern recognition is probabilistic in practice
 
@@ -459,8 +459,8 @@ This preserves an audit trail instead of overwriting all history in `patterns`.
 
 - Daily candles: retain indefinitely.
 - Hourly candles: retain indefinitely initially; review database size quarterly.
-- 15-minute candles: retain at least the 60-day source window and optionally archive longer locally.
-- 5-minute candles: default to watchlist symbols only; retain 60 days initially.
+- Lower intraday candles: deferred until chart responsiveness, scanner timing, and storage needs are
+  measured safe.
 - Scan runs: retain 90 days.
 - Pattern transitions and alert events: retain indefinitely unless the user clears them.
 
@@ -627,7 +627,7 @@ Updating `forming` to `confirmed` must update the same pattern and append a stat
 
 - product name;
 - searchable symbol selector;
-- interval selector: `1d`, `1h`, `15m`, then `5m` after performance validation;
+- interval selector: `1d` and `1h` only until lower intraday intervals are measured safe;
 - visible data-source label;
 - last candle time;
 - scanner status dot;
@@ -727,14 +727,14 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 - [x] **TV-0001 — P0 / XS:** Record that version 1 is local and single-user.
   - Acceptance: README states who runs it, where it runs, and that authentication is absent.
-- [x] **TV-0002 — P0 / XS:** Define the first scan intervals as `1d`, `1h`, and `15m`.
-  - Acceptance: config validates only supported values; `5m` is explicitly experimental/deferred.
-- [x] **TV-0003 — P0 / XS:** Define “closed candle” semantics for every interval.
-  - Acceptance: one written example shows when a 15-minute candle is eligible for detection.
+- [x] **TV-0002 — P0 / XS:** Define the first scan intervals as `1d` and `1h`.
+  - Acceptance: config validates only supported values; lower intraday intervals are deferred.
+- [x] **TV-0003 — P0 / XS:** Define “closed candle” semantics for every supported interval.
+  - Acceptance: one written example shows when an hourly candle is eligible for detection.
 - [x] **TV-0004 — P0 / XS:** Choose initial detector order: breakout, double top/bottom, head-and-shoulders, triangles.
   - Acceptance: backlog and settings use the same names.
 - [x] **TV-0005 — P0 / XS:** Set the initial BIST scan policy.
-  - Default: all active BIST equities on `1d` and `1h`; user watchlist on `15m`.
+  - Default: all active BIST equities on `1d`; `1h` is opt-in.
   - Acceptance: the policy is configurable and visible in settings.
 - [x] **TV-0006 — P0 / XS:** State that the app never places orders.
   - Acceptance: no broker credentials or order models exist in version 1.
@@ -880,6 +880,8 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0719 — P0 / M:** Add smoke tests for app creation and chart construction from fixed candles.
 - [x] **TV-0720 — P0 / S:** Limit live overlays to forming/recent confirmed patterns and scale the
   default viewport from visible candle prices rather than projected geometry.
+- [x] **TV-0721 — P0 / S:** Keep 1H BIST chart zoom responsive by disabling heavy intraday
+  range breaks and limiting user-facing intervals to `1d` and `1h`.
 
 **Exit criterion:** a user can search a symbol, switch interval, inspect candlesticks/volume, zoom, and understand data freshness.
 
@@ -1180,9 +1182,6 @@ provider_delay_seconds = 60
 [scan]
 bist_daily = true
 bist_hourly = true
-bist_15m = false
-watchlist_15m = true
-watchlist_5m = false
 
 [patterns]
 minimum_alert_score = 70
@@ -1222,7 +1221,7 @@ Demonstration:
 1. start the app;
 2. search `THYAO` and load `THYAO.IS`;
 3. search a generic Yahoo symbol and load it unchanged;
-4. switch daily/hourly/15-minute intervals where data is available;
+4. switch daily/hourly intervals where data is available;
 5. inspect candlesticks, volume, freshness, and provider errors;
 6. restart without losing cached candles or watchlist choices.
 
@@ -1282,7 +1281,7 @@ Release 1.0 is done only when:
 | Scanner | Plain Python worker | Durable distributed jobs are required |
 | Data provider | yfinance for MVP | Latency/reliability or licensing is insufficient |
 | Detection timing | Completed candles | The user deliberately enables provisional signals |
-| BIST intraday universe | Watchlist at 15m | Full-universe timing and rate limits are measured safe |
+| BIST intraday universe | Opt-in at 1h | Full-universe timing and rate limits are measured safe |
 | Prices | Explicit adjusted OHLC | A use case requires separate raw/adjusted views |
 | First detectors | Breakouts and double top/bottom | Pipeline and validation are stable |
 | Trading | Alerts only | Separate paper/live-trading project is approved |

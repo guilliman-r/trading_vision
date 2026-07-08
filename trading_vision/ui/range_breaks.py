@@ -34,14 +34,9 @@ def bist_range_breaks(
     if interval == "1d":
         return breaks
 
-    # Yahoo timestamps BIST hourly bars at xx:30, starting at 09:30 Istanbul.
-    open_bound = 6.5 if interval == "1h" else 7
-    breaks.append({"pattern": "hour", "bounds": [15, open_bound]})
-    half_day_values = _half_day_values(first_date, last_date, interval, session_calendar)
-    if half_day_values:
-        duration_ms = int(INTERVAL_LENGTHS[interval].total_seconds() * 1_000)
-        breaks.append({"values": half_day_values, "dvalue": duration_ms})
-    return breaks
+    # Plotly rangebreaks on intraday candlesticks can make zoom/pan very heavy.
+    # Keep 1H charts linear and responsive; missing market hours remain visible as time gaps.
+    return []
 
 
 def _local_date_range(candles: pd.DataFrame) -> tuple[date, date]:

@@ -9,6 +9,7 @@ from urllib.parse import parse_qs
 from dash import ALL, Input, Output, State, ctx, dcc, html
 
 from trading_vision.candle_gaps import CandleGapReport, find_bist_candle_gaps
+from trading_vision.config import SUPPORTED_INTERVALS
 from trading_vision.freshness import evaluate_data_freshness
 from trading_vision.scanner_results import PatternResultFilters, ScannerResultsSnapshot
 from trading_vision.services.market_data import ChartLoadResult
@@ -62,7 +63,7 @@ def register_callbacks(
         elif triggered == ids.URL or (triggered is None and url_search):
             requested = query.get("symbol", [requested])[0]
             requested_interval = query.get("interval", [interval])[0]
-            if requested_interval in {"1d", "1h", "15m", "5m"}:
+            if requested_interval in SUPPORTED_INTERVALS:
                 interval = requested_interval
         focus_range = _focus_range_from_query(query, requested)
         try:

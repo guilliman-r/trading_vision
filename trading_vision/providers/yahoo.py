@@ -16,8 +16,6 @@ from trading_vision.providers.base import FetchResult, MarketDataProvider
 PERIOD_BY_INTERVAL = {
     "1d": "2y",
     "1h": "60d",
-    "15m": "60d",
-    "5m": "1mo",
 }
 
 REQUIRED_PRICE_COLUMNS = {"open", "high", "low", "close", "volume"}

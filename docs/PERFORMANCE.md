@@ -29,8 +29,8 @@ prefer narrow query/index/lookback changes over broad rewrites.
 - Complete horizontal breakout scan: 100 passes in 4.140 seconds; 41.40 ms average
 
 Pivot extraction dominates the current detector runtime. This is already comfortably below the
-latency relevant to daily, hourly, and 15-minute closed-candle scans, so readability remains more
-valuable than optimization at this stage.
+latency relevant to daily and hourly closed-candle scans, so readability remains more valuable than
+optimization at this stage.
 
 ## 2026-07-04 — Double-pattern milestone
 

@@ -18,15 +18,13 @@ are informational; the user decides whether to act outside the application.
 
 ## First scanner intervals
 
-The first supported scanner intervals are:
+The supported chart and scanner intervals are currently:
 
 - `1d`
 - `1h`
-- `15m`
 
-The chart and provider layers may still load `5m` data manually for investigation, but `5m` is
-experimental and is not accepted by scanner configuration or the scanner CLI until performance and
-provider limits are measured.
+Lower intraday intervals are deliberately deferred. Do not expose `15m` or `5m` again until chart
+zoom/pan behavior, provider limits, and full-universe scan timing are measured safe.
 
 ## Closed-candle semantics
 
@@ -36,7 +34,6 @@ exchange/provider boundary has passed and the configured provider delay has elap
 Examples with the default `provider_delay_seconds = 60`:
 
 - A BIST daily candle is eligible after the exchange data close plus 60 seconds.
-- A BIST 15-minute candle opened at `10:15` closes at `10:30` and is eligible at `10:31`.
 - Yahoo labels BIST hourly bars on half-hour openings. The `09:30` hourly bar closes at `10:30`
   and is eligible at `10:31`.
 
@@ -59,10 +56,9 @@ real-world false-positive behavior is reviewed.
 
 The scanner reads active BIST symbols from SQLite when no explicit symbols are supplied.
 
-The conservative default configuration scans all active BIST symbols on `1d`. The first supported
-scan intervals also include `1h` and `15m`, but they must be enabled deliberately in `config.toml`
-or supplied to the scanner CLI. Use `15m` on a small explicit symbol set until watchlist controls
-and provider throughput measurements are complete.
+The conservative default configuration scans all active BIST symbols on `1d`. The supported scan
+intervals also include `1h`, but hourly scanning must be enabled deliberately in `config.toml` or
+supplied to the scanner CLI.
 
 ## Glossary
 

@@ -40,20 +40,13 @@ def test_daily_breaks_include_weekends_and_calendar_holidays() -> None:
     assert date(2026, 7, 6) not in closed_dates
 
 
-def test_intraday_breaks_hide_overnight_and_half_day_remainder() -> None:
+def test_hourly_bist_charts_keep_linear_axis_for_responsive_zoom() -> None:
     times = pd.date_range("2026-05-25 07:00", "2026-05-27 15:00", freq="1h", tz="UTC")
     candles = _candles(times)
 
     breaks = bist_range_breaks(candles, "1h", BistSessionCalendar())
-    overnight = next(item for item in breaks if item.get("pattern") == "hour")
-    half_days = next(
-        item for item in breaks if item.get("dvalue") == 3_600_000 and "values" in item
-    )
-    half_day_times = [pd.Timestamp(value).astimezone(ISTANBUL) for value in half_days["values"]]
 
-    assert overnight["bounds"] == [15, 6.5]
-    assert half_day_times[0].date() == date(2026, 5, 26)
-    assert (half_day_times[0].hour, half_day_times[0].minute) == (12, 30)
+    assert breaks == []
 
 
 def test_chart_applies_range_breaks_only_when_symbol_is_bist() -> None:
@@ -65,3 +58,11 @@ def test_chart_applies_range_breaks_only_when_symbol_is_bist() -> None:
     assert not generic.layout.xaxis.rangebreaks
     assert bist.layout.xaxis.rangebreaks
     assert bist.layout.xaxis2.rangebreaks == bist.layout.xaxis.rangebreaks
+
+
+def test_hourly_chart_does_not_apply_range_breaks_when_symbol_is_bist() -> None:
+    candles = _candles(pd.date_range("2026-07-03 07:00", periods=10, freq="1h", tz="UTC"))
+
+    figure = build_chart(candles, "THYAO.IS", "1h", is_bist=True)
+
+    assert not figure.layout.xaxis.rangebreaks

@@ -24,8 +24,8 @@ transitions, and alerts remain separate.
 - moving an item to a new position;
 - removing an item and compacting positions.
 
-Scanner intervals saved on watchlist items are limited to the first supported scanner intervals:
-`1d`, `1h`, and `15m`. The experimental `5m` chart interval is not accepted for scanner watchlists.
+Scanner intervals saved on watchlist items are limited to the supported scanner intervals: `1d`
+and `1h`. Lower intraday intervals are not accepted for scanner watchlists.
 
 ## UI scope
 

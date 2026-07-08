@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.63.0 — 2026-07-08
+
+- Limit user-facing chart, scanner, provider, and watchlist intervals to `1d` and `1h`.
+- Keep BIST `1h` charts on a linear x-axis instead of applying heavy intraday Plotly range breaks,
+  which prevents zoom/pan freezes on hourly views.
+- Update docs and tests for the 1D/1H-only product contract and mark `TV-0721` complete.
+
 ## 0.62.0 — 2026-07-08
 
 - Add opt-in live Yahoo integration tests for representative BIST and non-BIST symbols.

@@ -50,10 +50,12 @@ def test_rejects_unknown_interval() -> None:
         Settings(default_interval="2h").validate()
 
 
-def test_five_minute_interval_is_not_a_first_scanner_interval() -> None:
-    assert Settings(default_interval="5m").validate().default_interval == "5m"
-    with pytest.raises(ValueError, match="Unsupported scan intervals: 5m"):
-        Settings(scan_intervals=("5m",)).validate()
+def test_only_daily_and_hourly_intervals_are_user_supported() -> None:
+    assert Settings(default_interval="1h").validate().default_interval == "1h"
+    with pytest.raises(ValueError, match="Unsupported interval"):
+        Settings(default_interval="15m").validate()
+    with pytest.raises(ValueError, match="Unsupported scan intervals: 15m"):
+        Settings(scan_intervals=("15m",)).validate()
 
 
 def test_loads_scanner_settings_and_resolves_lock_path(tmp_path: Path) -> None:

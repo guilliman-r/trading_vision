@@ -35,7 +35,7 @@ def test_watchlist_add_reorder_and_remove_items(database_path) -> None:
 
         add_watchlist_item(connection, watchlist.id, thyao.id, ("1d", "1h"))
         add_watchlist_item(connection, watchlist.id, garan.id, ("1d",))
-        add_watchlist_item(connection, watchlist.id, asels.id, ("15m",))
+        add_watchlist_item(connection, watchlist.id, asels.id, ("1h",))
 
         reordered = reorder_watchlist_item(connection, watchlist.id, asels.id, 1)
         removed = remove_watchlist_item(connection, watchlist.id, thyao.id)
@@ -52,7 +52,7 @@ def test_watchlist_add_reorder_and_remove_items(database_path) -> None:
     assert missing is False
     assert [item.symbol.provider_symbol for item in remaining] == ["ASELS.IS", "GARAN.IS"]
     assert [item.position for item in remaining] == [1, 2]
-    assert remaining[0].scan_intervals == ("15m",)
+    assert remaining[0].scan_intervals == ("1h",)
 
 
 def test_watchlist_rejects_empty_name_unknown_list_and_unsupported_scan_interval(
@@ -65,6 +65,6 @@ def test_watchlist_rejects_empty_name_unknown_list_and_unsupported_scan_interval
         with pytest.raises(ValueError, match="name"):
             create_watchlist(connection, " ")
         with pytest.raises(ValueError, match="Unsupported watchlist scan intervals"):
-            add_watchlist_item(connection, watchlist.id, symbol.id, ("5m",))
+            add_watchlist_item(connection, watchlist.id, symbol.id, ("15m",))
         with pytest.raises(ValueError, match="Unknown watchlist"):
             add_watchlist_item(connection, 999, symbol.id)

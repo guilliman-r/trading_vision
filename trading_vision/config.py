@@ -11,8 +11,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SUPPORTED_INTERVALS = ("1d", "1h", "15m", "5m")
-SUPPORTED_SCAN_INTERVALS = ("1d", "1h", "15m")
+SUPPORTED_INTERVALS = ("1d", "1h")
+SUPPORTED_SCAN_INTERVALS = ("1d", "1h")
 SUPPORTED_PATTERN_TYPES = (
     "resistance_breakout",
     "support_breakdown",

@@ -11,9 +11,9 @@ completed trading session, and configured half days use their early close.
 
 ## Intraday candles
 
-For `5m`, `15m`, and `1h`, only bars whose full interval boundary has passed plus provider delay are
-complete. Before the first eligible boundary of a new session, the previous session's last bar is
-the newest completed candle.
+For `1h`, only bars whose full interval boundary has passed plus provider delay are complete.
+Before the first eligible boundary of a new session, the previous session's last bar is the newest
+completed candle.
 
 Yahoo Finance labels BIST hourly bars on the half-hour, from `09:30` through `17:30` Istanbul time.
 Trading Vision follows those provider timestamps rather than inventing round-hour boundaries. The
