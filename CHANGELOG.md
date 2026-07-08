@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.56.0 — 2026-07-08
+
+- Add explicit local performance budgets for UI, scanner, chart rebuilds, filters, and exports.
+- Link performance baselines from the README.
+- Mark `TV-1702` complete in the implementation checklist.
+
 ## 0.55.0 — 2026-07-08
 
 - Add a validated `scanner.export_limit` setting capped at 2,000 rows and use it for CSV exports.

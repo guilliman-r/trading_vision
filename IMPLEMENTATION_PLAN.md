@@ -1042,7 +1042,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 ### Phase 17 — Reliability, performance, and security
 
 - [ ] **TV-1701 — P0 / S:** Measure UI initial load, symbol switch, chart update, and full scan duration.
-- [ ] **TV-1702 — P0 / S:** Set performance budgets based on local use.
+- [x] **TV-1702 — P0 / S:** Set performance budgets based on local use.
   - Suggested: cached chart under 1 second; uncached chart under 4 seconds; UI remains responsive during scanning.
 - [ ] **TV-1703 — P0 / M:** Add only measured indexes and query optimizations.
 - [ ] **TV-1704 — P0 / S:** Limit chart queries to the visible/default window.

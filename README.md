@@ -134,6 +134,9 @@ scanner services that share the same local `var/` directory.
 For monthly dependency review and pre-release audit steps, see the
 [maintenance cadence](docs/MAINTENANCE.md).
 
+For local latency targets and existing detector/scanner baselines, see
+[performance baselines](docs/PERFORMANCE.md).
+
 ## Alerts
 
 Newly confirmed enabled patterns above the configured score create one deduplicated in-app alert.

@@ -31,3 +31,13 @@ def test_maintenance_cadence_is_documented() -> None:
     text = maintenance.read_text(encoding="utf-8")
     assert "Monthly dependency review" in text
     assert "Security audit before a release" in text
+
+
+def test_performance_budgets_are_documented() -> None:
+    performance = Path("docs/PERFORMANCE.md")
+
+    assert performance.is_file()
+    text = performance.read_text(encoding="utf-8")
+    assert "Local performance budgets" in text
+    assert "CSV export" in text
+    assert "2,000 rows" in text

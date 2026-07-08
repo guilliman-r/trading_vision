@@ -2,6 +2,25 @@
 
 These are development-machine smoke baselines, not production guarantees.
 
+## Local performance budgets
+
+These budgets are intentionally plain and local-first. Measure before optimizing, and only tune code
+that misses a budget on a realistic local database.
+
+| Operation | Budget |
+| --- | ---: |
+| UI first paint with cached startup metadata | under 2 seconds |
+| Cached symbol or interval switch | under 500 ms |
+| Explicit provider refresh response | under 10 seconds before showing cached fallback/error |
+| Chart rebuild for 500 candles and active overlays | under 750 ms |
+| Scanner one-shot dry run with fake provider for full BIST daily universe | under 20 seconds |
+| Scanner single-symbol detector pipeline on 500 candles | under 250 ms |
+| Scanner results filter refresh | under 1 second |
+| CSV export | under 2 seconds and capped at 2,000 rows |
+
+If a budget fails, first capture the symbol, interval, row counts, machine, and command used. Then
+prefer narrow query/index/lookback changes over broad rewrites.
+
 ## 2026-07-04 — Horizontal breakout milestone
 
 - Python: 3.13.9
