@@ -834,7 +834,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-0513 — P0 / M:** Upsert only new/changed candles and report added/updated counts.
 - [x] **TV-0514 — P0 / S:** Add a generic Yahoo symbol through the UI without appending `.IS` unless it matches the BIST catalog.
 - [x] **TV-0515 — P0 / S:** Add frozen provider-shape tests so most tests never contact Yahoo.
-- [ ] **TV-0516 — P1 / M:** Add a manually invoked live integration test for representative BIST and non-BIST symbols.
+- [x] **TV-0516 — P1 / M:** Add a manually invoked live integration test for representative BIST and non-BIST symbols.
 - [x] **TV-0517 — P1 / S:** Capture the installed `yfinance` version in diagnostic output.
 - [x] **TV-0518 — P1 / S:** Add a provider health result showing success rate, latency, and latest returned bar age.
 

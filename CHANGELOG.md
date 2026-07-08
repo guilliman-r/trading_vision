@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.62.0 — 2026-07-08
+
+- Add opt-in live Yahoo integration tests for representative BIST and non-BIST symbols.
+- Document the `TV_RUN_LIVE_PROVIDER_TESTS=1` manual test command.
+- Mark `TV-0516` complete in the implementation checklist.
+
 ## 0.61.0 — 2026-07-08
 
 - Allow BIST catalog refresh reports to include provider-validation failures from the validation CSV.

@@ -37,3 +37,15 @@ cooldown_seconds = 30
 
 Allowed values are 0–300 seconds. Set zero to disable only the short-lived chart-result reuse;
 SQLite remains the durable candle cache.
+
+## Opt-in live provider test
+
+Normal tests never call Yahoo. To manually check representative BIST and non-BIST symbols against
+the live provider, run:
+
+```bash
+TV_RUN_LIVE_PROVIDER_TESTS=1 .venv/bin/python -m pytest tests/test_live_provider.py -q
+```
+
+Use this sparingly; provider availability, rate limits, and market-data quirks are external to the
+local test suite.
