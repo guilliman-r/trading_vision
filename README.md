@@ -190,7 +190,8 @@ Create a safe SQLite backup copy with the backup API:
 The UI and scanner both write concise console logs and a rotating local file at
 `var/trading_vision.log` by default. Each line includes the process label (`ui` or `scanner`), and
 scanner cycle summaries include the persisted `run_id` for matching logs to diagnostics. Change the
-path or level in the `[logging]` section of `config.toml`.
+path or level in the `[logging]` section of `config.toml`. Common token, password, API-key, and
+Bearer fragments are redacted before messages reach console or file logs.
 
 ## Pattern engine
 

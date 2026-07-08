@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.54.0 — 2026-07-08
+
+- Add shared log redaction for common token, password, API-key, Authorization, and Bearer fragments.
+- Document logging redaction in the README.
+- Mark `TV-1707` complete in the implementation checklist.
+
 ## 0.53.0 — 2026-07-08
 
 - Add a SQLite `quick_check` integrity helper and run it during UI and scanner startup.
