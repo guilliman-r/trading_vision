@@ -12,6 +12,7 @@ from trading_vision.candle_gaps import CandleGapReport, find_bist_candle_gaps
 from trading_vision.freshness import evaluate_data_freshness
 from trading_vision.scanner_results import PatternResultFilters, ScannerResultsSnapshot
 from trading_vision.services.market_data import ChartLoadResult
+from trading_vision.text_safety import safe_display_text
 from trading_vision.ui import ids
 from trading_vision.ui.alert_views import render_alerts
 from trading_vision.ui.chart_builder import build_chart, empty_chart
@@ -343,7 +344,7 @@ def _source_label(source) -> str:
     normalized = str(source or "unknown").strip().lower()
     if normalized == "yahoo":
         return "Yahoo Finance"
-    return normalized.replace("_", " ").title()
+    return safe_display_text(normalized.replace("_", " ").title())
 
 
 def _result_filters(

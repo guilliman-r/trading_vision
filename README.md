@@ -196,6 +196,10 @@ scanner cycle summaries include the persisted `run_id` for matching logs to diag
 path or level in the `[logging]` section of `config.toml`. Common token, password, API-key, and
 Bearer fragments are redacted before messages reach console or file logs.
 
+User-visible provider/catalog text is stripped of control characters, whitespace-normalized, and
+length-capped before it appears in details, scanner tables, diagnostics, or CSV exports. Startup
+catalog imports are constrained to the project tree.
+
 ## Pattern engine
 
 The first detector finds repeated horizontal resistance and support levels. It:

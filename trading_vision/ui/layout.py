@@ -6,6 +6,7 @@ from dash import dcc, html
 
 from trading_vision.config import SUPPORTED_INTERVALS, Settings
 from trading_vision.models import PatternMatch, Symbol
+from trading_vision.text_safety import safe_display_text
 from trading_vision.ui import ids
 from trading_vision.ui.chart_builder import CHART_CONFIG, empty_chart
 from trading_vision.ui.scanner_views import build_scanner_workspace
@@ -93,7 +94,10 @@ def _top_bar(settings: Settings, symbols: tuple[Symbol, ...]) -> html.Header:
 
 
 def _symbol_option_label(symbol: Symbol) -> str:
-    return f"{symbol.display_symbol} · {symbol.name}" if symbol.name else symbol.display_symbol
+    display_symbol = safe_display_text(symbol.display_symbol, max_length=40)
+    if not symbol.name:
+        return display_symbol
+    return f"{display_symbol} · {safe_display_text(symbol.name)}"
 
 
 def _watchlist(scanner_status: str) -> html.Aside:
@@ -203,9 +207,9 @@ def detail_rows(
     patterns: tuple[PatternMatch, ...] = (),
 ) -> list[html.Div]:
     rows = [
-        _detail_row("Symbol", symbol),
-        _detail_row("Name", name or "Yahoo instrument"),
-        _detail_row("Interval", interval.upper()),
+        _detail_row("Symbol", safe_display_text(symbol, max_length=40)),
+        _detail_row("Name", safe_display_text(name, fallback="Yahoo instrument")),
+        _detail_row("Interval", safe_display_text(interval.upper(), max_length=10)),
         _detail_row("Candles", f"{candle_count:,}"),
         _detail_row("Latest", latest),
         _detail_row("Close", close),
@@ -216,7 +220,10 @@ def detail_rows(
 
 
 def _detail_row(label: str, value: str) -> html.Div:
-    return html.Div([html.Span(label), html.Strong(value)], className="detail-row")
+    return html.Div(
+        [html.Span(label), html.Strong(safe_display_text(value))],
+        className="detail-row",
+    )
 
 
 def _pattern_summary(patterns: tuple[PatternMatch, ...]) -> html.Div:
@@ -260,7 +267,10 @@ def _pattern_card(pattern: PatternMatch) -> html.Div:
                 ],
                 className="pattern-metrics",
             ),
-            html.Ul([html.Li(reason) for reason in pattern.reasons], className="pattern-reasons"),
+            html.Ul(
+                [html.Li(safe_display_text(reason, max_length=240)) for reason in pattern.reasons],
+                className="pattern-reasons",
+            ),
         ],
         className="pattern-card",
     )

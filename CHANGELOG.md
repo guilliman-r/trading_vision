@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.57.0 — 2026-07-08
+
+- Add safe display-text normalization for provider/catalog metadata in UI details, scanner tables,
+  diagnostics, and CSV exports.
+- Constrain built-in startup catalog imports to paths inside the project tree.
+- Mark `TV-1710` complete in the implementation checklist.
+
 ## 0.56.0 — 2026-07-08
 
 - Add explicit local performance budgets for UI, scanner, chart rebuilds, filters, and exports.

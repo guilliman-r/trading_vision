@@ -1051,7 +1051,7 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 - [x] **TV-1707 — P0 / S:** Ensure logs do not contain tokens or full environment dumps.
 - [x] **TV-1708 — P0 / S:** Bind the local server to `127.0.0.1` by default.
 - [x] **TV-1709 — P0 / XS:** Warn when binding to a non-loopback address without authentication.
-- [ ] **TV-1710 — P0 / S:** Escape/sanitize user-visible metadata and constrain imported file paths.
+- [x] **TV-1710 — P0 / S:** Escape/sanitize user-visible metadata and constrain imported file paths.
 - [x] **TV-1711 — P0 / S:** Cap batch size, candle lookback, export size, and retry count.
 - [x] **TV-1712 — P1 / M:** Add startup database integrity check and documented restore procedure.
 - [ ] **TV-1713 — P1 / M:** Run a multi-day local soak test covering scanner restarts and provider failures.

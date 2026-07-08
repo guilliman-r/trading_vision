@@ -10,6 +10,7 @@ from trading_vision.candle_completion import mark_bist_candle_completion
 from trading_vision.config import PROJECT_ROOT, Settings
 from trading_vision.database import check_database_integrity, connection_scope, initialize_database
 from trading_vision.market_calendar import BistSessionCalendar
+from trading_vision.path_safety import require_path_inside
 from trading_vision.providers.base import FetchResult, MarketDataProvider
 from trading_vision.repositories import (
     find_symbol,
@@ -44,11 +45,12 @@ class ScannerService:
         self.now = now or (lambda: datetime.now(UTC))
         self.process_started_at = self.now()
         initialize_database(settings.database_path)
+        catalog_path = require_path_inside(
+            PROJECT_ROOT,
+            PROJECT_ROOT / "data" / "catalogs" / "bist_symbols.csv",
+        )
         with connection_scope(settings.database_path) as connection:
-            import_symbol_catalog(
-                connection,
-                PROJECT_ROOT / "data" / "catalogs" / "bist_symbols.csv",
-            )
+            import_symbol_catalog(connection, catalog_path)
         check_database_integrity(settings.database_path)
 
     def run_once(

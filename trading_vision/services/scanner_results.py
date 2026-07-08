@@ -25,6 +25,7 @@ from trading_vision.scanner_results_repository import (
     recent_scan_warnings,
     search_pattern_results,
 )
+from trading_vision.text_safety import safe_display_text
 
 
 class ScannerResultsService:
@@ -97,18 +98,18 @@ class ScannerResultsService:
 
 def _csv_row(row: PatternResultRow) -> tuple[object, ...]:
     return (
-        row.provider_symbol,
-        row.interval,
-        row.pattern_type,
-        row.direction,
-        row.state,
+        safe_display_text(row.provider_symbol, max_length=40),
+        safe_display_text(row.interval, max_length=10),
+        safe_display_text(row.pattern_type),
+        safe_display_text(row.direction),
+        safe_display_text(row.state),
         row.score,
         row.started_at.isoformat(),
         row.confirmed_at.isoformat() if row.confirmed_at else "",
         row.boundary_price,
         row.target_price if row.target_price is not None else "",
         row.invalidation_price if row.invalidation_price is not None else "",
-        " | ".join(row.reasons),
+        " | ".join(safe_display_text(reason, max_length=240) for reason in row.reasons),
         row.app_link,
     )
 

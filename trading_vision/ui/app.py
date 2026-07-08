@@ -17,6 +17,7 @@ from trading_vision.config import PROJECT_ROOT, Settings, host_binding_warning, 
 from trading_vision.database import check_database_integrity, connection_scope, initialize_database
 from trading_vision.logging_setup import configure_logging
 from trading_vision.models import Symbol
+from trading_vision.path_safety import require_path_inside
 from trading_vision.providers.yahoo import YahooFinanceProvider
 from trading_vision.repositories import import_symbol_catalog, search_symbols, seed_symbols
 from trading_vision.scanner_repository import get_heartbeat
@@ -42,8 +43,9 @@ FALLBACK_SYMBOLS = (
 def create_app(settings: Settings | None = None, provider=None) -> Dash:
     settings = settings or load_settings()
     initialize_database(settings.database_path)
+    catalog_path = require_path_inside(PROJECT_ROOT, CATALOG_PATH)
     with connection_scope(settings.database_path) as connection:
-        import_symbol_catalog(connection, CATALOG_PATH)
+        import_symbol_catalog(connection, catalog_path)
         seed_symbols(connection, FALLBACK_SYMBOLS)
         scanner_status = scanner_status_text(get_heartbeat(connection))
         symbols = _unique_display_symbols(search_symbols(connection, limit=10_000))

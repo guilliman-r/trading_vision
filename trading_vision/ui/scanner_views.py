@@ -6,6 +6,7 @@ from dash import dcc, html
 
 from trading_vision.config import SUPPORTED_INTERVALS, SUPPORTED_PATTERN_TYPES
 from trading_vision.scanner_results import PatternResultRow
+from trading_vision.text_safety import safe_display_text
 from trading_vision.ui import ids
 
 
@@ -77,7 +78,10 @@ def render_result_table(rows: tuple[PatternResultRow, ...]):
 
 def diagnostic_cards(items: tuple[tuple[str, str], ...]) -> list[html.Div]:
     return [
-        html.Div([html.Span(label), html.Strong(value)], className="diagnostic-card")
+        html.Div(
+            [html.Span(safe_display_text(label)), html.Strong(safe_display_text(value))],
+            className="diagnostic-card",
+        )
         for label, value in items
     ]
 
@@ -165,15 +169,18 @@ def _filter(label: str, control) -> html.Label:
 
 def _table_row(row: PatternResultRow) -> html.Tr:
     confirmed = row.confirmed_at or row.started_at
-    reason_preview = row.reasons[0] if row.reasons else "No score reasons"
+    reason_preview = safe_display_text(
+        row.reasons[0] if row.reasons else "No score reasons",
+        max_length=160,
+    )
     return html.Tr(
         [
             html.Td(dcc.Link("Open", href=row.app_link)),
-            html.Td(row.provider_symbol),
-            html.Td(row.interval.upper()),
-            html.Td(row.pattern_type.replace("_", " ").title()),
-            html.Td(row.direction),
-            html.Td(row.state),
+            html.Td(safe_display_text(row.provider_symbol, max_length=40)),
+            html.Td(safe_display_text(row.interval.upper(), max_length=10)),
+            html.Td(safe_display_text(row.pattern_type.replace("_", " ").title())),
+            html.Td(safe_display_text(row.direction)),
+            html.Td(safe_display_text(row.state)),
             html.Td(f"{row.score:.1f}"),
             html.Td(confirmed.strftime("%Y-%m-%d %H:%M")),
             html.Td(f"{row.boundary_price:,.4f}"),
@@ -182,7 +189,12 @@ def _table_row(row: PatternResultRow) -> html.Tr:
                 html.Details(
                     [
                         html.Summary(reason_preview),
-                        html.Ul([html.Li(reason) for reason in row.reasons]),
+                        html.Ul(
+                            [
+                                html.Li(safe_display_text(reason, max_length=240))
+                                for reason in row.reasons
+                            ]
+                        ),
                     ]
                 )
             ),
