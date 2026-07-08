@@ -122,6 +122,8 @@ def test_dash_page_layout_dependencies_and_css_are_served(database_path) -> None
     assert stylesheet.status_code == 200
     assert b".workspace" in stylesheet.data
     assert b".chart-help" in stylesheet.data
+    assert b".pattern-card-link.selected" in stylesheet.data
+    assert b".pattern-selected-chip" in stylesheet.data
     assert b"max-height: calc(100vh - 68px)" in stylesheet.data
     assert b".chart { height: 680px" in stylesheet.data
     assert b".interval-select .Select-control" in stylesheet.data
@@ -283,7 +285,7 @@ def test_focused_chart_result_draws_only_selected_signal_overlay() -> None:
         patterns=(pattern,),
     )
 
-    figure, *_ = _successful_chart_result(
+    figure, _title, _meta, _status, _class_name, details, _symbol = _successful_chart_result(
         result,
         "1d",
         provider_delay_seconds=60,
@@ -295,6 +297,9 @@ def test_focused_chart_result_draws_only_selected_signal_overlay() -> None:
     assert names[:2] == ["TEST.IS", "resistance_breakout · forming"]
     assert "Pattern structure" in names
     assert names[-1] == "Volume"
+    rendered_details = repr(details)
+    assert "pattern-card pattern-card-link selected" in rendered_details
+    assert "Selected" in rendered_details
 
 
 def test_chart_callback_can_run_in_a_different_thread(database_path) -> None:

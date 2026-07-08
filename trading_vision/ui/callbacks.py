@@ -273,6 +273,7 @@ def _successful_chart_result(
         close=f"{latest['close']:,.2f} {result.symbol.currency or ''}".strip(),
         change=f"{change_percent:+.2f}%",
         patterns=visible_patterns,
+        focused_pattern=focused_pattern if focus_range is not None else "",
     )
     if provider_message:
         details.append(html.P(provider_message, className="inline-warning"))

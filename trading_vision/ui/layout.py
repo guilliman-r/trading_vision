@@ -223,6 +223,7 @@ def detail_rows(
     close: str,
     change: str,
     patterns: tuple[PatternMatch, ...] = (),
+    focused_pattern: str = "",
 ) -> list[html.Div]:
     rows = [
         _detail_row("Symbol", safe_display_text(symbol, max_length=40)),
@@ -232,7 +233,7 @@ def detail_rows(
         _detail_row("Latest", latest),
         _detail_row("Close", close),
         _detail_row("Bar change", change),
-        _pattern_summary(symbol, interval, patterns),
+        _pattern_summary(symbol, interval, patterns, focused_pattern),
     ]
     return rows
 
@@ -244,12 +245,25 @@ def _detail_row(label: str, value: str) -> html.Div:
     )
 
 
-def _pattern_summary(symbol: str, interval: str, patterns: tuple[PatternMatch, ...]) -> html.Div:
+def _pattern_summary(
+    symbol: str,
+    interval: str,
+    patterns: tuple[PatternMatch, ...],
+    focused_pattern: str = "",
+) -> html.Div:
     if not patterns:
         return _pattern_empty("No forming or recently confirmed patterns in this window.")
     priority = {"forming": 0, "confirmed": 1}
     active = sorted(patterns, key=lambda pattern: (priority.get(pattern.state, 9), -pattern.score))
-    cards = [_pattern_card(symbol, interval, pattern) for pattern in active]
+    cards = [
+        _pattern_card(
+            symbol,
+            interval,
+            pattern,
+            is_selected=bool(focused_pattern) and pattern.pattern_type == focused_pattern,
+        )
+        for pattern in active
+    ]
     return html.Div(
         [
             html.Div(
@@ -262,24 +276,29 @@ def _pattern_summary(symbol: str, interval: str, patterns: tuple[PatternMatch, .
     )
 
 
-def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link:
+def _pattern_card(
+    symbol: str,
+    interval: str,
+    pattern: PatternMatch,
+    is_selected: bool = False,
+) -> dcc.Link:
     title = pattern.pattern_type.replace("_", " ").title()
+    action_chips = [
+        html.Span(
+            pattern.direction,
+            className=f"pattern-direction {pattern.direction}",
+        ),
+        html.Span(pattern.state, className=f"pattern-state {pattern.state}"),
+    ]
+    if is_selected:
+        action_chips.append(html.Span("Selected", className="pattern-selected-chip"))
+    action_chips.append(html.Span("Zoom", className="pattern-zoom-chip"))
     return dcc.Link(
         [
             html.Div(
                 [
                     html.Strong(title),
-                    html.Div(
-                        [
-                            html.Span(
-                                pattern.direction,
-                                className=f"pattern-direction {pattern.direction}",
-                            ),
-                            html.Span(pattern.state, className=f"pattern-state {pattern.state}"),
-                            html.Span("Zoom", className="pattern-zoom-chip"),
-                        ],
-                        className="pattern-card-actions",
-                    ),
+                    html.Div(action_chips, className="pattern-card-actions"),
                 ],
                 className="pattern-card-heading",
             ),
@@ -303,7 +322,9 @@ def _pattern_card(symbol: str, interval: str, pattern: PatternMatch) -> dcc.Link
         ],
         href=_pattern_card_href(symbol, interval, pattern),
         title=f"Zoom chart to {title}",
-        className="pattern-card pattern-card-link",
+        className="pattern-card pattern-card-link selected"
+        if is_selected
+        else "pattern-card pattern-card-link",
     )
 
 

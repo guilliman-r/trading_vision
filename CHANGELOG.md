@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.76.0 — 2026-07-08
+
+- Highlight the selected signal card after a focused signal zoom is active.
+- Add a compact `Selected` chip so the right panel and chart focus stay visually connected.
+- Add callback and stylesheet regression coverage and mark `TV-0734` complete.
+
 ## 0.75.0 — 2026-07-08
 
 - Add an always-visible chart interaction helper strip below the plot.
