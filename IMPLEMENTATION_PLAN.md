@@ -14,6 +14,13 @@ Build a local-first Python application that:
 
 The first release is a decision-support and alerting tool. It does **not** place trades, promise real-time exchange data, or present pattern detections as financial advice.
 
+### Current priority — backend speed overhaul
+
+As of 2026-07-09, pause new product/UI features. The immediate goal is to make the backend scanner
+and chart-loading path extremely fast, predictable, and safe under multiprocessing. The overhaul
+must keep the code easy to inspect: plain Python processes, explicit data objects, clear database
+ownership, and benchmarks before/after every optimization.
+
 ---
 
 ## 2. Product principles
@@ -29,7 +36,7 @@ These rules are part of the specification, not optional style preferences.
 7. **Store times in UTC.** Convert to `Europe/Istanbul` only for display and exchange-session decisions.
 8. **Detect on closed candles by default.** This prevents alerts from appearing and disappearing as the current candle changes.
 9. **No future leakage.** A detector may only use candles that existed at the evaluated time.
-10. **No premature infrastructure.** Start with SQLite and two Python processes. Add PostgreSQL, Redis, queues, or a separate API only when a measured constraint requires them.
+10. **No premature infrastructure.** Stay local-first with SQLite and plain Python processes. Add multiprocessing only behind explicit service boundaries, and add PostgreSQL, Redis, durable queues, or a separate API only when a measured constraint requires them.
 11. **Separate domain logic from UI callbacks.** Detectors and data services must work from tests and the command line without starting Dash.
 12. **Make replacement easy.** Yahoo Finance is an adapter, not a dependency embedded throughout the application.
 
@@ -1085,6 +1092,75 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 **Exit criterion:** failures degrade visibly, local data can be restored, and no secret is stored in the database or repository.
 
+### Phase 17A — Backend speed and multiprocess scanner overhaul
+
+This phase takes priority before new UI features, new notification channels, or new detector
+families. The goal is a backend that can scan BIST `1d` and `1h` jobs quickly without freezing the
+UI, corrupting SQLite state, or hiding provider/rate-limit failures.
+
+Design rules for this overhaul:
+
+- profile first, optimize second;
+- never share a SQLite connection across threads or processes;
+- keep provider downloads, detector CPU work, and SQLite writes as separate stages;
+- prefer one parent-owned writer or one explicit writer process over many concurrent writers;
+- keep process payloads small enough that multiprocessing does not lose its benefit to pickling;
+- expose elapsed time, queue depth, worker count, successes, failures, and skipped jobs in logs and
+  diagnostics;
+- keep all concurrency behind plain, testable services rather than UI callbacks.
+
+- [ ] **TV-1720 — P0 / XS:** Freeze new feature work and record backend performance as the active
+  implementation priority.
+- [ ] **TV-1721 — P0 / S:** Add a benchmark command that measures chart load, one-shot scanner,
+  full BIST daily scan, and full BIST hourly scan durations on the local machine.
+- [ ] **TV-1722 — P0 / S:** Add simple timing spans for provider fetch, validation, candle writes,
+  candle reads, detector execution, pattern writes, alert evaluation, and UI chart callbacks.
+- [ ] **TV-1723 — P0 / S:** Define an explicit immutable scan-job object containing symbol,
+  provider symbol, interval, due candle time, detector version, and required lookback.
+- [ ] **TV-1724 — P0 / S:** Split scanner orchestration into clear stages: due-job selection,
+  provider fetch, validation/cache write, detector payload loading, detector execution, and result
+  persistence.
+- [ ] **TV-1725 — P0 / M:** Make SQLite ownership process-safe: each process opens its own
+  connection, and no connection/cursor/data repository object crosses a thread or process boundary.
+- [ ] **TV-1726 — P0 / M:** Implement a bounded process pool for CPU-heavy detector execution using
+  only serializable inputs and outputs.
+- [ ] **TV-1727 — P0 / M:** Keep Yahoo/provider downloads rate-limited and batched separately from
+  detector multiprocessing so the app does not create a provider stampede.
+- [ ] **TV-1728 — P0 / M:** Serialize database writes through the parent scanner or a single writer
+  process; worker processes should return pattern candidates, not write shared SQLite state
+  directly.
+- [ ] **TV-1729 — P0 / S:** Add configuration for worker count, fetch batch size, detector batch
+  size, and queue limits with conservative defaults based on CPU count.
+- [ ] **TV-1730 — P0 / M:** Limit detector payloads to the smallest required candle lookback per
+  detector and interval instead of shipping full symbol history to workers.
+- [ ] **TV-1731 — P0 / M:** Add incremental-scan skipping so unchanged symbol/interval/detector
+  combinations are not recomputed.
+- [ ] **TV-1732 — P0 / M:** Review and add measured SQLite indexes for due-job selection, latest
+  candles, detector lookbacks, pattern upserts, and scanner result filtering.
+- [ ] **TV-1733 — P0 / S:** Tune SQLite WAL, busy timeout, transaction size, and commit frequency
+  using benchmark evidence rather than guesswork.
+- [ ] **TV-1734 — P0 / S:** Add scanner progress reporting with total jobs, queued jobs, active
+  workers, completed jobs, failures, skipped jobs, elapsed time, and ETA.
+- [ ] **TV-1735 — P0 / M:** Preserve failure isolation: one bad symbol, provider error, detector
+  exception, or worker crash must not stop the full scan.
+- [ ] **TV-1736 — P0 / M:** Add deterministic tests proving multiprocessing results match the
+  single-process scanner output for the same frozen candle set.
+- [ ] **TV-1737 — P0 / S:** Add a regression test for the SQLite threading/process boundary so the
+  previous “SQLite objects created in a thread” failure cannot return.
+- [ ] **TV-1738 — P0 / M:** Add benchmark reports before and after the overhaul, saved as
+  human-readable Markdown/CSV under documented paths.
+- [ ] **TV-1739 — P1 / M:** Run a local soak test with continuous `1h` and `1d` scanning, UI chart
+  loads, provider failures, and scanner restarts.
+- [ ] **TV-1740 — P1 / S:** Document safe multiprocessing defaults, when to raise/lower worker
+  count, and how to diagnose slow scans.
+- [ ] **TV-1741 — P1 / S:** Decide from measurements whether SQLite remains sufficient; do not move
+  to PostgreSQL or a durable queue unless the measured bottleneck requires it.
+
+**Exit criterion:** full BIST `1d` and `1h` scans are measurably faster than the current
+single-process baseline, chart loads stay responsive during scanning, no SQLite object crosses an
+unsafe thread/process boundary, multiprocessing and single-process scans produce equivalent
+results, and the benchmark report explains the achieved speedup.
+
 ### Phase 18 — Packaging and personal deployment
 
 - [x] **TV-1801 — P0 / S:** Provide two explicit commands: run UI and run scanner.
@@ -1265,7 +1341,10 @@ Demonstration:
 
 ### Personal release 1.0
 
-Adds head-and-shoulders after validation, scanner/settings UI, reliability work, backups, and operating documentation. Triangles and external notification channels are P1 and may ship shortly after 1.0 if validation is not ready.
+Before adding more product features, complete the backend speed and multiprocessing overhaul in
+Phase 17A. After that, release 1.0 adds validated head-and-shoulders behavior, scanner/settings UI,
+reliability work, backups, and operating documentation. Triangles and external notification
+channels are P1 and may ship shortly after 1.0 if validation is not ready.
 
 ---
 
@@ -1302,7 +1381,7 @@ Release 1.0 is done only when:
 | UI | Dash + Plotly | Drawing/chart limitations block a required workflow |
 | Internal API | Direct service calls | A second client needs the backend |
 | Database | SQLite | Measured concurrency/size causes real issues |
-| Scanner | Plain Python worker | Durable distributed jobs are required |
+| Scanner | Plain Python worker plus measured process pool | Durable distributed jobs are required |
 | Data provider | yfinance for MVP | Latency/reliability or licensing is insufficient |
 | Detection timing | Completed candles | The user deliberately enables provisional signals |
 | BIST intraday universe | Opt-in at 1h | Full-universe timing and rate limits are measured safe |
@@ -1327,4 +1406,7 @@ This is the shortest path to visible value while preserving the architecture.
 9. Implement continuous worker, heartbeat, in-app alerts, and scanner health UI.
 10. Implement double top/bottom, replay tests, settings UI, and manual BIST review.
 
-After session 10, pause feature growth. Use the app, inspect false positives, improve fixtures, and only then proceed to head-and-shoulders and triangles.
+After session 10, pause feature growth. The current pause is active: complete Phase 17A's backend
+speed and multiprocessing work, use the app under load, inspect false positives, improve fixtures,
+and only then proceed to more UI features, head-and-shoulders expansion, triangles, or external
+notification channels.
