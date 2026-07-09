@@ -14,12 +14,12 @@ Build a local-first Python application that:
 
 The first release is a decision-support and alerting tool. It does **not** place trades, promise real-time exchange data, or present pattern detections as financial advice.
 
-### Current priority — backend speed overhaul
+### Current priority — backend and plotting speed overhaul
 
-As of 2026-07-09, pause new product/UI features. The immediate goal is to make the backend scanner
-and chart-loading path extremely fast, predictable, and safe under multiprocessing. The overhaul
-must keep the code easy to inspect: plain Python processes, explicit data objects, clear database
-ownership, and benchmarks before/after every optimization.
+As of 2026-07-09, pause new product/UI features. The immediate goal is to make plotting, chart
+loading, and scanner execution extremely fast, predictable, and safe under multiprocessing. The
+overhaul must keep the code easy to inspect: plain Python processes, explicit data objects, clear
+database ownership, small chart payloads, and benchmarks before/after every optimization.
 
 ---
 
@@ -1092,11 +1092,65 @@ Sizes are relative: **XS** (under half a day), **S** (about half to one day), **
 
 **Exit criterion:** failures degrade visibly, local data can be restored, and no secret is stored in the database or repository.
 
-### Phase 17A — Backend speed and multiprocess scanner overhaul
+### Phase 17A — Plotting performance overhaul
+
+This phase takes first priority inside the speed overhaul. The chart must feel responsive at `1d`
+and `1h` intervals before deeper scanner multiprocessing work continues.
+
+Design rules for plotting performance:
+
+- measure browser-visible latency, not only Python function time;
+- keep the default chart payload small and predictable;
+- avoid plotting all history when only the latest actionable window is needed;
+- keep overlays opt-in and scoped to the selected signal;
+- preserve ordinary Plotly zoom/pan/reset behavior while removing expensive extras;
+- prefer simple server-side windowing and caching before complex browser code;
+- validate changes with both Python tests and an actual browser smoke check when possible.
+
+- [ ] **TV-1742 — P0 / XS:** Record plotting performance as the first speed-overhaul priority.
+- [ ] **TV-1743 — P0 / S:** Add a chart benchmark that records candle count, figure trace count,
+  figure JSON size, Python figure-build time, Dash callback time, and browser first-render time.
+- [ ] **TV-1744 — P0 / S:** Define explicit plotting budgets for `1d` and `1h` charts.
+  - Suggested starting targets: default chart payload under 2 MB, Python figure build under 250 ms,
+    cached chart callback under 750 ms, and browser first render under 1.5 seconds on the local
+    machine.
+- [ ] **TV-1745 — P0 / S:** Add a chart debug panel or diagnostic log line showing loaded candles,
+  plotted candles, trace count, payload size estimate, and callback duration.
+- [ ] **TV-1746 — P0 / M:** Limit default plotted candles separately from cached candle history, so
+  the database can retain more data without forcing Plotly to render it all.
+- [ ] **TV-1747 — P0 / M:** Add server-side range presets for `1h` and `1d` charts, starting with
+  fast defaults and allowing larger ranges only on deliberate user action.
+- [ ] **TV-1748 — P0 / S:** Ensure `1h` charts never use expensive range breaks, range sliders, or
+  dense modebar/drawing tools by default.
+- [ ] **TV-1749 — P0 / M:** Cache reusable chart payload inputs for repeated symbol/interval loads:
+  prepared candle arrays, visible-pattern summaries, latest metadata, and freshness labels.
+- [ ] **TV-1750 — P0 / M:** Split chart data preparation from Plotly figure construction so each
+  step can be benchmarked and optimized independently.
+- [ ] **TV-1751 — P0 / M:** Reduce figure serialization cost by sending only fields required for
+  candlesticks, volume, focused overlays, and visible diagnostics.
+- [ ] **TV-1752 — P0 / M:** Keep pattern geometry out of the default figure and prove selected-signal
+  overlays add only a small bounded number of traces/shapes.
+- [ ] **TV-1753 — P0 / M:** Investigate whether `Scattergl` is useful for auxiliary traces while
+  keeping candlesticks readable; adopt it only if browser benchmarks improve.
+- [ ] **TV-1754 — P0 / S:** Add automated regression tests for maximum default trace count, disabled
+  range slider, bounded candle window, and focused-overlay trace count.
+- [ ] **TV-1755 — P0 / M:** Use the browser plugin to smoke-test loading, zooming, panning, signal
+  focusing, and reset behavior on both `1h` and `1d` charts.
+- [ ] **TV-1756 — P0 / M:** Save before/after plotting benchmark reports as Markdown/CSV, including
+  screenshots or notes for visibly improved responsiveness.
+- [ ] **TV-1757 — P1 / S:** Document what to tune when charts feel slow: plotted candle limit,
+  browser range, overlays, cache state, and provider freshness.
+
+**Exit criterion:** `1h` and `1d` charts open, zoom, pan, reset, and focused-signal zoom smoothly on
+the local machine; default chart payloads stay within the agreed budget; browser smoke checks pass;
+and the benchmark report shows a significant improvement from the pre-overhaul baseline.
+
+### Phase 17B — Backend speed and multiprocess scanner overhaul
 
 This phase takes priority before new UI features, new notification channels, or new detector
-families. The goal is a backend that can scan BIST `1d` and `1h` jobs quickly without freezing the
-UI, corrupting SQLite state, or hiding provider/rate-limit failures.
+families after plotting performance is under control. The goal is a backend that can scan BIST `1d`
+and `1h` jobs quickly without freezing the UI, corrupting SQLite state, or hiding provider/rate-limit
+failures.
 
 Design rules for this overhaul:
 
@@ -1341,10 +1395,11 @@ Demonstration:
 
 ### Personal release 1.0
 
-Before adding more product features, complete the backend speed and multiprocessing overhaul in
-Phase 17A. After that, release 1.0 adds validated head-and-shoulders behavior, scanner/settings UI,
-reliability work, backups, and operating documentation. Triangles and external notification
-channels are P1 and may ship shortly after 1.0 if validation is not ready.
+Before adding more product features, complete the plotting performance overhaul in Phase 17A and
+the backend speed/multiprocessing overhaul in Phase 17B. After that, release 1.0 adds validated
+head-and-shoulders behavior, scanner/settings UI, reliability work, backups, and operating
+documentation. Triangles and external notification channels are P1 and may ship shortly after 1.0 if
+validation is not ready.
 
 ---
 
@@ -1379,6 +1434,7 @@ Release 1.0 is done only when:
 |---|---|---|
 | Local vs hosted | Local single-user | Remote access is explicitly needed |
 | UI | Dash + Plotly | Drawing/chart limitations block a required workflow |
+| Chart plotting | Bounded, measured Plotly payloads | Browser benchmarks show another renderer is needed |
 | Internal API | Direct service calls | A second client needs the backend |
 | Database | SQLite | Measured concurrency/size causes real issues |
 | Scanner | Plain Python worker plus measured process pool | Durable distributed jobs are required |
@@ -1406,7 +1462,7 @@ This is the shortest path to visible value while preserving the architecture.
 9. Implement continuous worker, heartbeat, in-app alerts, and scanner health UI.
 10. Implement double top/bottom, replay tests, settings UI, and manual BIST review.
 
-After session 10, pause feature growth. The current pause is active: complete Phase 17A's backend
-speed and multiprocessing work, use the app under load, inspect false positives, improve fixtures,
-and only then proceed to more UI features, head-and-shoulders expansion, triangles, or external
-notification channels.
+After session 10, pause feature growth. The current pause is active: complete Phase 17A's plotting
+performance work, then Phase 17B's backend speed and multiprocessing work, use the app under load,
+inspect false positives, improve fixtures, and only then proceed to more UI features,
+head-and-shoulders expansion, triangles, or external notification channels.
